@@ -39,6 +39,7 @@ exit 1
 :no_winget
 @REM =====================================================
 echo winget not found. Your Windows installation must at least have winget. 
+pause
 exit 1
 
 @REM =====================================================
