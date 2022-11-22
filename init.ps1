@@ -7,6 +7,8 @@ $ErrorActionPreference = 'Stop'
 
 $BinDirectory = "$Home\.local\bin"
 
+New-Item -ItemType Directory -Force -Path $BinDirectory
+
 $User = [EnvironmentVariableTarget]::User
 $Path = [Environment]::GetEnvironmentVariable('Path', $User)
 if (!(";$Path;".ToLower() -like "*;$BinDirectory;*".ToLower())) {
