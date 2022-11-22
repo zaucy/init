@@ -26,6 +26,10 @@ if %ErrorLevel% neq 0 (
   winget install Git.Git
 )
 
+if not exist .\init.ps1 (
+  git clone https://github.com/zaucy/init.git .
+)
+
 start pwsh.exe .\init.ps1
 exit 0
 
