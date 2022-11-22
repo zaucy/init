@@ -17,6 +17,15 @@ if %ErrorLevel% neq 0 (goto winget_install_pwsh_fail) else (goto init_pwsh)
 
 :init_pwsh
 @REM =====================================================
+md %USERPROFILE%\projects\zaucy\init
+cd %USERPROFILE%\projects\zaucy\init
+where /q git.exe
+if %ErrorLevel% neq 0 (
+  where /q winget
+  if %ErrorLevel% neq 0 goto no_winget
+  winget install Git.Git
+)
+
 start pwsh.exe .\init.ps1
 exit 0
 
