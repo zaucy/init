@@ -5,11 +5,11 @@ I re-install my operating system(s) often. I use these scripts to get my machine
 ## Windows
 
 ```sh
-curl "https://raw.githubusercontent.com/zaucy/init/main/init.cmd" -sSfL | cmd
+curl "https://zau.cy/init.cmd" -sSfL | cmd
 ```
 
 ## Unix
 
 ```sh
-curl "https://raw.githubusercontent.com/zaucy/init/main/init.sh" -sSfL | sh
+curl "https://zau.cy/init.sh" -sSfL | sh
 ```
