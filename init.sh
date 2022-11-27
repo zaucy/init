@@ -10,6 +10,14 @@ if [ "$InitDir" != "$(pwd)" ]; then
   cd $InitDir
 fi
 
+if [ -z "$(which git)" ]; then
+  sudo apt install git
+fi
+
+if [ ! -d ".git" ]; then
+  git clone https://github.com/zaucy/init.git .
+fi
+
 if [ -z "$(which cargo)" ]; then
   curl https://sh.rustup.rs -sSf | sh
 fi
