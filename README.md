@@ -4,6 +4,12 @@ I re-install my operating system(s) often. I use these scripts to get my machine
 
 ## Windows
 
-```batch
-curl "https://raw.githubusercontent.com/zaucy/init/main/init.bat" > init.bat && .\init.bat
+```sh
+curl "https://raw.githubusercontent.com/zaucy/init/main/init.cmd" -sSfL | cmd
+```
+
+## Unix
+
+```sh
+curl "https://raw.githubusercontent.com/zaucy/init/main/init.sh" -sSfL | sh
 ```
