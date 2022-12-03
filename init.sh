@@ -11,7 +11,7 @@ if [ "$InitDir" != "$(pwd)" ]; then
 fi
 
 if [ -z "$(which git)" ]; then
-  sudo apt install git
+  sudo apt install git -y
 fi
 
 if [ ! -d ".git" ]; then
@@ -35,7 +35,7 @@ if [ -z "$(which bazel)" ]; then
 fi
 
 if [ -z "$(which nvim)" ]; then
-  sudo apt install neovim
+  sudo apt install neovim -y
 fi
 
 mkdir -p $HOME/.config/nvim
