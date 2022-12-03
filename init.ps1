@@ -46,6 +46,13 @@ if ((Get-Command "jq.exe" -errorAction SilentlyContinue) -eq $false) {
   Get-GitHubReleaseFile -Org "stedolan" -Repo "jq" -File "jq-win64.exe" -OutFile "$BinDirectory\jq.exe"
 }
 
+if ((Get-Command "nvim.exe" -errorAction SilentlyContinue) -eq $false) {
+  winget install Neovim.Neovim
+}
+
+$NeovimConfigDir = "$env:LOCALAPPDATA\nvim"
+mkdir $NeovimConfigDir -Force
+Copy-Item -Path ".\nvim-config\*" -Destination "$NeovimConfigDir" -Recurse -Force
 
 if ((Get-Command "cargo.exe" -errorAction SilentlyContinue) -eq $false) {
   # Get rust + cargo
