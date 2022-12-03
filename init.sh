@@ -16,6 +16,8 @@ fi
 
 if [ ! -d ".git" ]; then
   git clone https://github.com/zaucy/init.git .
+else
+  git pull
 fi
 
 if [ -z "$(which gh)" ]; then
@@ -31,6 +33,13 @@ if [ -z "$(which bazel)" ]; then
   gh release download -R bazelbuild/bazelisk -p 'bazelisk-linux-amd64' -O "$HOME/.local/bin/bazel" --clobber
   chmod +x "$HOME/.local/bin/bazel"
 fi
+
+if [ -z "$(which nvim)" ]; then
+  sudo apt install neovim
+fi
+
+mkdir -p $HOME/.config/nvim
+cp ./nvim-config/* $HOME/.config/nvim --force --recursive
 
 if [ -z "$(which cargo)" ]; then
   curl https://sh.rustup.rs -sSf | sh
