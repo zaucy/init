@@ -35,7 +35,9 @@ if [ -z "$(which bazel)" ]; then
 fi
 
 if [ -z "$(which nvim)" ]; then
-  sudo apt install neovim -y
+  sudo add-apt-repository ppa:neovim-ppa/unstable -y
+  sudo apt-get update -y
+  sudo apt-get install neovim -y
 fi
 
 mkdir -p $HOME/.config/nvim
