@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 
 $BinDirectory = "$Home\.local\bin"
 
-New-Item -ItemType Directory -Force -Path $BinDirectory
+New-Item -ItemType Directory -Force -Path $BinDirectory | Out-Null
 
 $User = [EnvironmentVariableTarget]::User
 $Path = [Environment]::GetEnvironmentVariable('Path', $User)
@@ -51,7 +51,7 @@ if ((Get-Command "nvim.exe" -errorAction SilentlyContinue) -eq $false) {
 }
 
 $NeovimConfigDir = "$env:LOCALAPPDATA\nvim"
-mkdir $NeovimConfigDir -Force
+mkdir $NeovimConfigDir -Force | Out-Null
 Copy-Item -Path ".\nvim-config\*" -Destination "$NeovimConfigDir" -Recurse -Force
 
 if ((Get-Command "cargo.exe" -errorAction SilentlyContinue) -eq $false) {
@@ -68,6 +68,3 @@ if ((Get-Command "nu.exe" -errorAction SilentlyContinue) -eq $false) {
 }
 
 # TODO(zaucy): init WSL + WSLg
-
-Write-Output Done
-Pause
