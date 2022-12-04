@@ -76,6 +76,12 @@ require('lspconfig').tsserver.setup {
 	flags = lsp_flags,
 }
 
+require('lspconfig').powershell_es.setup {
+	capabilities = capabilities,
+	on_attach = on_attach,
+	flags = lsp_flags,
+}
+
 require('lspconfig').rust_analyzer.setup {
 	capabilities = capabilities,
 	on_attach = on_attach,
