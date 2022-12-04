@@ -4,6 +4,7 @@ return require('packer').startup(function()
 	use 'wbthomason/packer.nvim'
 	use 'williamboman/mason.nvim'
 	use 'williamboman/mason-lspconfig.nvim'
+	use 'nvim-treesitter/nvim-treesitter'
 	use 'neovim/nvim-lspconfig'
 	use 'L3MON4D3/LuaSnip'
 	use 'hrsh7th/cmp-buffer'
