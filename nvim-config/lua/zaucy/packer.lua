@@ -41,7 +41,6 @@ return require('packer').startup(function()
 	use '~/projects/zaucy/bazel.nvim'
 	-- keeping around until vim is more second nature
 	use 'ThePrimeagen/vim-be-good'
-	use { "akinsho/toggleterm.nvim", tag = '*', config = function()
-		
-	end }
+	use { "akinsho/toggleterm.nvim", tag = '*' }
 end)
+
