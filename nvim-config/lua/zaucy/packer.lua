@@ -15,6 +15,7 @@ return require('packer').startup(function()
 	use 'hrsh7th/nvim-cmp'
 	use 'folke/tokyonight.nvim'
 	use 'nvim-lua/plenary.nvim'
+	use 'stevearc/dressing.nvim'
 	use {
 		"nvim-telescope/telescope.nvim",
 		requires = {
