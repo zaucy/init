@@ -9,6 +9,13 @@ nnoremap("<C-S-0>", ":NvimTreeFindFile<CR>")
 
 vim.api.nvim_set_keymap(
   "n",
+  "<C-\\>",
+  ":ToggleTerm<CR>",
+  { noremap = true }
+)
+
+vim.api.nvim_set_keymap(
+  "n",
   "<leader>t",
   ":Telescope<CR>",
   { noremap = true }
