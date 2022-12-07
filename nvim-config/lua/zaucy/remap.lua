@@ -15,13 +15,6 @@ vim.api.nvim_set_keymap(
 
 vim.api.nvim_set_keymap(
 	"n",
-	"<leader>t",
-	":Telescope<CR>",
-	{ noremap = true }
-)
-
-vim.api.nvim_set_keymap(
-	"n",
 	"<leader>ghp",
 	":Telescope gh pull_request<CR>",
 	{ noremap = true }
@@ -34,12 +27,72 @@ vim.api.nvim_set_keymap(
 	{ noremap = true }
 )
 
+for _, mode in ipairs({ "n", "i" }) do
+	vim.api.nvim_set_keymap(
+		mode,
+		"<C-p>",
+		"<Esc>:Telescope fd<CR>",
+		{ noremap = true }
+	)
 
-vim.api.nvim_set_keymap(
+	vim.api.nvim_set_keymap(
+		mode,
+		"<C-b>",
+		"<Esc>:Telescope buffers theme=dropdown<CR>",
+		{ noremap = true }
+	)
+
+	vim.keymap.set(
+		mode,
+		"<C-S-R>",
+		function()
+			require("telescope").extensions.vstask.tasks()
+		end,
+		{ noremap = true, expr = true }
+	)
+
+	vim.keymap.set(
+		mode,
+		"<F5>",
+		function()
+			require('dap.ext.vscode').load_launchjs(nil, { cppdbg = {'c', 'cpp'} })
+			require('dap').continue()
+		end,
+		{ noremap = true, expr = true }
+	)
+	vim.keymap.set(
+		mode,
+		"<F10>",
+		function()
+			require('dap').step_over()
+		end,
+		{ noremap = true, expr = true }
+	)
+	vim.keymap.set(
+		mode,
+		"<F11>",
+		function()
+			require('dap').step_into()
+		end,
+		{ noremap = true, expr = true }
+	)
+	vim.keymap.set(
+		mode,
+		"<F12>",
+		function()
+			require('dap').step_out()
+		end,
+		{ noremap = true, expr = true }
+	)
+end
+
+vim.keymap.set(
 	"n",
-	"<leader>fd",
-	":Telescope fd<CR>",
-	{ noremap = true }
+	"<leader>git",
+	function()
+		print("TODO: open git stuff")
+	end,
+	{ noremap = true, expr = true }
 )
 
 vim.api.nvim_set_keymap(

@@ -6,6 +6,7 @@ vim.opt.smartindent = true
 vim.opt.cursorline = true
 vim.opt.list = true
 vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
 vim.opt.listchars = {
 	lead = '.',
 	trail = '.',

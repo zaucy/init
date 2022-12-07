@@ -43,5 +43,20 @@ return require('packer').startup(function()
 	-- keeping around until vim is more second nature
 	use 'ThePrimeagen/vim-be-good'
 	use { "akinsho/toggleterm.nvim", tag = '*' }
+	use { 'sindrets/diffview.nvim', requires = 'nvim-lua/plenary.nvim' }
+	use {
+		'EthanJWright/vs-tasks.nvim',
+		requires = {
+			'nvim-lua/popup.nvim',
+			'nvim-lua/plenary.nvim',
+			'nvim-telescope/telescope.nvim',
+		},
+	}
+	use {
+		'MunifTanjim/prettier.nvim',
+		requires = {
+			'neovim/nvim-lspconfig',
+			'jose-elias-alvarez/null-ls.nvim',
+		},
+	}
 end)
-
