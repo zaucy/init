@@ -16,6 +16,13 @@ return require('packer').startup(function()
 	use 'folke/tokyonight.nvim'
 	use 'nvim-lua/plenary.nvim'
 	use 'stevearc/dressing.nvim'
+	use 'lewis6991/gitsigns.nvim'
+	use {
+		"folke/which-key.nvim",
+		config = function()
+			require("which-key").setup {}
+		end
+	}
 	use {
 		"nvim-telescope/telescope.nvim",
 		requires = {

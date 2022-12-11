@@ -1,15 +1,6 @@
 local prettier = require("prettier")
 local null_ls = require("null-ls")
 
--- TODO(zaucy): Probably move this somewhere else
-null_ls.setup {
-	sources = {
-		null_ls.builtins.formatting.stylua,
-		null_ls.builtins.diagnostics.eslint,
-		null_ls.builtins.completion.spell,
-	},
-}
-
 prettier.setup {
 	bin = 'prettier',
 	filetypes = {

@@ -30,7 +30,7 @@ cmp.setup({
 		-- { name = 'nvim_lsp_document_symbol' },
 		-- { name = 'luasnip' },
 	}, {
-		{ name = 'buffer' },
+		-- { name = 'buffer' },
 	})
 })
 
@@ -39,6 +39,7 @@ local lsp_flags = {
 	debounce_text_changes = 150,
 }
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
+local fmt_augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 local on_attach = function(client, bufnr)
 
 	if client.name == "tsserver" then
@@ -46,6 +47,15 @@ local on_attach = function(client, bufnr)
 		if require('prettier').config_exists() then
 			client.server_capabilities.documentFormattingProvider = false
 		end
+	elseif client.supports_method("textDocument/formatting") then
+		vim.api.nvim_clear_autocmds({ group = fmt_augroup, buffer = bufnr })
+		vim.api.nvim_create_autocmd("BufWritePre", {
+			group = fmt_augroup,
+			buffer = bufnr,
+			callback = function()
+				vim.lsp.buf.format({ bufnr = bufnr })
+			end,
+		})
 	end
 
 	-- Enable completion triggered by <c-x><c-o>
@@ -68,7 +78,7 @@ local on_attach = function(client, bufnr)
 	vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
 	vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
 	vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-	vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, bufopts)
+	-- vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, bufopts)
 	vim.keymap.set('n', '<F2>', vim.lsp.buf.rename, bufopts)
 end
 
