@@ -57,9 +57,18 @@ if ((Get-Command "nvim.exe" -errorAction SilentlyContinue) -eq $false)
 	winget install Neovim.Neovim
 }
 
+if ((Get-Command "wezterm-gui.exe" -errorAction SilentlyContinue) -eq $false)
+{
+	winget install wez.wezterm
+}
+
 $NeovimConfigDir = "$env:LOCALAPPDATA\nvim"
 mkdir $NeovimConfigDir -Force | Out-Null
 Copy-Item -Path ".\nvim-config\*" -Destination "$NeovimConfigDir" -Recurse -Force
+
+$WeztermConfigDir = "$env:USERPROFILE\.config\wezterm"
+mkdir $WeztermConfigDir -Force | Out-Null
+Copy-Item -Path ".\wezterm\*" -Destination "$WeztermConfigDir" -Recurse -Force
 
 if ((Get-Command "cargo.exe" -errorAction SilentlyContinue) -eq $false)
 {
