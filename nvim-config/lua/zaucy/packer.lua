@@ -5,7 +5,8 @@ return require('packer').startup(function()
 	use 'williamboman/mason.nvim'
 	use 'williamboman/mason-lspconfig.nvim'
 	use 'nvim-treesitter/nvim-treesitter'
-	use 'neovim/nvim-lspconfig'
+	-- use 'neovim/nvim-lspconfig'
+	use '~/projects/zaucy/nvim-lspconfig' -- I'm using my fork while I develop Ecsact
 	use 'L3MON4D3/LuaSnip'
 	use 'hrsh7th/cmp-buffer'
 	use 'hrsh7th/cmp-nvim-lsp'
@@ -17,6 +18,13 @@ return require('packer').startup(function()
 	use 'nvim-lua/plenary.nvim'
 	use 'stevearc/dressing.nvim'
 	use 'lewis6991/gitsigns.nvim'
+	use 'nathom/filetype.nvim'
+	use {
+		'j-hui/fidget.nvim',
+		config = function()
+			require("fidget").setup {}
+		end,
+	}
 	use {
 		"folke/which-key.nvim",
 		config = function()

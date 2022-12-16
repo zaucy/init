@@ -5,6 +5,8 @@ wk.register({
 	f = {
 		name = "file",
 		f = { "<cmd>Telescope find_files<CR>", "Find File" },
+		s = { "<cmd>Telescope live_grep<CR>", "Search Files" },
+		y = { "<cmd>Telescope treesitter<CR>", "Search Current Buffer Symbols (Treesitter)" },
 		z = { "<cmd>Telescope zoxide list theme=dropdown<CR>", "Open Directory (Zoxide)" },
 		b = { "<cmd>Telescope buffers theme=dropdown<CR>", "Find Buffer" },
 		tt = { "<cmd>NvimTreeToggle<CR>", "Toggle File Tree" },

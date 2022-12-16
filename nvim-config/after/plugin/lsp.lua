@@ -129,3 +129,9 @@ require('lspconfig').sumneko_lua.setup {
 		},
 	},
 }
+
+require('lspconfig').ecsact.setup {
+	capabilities = capabilities,
+	on_attach = on_attach,
+	flags = lsp_flags,
+}

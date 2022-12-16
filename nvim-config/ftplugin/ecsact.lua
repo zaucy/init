@@ -1,0 +1,4 @@
+-- vim.lsp.start({
+-- 	name = 'ecsact_lsp_server',
+-- 	cmd = { "C:\\Users\\zekew\\projects\\ecsact-dev\\ecsact_lsp_server\\bazel-bin\\ecsact_lsp_server.exe" },
+-- })
