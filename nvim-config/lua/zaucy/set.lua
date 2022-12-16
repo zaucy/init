@@ -13,7 +13,7 @@ vim.opt.colorcolumn = "80"
 vim.opt.listchars = {
 	lead = '.',
 	trail = '.',
-	tab = '🡢 ',
+	tab = '⇥ ',
 }
 
 -- I'm using nathom/filetype.nvim
