@@ -130,6 +130,12 @@ require('lspconfig').sumneko_lua.setup {
 	},
 }
 
+require('lspconfig').angularls.setup {
+}
+
+require('lspconfig').tailwindcss.setup {
+}
+
 require('lspconfig').ecsact.setup {
 	capabilities = capabilities,
 	on_attach = on_attach,
