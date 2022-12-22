@@ -107,7 +107,15 @@ require('lspconfig').rust_analyzer.setup {
 	flags = lsp_flags,
 	-- Server-specific settings...
 	settings = {
-		["rust-analyzer"] = {}
+		["rust-analyzer"] = {
+			cargo = {
+				loadOutDirsFromCheck = true,
+			},
+			procMacro = {
+				enable = true,
+			},
+			checkOnSave = { command = "clippy" },
+		}
 	}
 }
 
