@@ -19,6 +19,7 @@ return require('packer').startup(function()
 	use 'stevearc/dressing.nvim'
 	use 'lewis6991/gitsigns.nvim'
 	use 'nathom/filetype.nvim'
+	use 'simrat39/rust-tools.nvim'
 	use {
 		'j-hui/fidget.nvim',
 		config = function()
