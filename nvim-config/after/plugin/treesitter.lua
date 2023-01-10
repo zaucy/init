@@ -11,6 +11,9 @@ parser_config.ecsact = {
 	filetype = "ecsact", -- if filetype does not match the parser name
 }
 
+local ft_to_parser = require "nvim-treesitter.parsers".filetype_to_parsername
+ft_to_parser.bazel = "python" -- no tree sitter for bazel. Python is close enough.
+
 require('nvim-treesitter.configs').setup {
 	auto_install = true,
 	highlight = {

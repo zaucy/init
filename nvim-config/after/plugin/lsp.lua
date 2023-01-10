@@ -132,9 +132,16 @@ require('lspconfig').ecsact.setup {
 	flags = lsp_flags,
 }
 
+require('lspconfig').bzl.setup {
+	capabilities = capabilities,
+	on_attach = on_attach,
+	flags = lsp_flags,
+}
+
 local rt = require("rust-tools")
 rt.setup {
 	tools = {
+		executor = require("rust-tools.executors").quickfix,
 		inlay_hints = {
 			auto = false,
 			only_current_line = true,
