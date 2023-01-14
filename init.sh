@@ -50,3 +50,8 @@ fi
 if [ -z "$(which nu)" ]; then
   cargo install nu --features=extra
 fi
+
+if [ -z "$(which zoxide)" ]; then
+  cargo install zoxide
+fi
+
