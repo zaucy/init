@@ -126,6 +126,21 @@ require('lspconfig').angularls.setup {
 require('lspconfig').tailwindcss.setup {
 }
 
+-- require('lspconfig').omnisharp.setup {
+-- 	capabilities = capabilities,
+-- 	on_attach = on_attach,
+-- 	flags = lsp_flags,
+--
+-- 	-- cmd = { "dotnet", "/path/to/omnisharp/OmniSharp.dll" },
+-- 	enable_editorconfig_support = true,
+-- 	enable_ms_build_load_projects_on_demand = false,
+-- 	enable_roslyn_analyzers = true,
+-- 	organize_imports_on_format = true,
+-- 	enable_import_completion = true,
+-- 	sdk_include_prereleases = true,
+-- 	analyze_open_documents_only = false,
+-- }
+
 require('lspconfig').ecsact.setup {
 	capabilities = capabilities,
 	on_attach = on_attach,

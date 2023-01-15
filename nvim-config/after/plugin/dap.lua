@@ -1,4 +1,6 @@
-local dap, dapui = require("dap"), require("dapui")
+local dap = require("dap")
+local dapui = require("dapui")
+
 dap.listeners.after.event_initialized["dapui_config"] = function()
 	dapui.open {}
 end
@@ -9,19 +11,51 @@ dap.listeners.before.event_exited["dapui_config"] = function()
 	dapui.close {}
 end
 
-dapui.setup {}
+dapui.setup {
+	controls = {
+		enabled = true,
+		element = "breakpoints",
+	},
+	element_mappings = {
+		breakpoints = {
+			open = "<CR>",
+			toggle = "<TAB>",
+		},
+	},
+	layouts = {
+		{
+			elements = {
+				"scopes",
+				"stacks",
+				"watches",
+			},
+			size = 40, -- 40 columns
+			position = "left",
+		},
+		{
+			elements = {
+				"breakpoints",
+				"console",
+			},
+			size = 0.25, -- 25% of total lines
+			position = "bottom",
+		},
+	}
+}
 
 local is_windows = vim.loop.os_uname().sysname == "Windows_NT"
 
 if is_windows then
 	dap.adapters.cppdbg = {
 		id = 'cppdbg',
-		type = 'executable',
-		command = os.getenv("LOCALAPPDATA") ..
-			'\\nvim-data\\mason\\packages\\cpptools\\extension\\debugAdapters\\bin\\OpenDebugAD7.exe',
-		options = {
-			detached = false,
-		},
+		type = 'server',
+		port = "4711",
+		-- executable = {
+		-- 	command = os.getenv("LOCALAPPDATA") ..
+		-- 		'\\nvim-data\\mason\\packages\\cpptools\\extension\\debugAdapters\\bin\\OpenDebugAD7.exe',
+		-- 	args = { "--server", "--trace" },
+		-- 	detached = false,
+		-- },
 	}
 
 	dap.adapters.codelldb = {
@@ -65,52 +99,75 @@ local function debug_reverse_continue()
 	end
 end
 
+local function convert_cppvsdbg_configurations()
+	if dap.configurations.cppvsdbg then
+		if not dap.configurations.cppdbg then
+			dap.configurations.cppdbg = {}
+		end
+
+		for _, conf in ipairs(dap.configurations.cppvsdbg) do
+			-- TODO(zaucy): Modify cppvsdbg to be compatible with cppdbg
+			table.insert(dap.configurations.cppdbg, conf)
+		end
+
+		dap.configurations.cppvsdbg = nil
+	end
+end
+
 local function debug_continue()
 	if dap.session() ~= nil then
 		dap.continue()
 		return
 	end
 
+	dap.configurations = { cppdbg = {} }
 	require('dap.ext.vscode').load_launchjs(".vscode/launch.json", {
-		cppdbg = { 'c', 'cpp' },
+		cppdbg = { 'cppdbg' },
 	})
 
-	if dap.configurations.cppdbg then
-		print(vim.inspect(dap.configurations.cppdbg))
-		local items = {}
-		for _, cpp_conf in ipairs(dap.configurations.cppdbg) do
-			items[#items + 1] = cpp_conf
-		end
-		print(vim.inspect(items))
-		vim.ui.select(
-			items,
-			{
-				prompt = "Launch",
-				format_item = function(item)
-					return item.name .. " (" .. item.type .. ")"
-				end,
-			},
-			function(choice)
-				if choice then
-					-- TODO(zaucy): this type override is weak
-					choice.type = "lldb-vscode"
-					choice.runInTerminal = true
-					choice.stopOnEntry = true
-					if is_windows then
-						if choice.program:sub(-string.len(".exe")) ~= ".exe" then
-							choice.program = choice.program .. ".exe"
-						end
-					end
-					choice.sourceMap = {
-						{ "E:/.cache/bazel/output_base/execroot/ecsact_rt_entt", "${workspaceFolder}" },
-					}
-					dap.run(choice)
-				end
-			end
-		)
-	else
-		print("No cppdbg configurations")
+	convert_cppvsdbg_configurations()
+
+	local items = {}
+	for _, cpp_conf in ipairs(dap.configurations.cppdbg) do
+		items[#items + 1] = cpp_conf
 	end
+	vim.ui.select(
+		items,
+		{
+			prompt = "Launch",
+			format_item = function(item)
+				return item.name .. " (" .. item.type .. ")"
+			end,
+		},
+		function(choice)
+			if choice then
+				-- TODO(zaucy): this type override is weak
+				if choice.type == "cppvsdbg" then
+					choice.type = "cppdbg"
+				end
+				choice.type = "codelldb"
+
+				if choice.stopOnEntry then
+					print("stopOnEntry=true does not work. Overriding to false.")
+					-- https://github.com/mfussenegger/nvim-dap/issues/787#issuecomment-1382755980
+					choice.stopOnEntry = false
+				end
+
+				-- choice.MIMode = "lldb"
+				-- choice.miDebuggerPath = "lldb"
+				if is_windows then
+					if choice.program:sub(-string.len(".exe")) ~= ".exe" then
+						choice.program = choice.program .. ".exe"
+					end
+				end
+				-- choice.sourceMap = {
+				-- 	{ "E:/.cache/bazel/output_base/execroot/ecsact_rt_entt", "${workspaceFolder}" },
+				-- }
+				dap.run(choice)
+			end
+		end
+	)
+
 end
 
 vim.keymap.set(
@@ -119,7 +176,7 @@ vim.keymap.set(
 	function()
 		require('dap.ui.widgets').hover()
 	end,
-	{ noremap = true, expr = true }
+	{ noremap = true, expr = false }
 )
 
 for _, mode in ipairs({ "n", "i" }) do
@@ -127,13 +184,13 @@ for _, mode in ipairs({ "n", "i" }) do
 		mode,
 		"<F5>",
 		debug_continue,
-		{ noremap = true, expr = true }
+		{ noremap = true, expr = false }
 	)
 	vim.keymap.set(
 		mode,
 		"<S-F5>",
 		debug_reverse_continue,
-		{ noremap = true, expr = true }
+		{ noremap = true, expr = false }
 	)
 	vim.keymap.set(
 		mode,
@@ -141,7 +198,7 @@ for _, mode in ipairs({ "n", "i" }) do
 		function()
 			require('dap').toggle_breakpoint()
 		end,
-		{ noremap = true, expr = true }
+		{ noremap = true, expr = false }
 	)
 	vim.keymap.set(
 		mode,
@@ -149,7 +206,7 @@ for _, mode in ipairs({ "n", "i" }) do
 		function()
 			require('dap').step_over()
 		end,
-		{ noremap = true, expr = true }
+		{ noremap = true, expr = false }
 	)
 	vim.keymap.set(
 		mode,
@@ -157,7 +214,7 @@ for _, mode in ipairs({ "n", "i" }) do
 		function()
 			require('dap').step_into()
 		end,
-		{ noremap = true, expr = true }
+		{ noremap = true, expr = false }
 	)
 	vim.keymap.set(
 		mode,
@@ -165,7 +222,7 @@ for _, mode in ipairs({ "n", "i" }) do
 		function()
 			require('dap').step_out()
 		end,
-		{ noremap = true, expr = true }
+		{ noremap = true, expr = false }
 	)
 end
 
@@ -173,16 +230,16 @@ vim.keymap.set(
 	"n",
 	"<C-S-D>",
 	function()
-		dapui.toggle {}
+		require('dapui').toggle {}
 	end,
-	{ noremap = true, expr = true }
+	{ noremap = true, expr = false }
 )
 
 vim.keymap.set(
 	"i",
 	"<C-S-D>",
 	function()
-		dapui.toggle {}
+		require('dapui').toggle {}
 	end,
-	{ noremap = true, expr = true }
+	{ noremap = true, expr = false }
 )
