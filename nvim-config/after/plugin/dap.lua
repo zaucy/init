@@ -79,6 +79,14 @@ if is_windows then
 		},
 	}
 
+	dap.adapters["cppvsdbg"] = {
+		type = 'executable',
+		command = os.getenv("LOCALAPPDATA") ..
+			'\\nvim-data\\mason\\packages\\cpptools\\extension\\debugAdapters\\vsdbg\\bin\\vsdbg.exe',
+		args = { "--interpreter=vscode", "--extConfigDir=%USERPROFILE%\\.cppvsdbg\\extensions" },
+		detached = false
+	}
+
 	-- dap.adapters["lldb-vscode"] = {
 	-- 	type = 'executable',
 	-- 	command = os.getenv("ProgramFiles") .. "\\LLVM\\bin\\lldb-vscode.exe",
@@ -159,10 +167,10 @@ local function debug_continue()
 					if choice.program:sub(-string.len(".exe")) ~= ".exe" then
 						choice.program = choice.program .. ".exe"
 					end
+					choice.sourceMap = {
+						["."] = "${workspaceFolder}",
+					}
 				end
-				-- choice.sourceMap = {
-				-- 	{ "E:/.cache/bazel/output_base/execroot/ecsact_rt_entt", "${workspaceFolder}" },
-				-- }
 				dap.run(choice)
 			end
 		end

@@ -1,3 +1,5 @@
+local zs = require('zaucy.session')
+
 local _original_options = nil
 local _streamer_options = {
 	neovide_scale_factor = 1.2
@@ -33,7 +35,7 @@ local function on_key(c)
 	vim.api.nvim_buf_set_lines(_keys_buf, 0, 0, false, { _keys })
 end
 
-local function enable_streamer_mode()
+local function apply_streamer_mode_settings()
 	if _original_options == nil then
 		_original_options = {}
 		for key, _ in pairs(_streamer_options) do
@@ -59,10 +61,9 @@ local function enable_streamer_mode()
 	-- 	border = "rounded",
 	-- 	noautocmd = true,
 	-- })
-
 end
 
-local function disable_streamer_mode()
+local function restore_original_settings()
 	vim.on_key(nil, _ns)
 	_keys = ""
 	if _keys_buf then
@@ -76,5 +77,43 @@ local function disable_streamer_mode()
 	end
 end
 
+local function enable_streamer_mode()
+	local session = zs.session_state()
+	if not session["streamer_mode"] then
+		apply_streamer_mode_settings()
+		session["streamer_mode"] = true
+		zs.store_session_state(session)
+	end
+end
+
+local function disable_streamer_mode()
+	local session = zs.session_state()
+	if session["streamer_mode"] then
+		restore_original_settings()
+		session["streamer_mode"] = false
+		zs.store_session_state(session)
+	end
+end
+
+local function toggle_streamer_mode()
+	if zs.session_state()["streamer_mode"] then
+		disable_streamer_mode()
+	else
+		enable_streamer_mode()
+	end
+end
+
+local function read_session_streamer_mode()
+	local session = zs.load_session_state()
+	if session["streamer_mode"] then
+		apply_streamer_mode_settings()
+		print("Streamer Mode Enabled [Read Session]")
+	end
+end
+
 vim.api.nvim_create_user_command("StreamerModeEnable", enable_streamer_mode, {})
 vim.api.nvim_create_user_command("StreamerModeDisable", disable_streamer_mode, {})
+vim.api.nvim_create_user_command("StreamerModeToggle", toggle_streamer_mode, {})
+vim.api.nvim_create_user_command("StreamerReadSession", read_session_streamer_mode, {})
+
+read_session_streamer_mode()
