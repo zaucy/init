@@ -4,13 +4,14 @@ vim.opt.termguicolors = true
 
 require("nvim-tree").setup {
 	sync_root_with_cwd = true,
+	hijack_unnamed_buffer_when_opening = true,
 	view = {
 		side = "right",
 		adaptive_size = true,
 	},
 	actions = {
 		expand_all = {
-			exclude = {".git"},
+			exclude = { ".git" },
 		},
 	},
 	renderer = {

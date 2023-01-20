@@ -15,8 +15,8 @@ cmp.setup({
 		end,
 	},
 	window = {
-		-- completion = cmp.config.window.bordered(),
-		-- documentation = cmp.config.window.bordered(),
+		completion = cmp.config.window.bordered(),
+		documentation = cmp.config.window.bordered(),
 	},
 	mapping = cmp.mapping.preset.insert({
 		['<C-b>'] = cmp.mapping.scroll_docs(-4),
@@ -31,7 +31,42 @@ cmp.setup({
 		-- { name = 'luasnip' },
 	}, {
 		-- { name = 'buffer' },
-	})
+	}),
+	formatting = {
+		format = function(_, vim_item)
+			local icons = {
+				Text = "",
+				Method = "",
+				Function = "",
+				Constructor = "",
+				Field = "ﰠ",
+				Variable = "",
+				Class = "ﴯ",
+				Interface = "",
+				Module = "",
+				Property = "ﰠ",
+				Unit = "塞",
+				Value = "",
+				Enum = "",
+				Keyword = "",
+				Snippet = "",
+				Color = "",
+				File = "",
+				Reference = "",
+				Folder = "",
+				EnumMember = "",
+				Constant = "",
+				Struct = "פּ",
+				Event = "",
+				Operator = "",
+				TypeParameter = "",
+			}
+			vim_item.kind = icons[vim_item.kind]
+			vim_item.menu = ""
+			return vim_item
+		end,
+		expandable_indicator = false
+	},
 })
 
 -- Set up lspconfig.
