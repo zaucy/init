@@ -21,6 +21,17 @@ return require('packer').startup(function()
 	use 'nathom/filetype.nvim'
 	use 'simrat39/rust-tools.nvim'
 	use {
+		'goolord/alpha-nvim',
+		requires = { 'nvim-tree/nvim-web-devicons' },
+		config = function()
+			require('alpha').setup(require('alpha.themes.theta').config)
+		end
+	}
+	use {
+		'nvim-lualine/lualine.nvim',
+		requires = { 'kyazdani42/nvim-web-devicons', opt = true }
+	}
+	use {
 		'j-hui/fidget.nvim',
 		config = function()
 			require("fidget").setup {}
