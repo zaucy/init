@@ -27,6 +27,14 @@ return require('packer').startup(function()
 		end,
 	}
 	use {
+		"tpope/vim-scriptease",
+		cmd = {
+			"Messages", --view messages in quickfix list
+			"Verbose", -- view verbose output in preview window.
+			"Time", -- measure how long it takes to run some stuff.
+		},
+	}
+	use {
 		"folke/which-key.nvim",
 		config = function()
 			require("which-key").setup {}
@@ -60,6 +68,7 @@ return require('packer').startup(function()
 	use 'ThePrimeagen/vim-be-good'
 	use { "akinsho/toggleterm.nvim", tag = '*' }
 	use { 'sindrets/diffview.nvim', requires = 'nvim-lua/plenary.nvim' }
+	use { 'TimUntersberger/neogit', requires = 'nvim-lua/plenary.nvim' }
 	use {
 		'EthanJWright/vs-tasks.nvim',
 		requires = {
