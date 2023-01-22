@@ -8,8 +8,10 @@ local function open_reloading_dialog()
 	reload_buf = vim.api.nvim_create_buf('', true)
 	local ui = vim.api.nvim_list_uis()[1]
 
-	local width = math.max(math.floor(ui.width * 0.5), 40)
-	local height = math.max(math.floor(ui.height * 0.5), 20)
+	-- local width = math.max(math.floor(ui.width * 0.5), 120)
+	-- local height = math.max(math.floor(ui.height * 0.5), 20)
+	local width = 80
+	local height = 24
 
 	update_reloading_dialog()
 
