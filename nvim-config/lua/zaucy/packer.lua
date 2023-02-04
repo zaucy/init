@@ -74,7 +74,7 @@ return require('packer').startup(function()
 			require('Comment').setup()
 		end
 	}
-	use '~/projects/zaucy/bazel.nvim'
+	use 'zaucy/bazel.nvim'
 	-- keeping around until vim is more second nature
 	use 'ThePrimeagen/vim-be-good'
 	use { "akinsho/toggleterm.nvim", tag = '*' }
