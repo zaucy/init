@@ -59,7 +59,8 @@ return require('packer').startup(function()
 			{ "jvgrootveld/telescope-zoxide" },
 		},
 	}
-	use 'mfussenegger/nvim-dap'
+	-- use 'mfussenegger/nvim-dap'
+	use '~/projects/nvim-dap'
 	use 'rcarriga/nvim-dap-ui'
 	use {
 		'nvim-tree/nvim-tree.lua',
@@ -94,5 +95,11 @@ return require('packer').startup(function()
 			'neovim/nvim-lspconfig',
 			'jose-elias-alvarez/null-ls.nvim',
 		},
+	}
+	use {
+		'rcarriga/nvim-notify',
+		config = function()
+			vim.notify = require('notify')
+		end
 	}
 end)

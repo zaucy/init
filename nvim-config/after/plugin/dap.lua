@@ -5,10 +5,10 @@ dap.listeners.after.event_initialized["dapui_config"] = function()
 	dapui.open {}
 end
 dap.listeners.before.event_terminated["dapui_config"] = function()
-	dapui.close {}
+	-- dapui.close {}
 end
 dap.listeners.before.event_exited["dapui_config"] = function()
-	dapui.close {}
+	-- dapui.close {}
 end
 
 dapui.setup {
@@ -48,54 +48,65 @@ local is_windows = vim.loop.os_uname().sysname == "Windows_NT"
 if is_windows then
 	dap.adapters.cppdbg = {
 		id = 'cppdbg',
-		type = 'server',
-		port = "4711",
-		-- executable = {
-		-- 	command = os.getenv("LOCALAPPDATA") ..
-		-- 		'\\nvim-data\\mason\\packages\\cpptools\\extension\\debugAdapters\\bin\\OpenDebugAD7.exe',
-		-- 	args = { "--server", "--trace" },
-		-- 	detached = false,
-		-- },
+		type = 'executable',
+		command = os.getenv("LOCALAPPDATA") .. "\\nvim-data\\mason\\bin\\OpenDebugAD7.cmd",
+		options = {
+			detached = false,
+		},
 	}
 
-	dap.adapters.codelldb = {
+	dap.adapters.lldb = {
 		type = 'server',
 		port = "${port}",
+		id = "lldb",
 		executable = {
-			command = os.getenv("LOCALAPPDATA") ..
-				'\\nvim-data\\mason\\packages\\codelldb\\extension\\adapter\\codelldb.exe',
+			-- command = os.getenv("LOCALAPPDATA") ..
+			-- 	'\\nvim-data\\mason\\packages\\codelldb\\extension\\adapter\\codelldb.exe',
+			command = os.getenv("LOCALAPPDATA") .. "\\nvim-data\\mason\\bin\\codelldb.cmd",
 			args = { "--port", "${port}" },
 			detached = false,
 		},
+		env = function()
+			local variables = {}
+			for k, v in pairs(vim.fn.environ()) do
+				table.insert(variables, string.format("%s=%s", k, v))
+			end
+			return variables
+		end,
 	}
 
+	-- dap.adapters["lldb-vscode"] = {
+	-- 	type = 'server',
+	-- 	port = "${port}",
+	-- 	executable = {
+	-- 		command = os.getenv("ProgramFiles") .. "\\LLVM\\bin\\lldb-vscode.exe",
+	-- 		args = { "-p", "${port}", "-g" },
+	-- 		detached = false,
+	-- 	},
+	-- }
+
 	dap.adapters["lldb-vscode"] = {
-		type = 'server',
-		port = "${port}",
-		executable = {
-			command = os.getenv("ProgramFiles") .. "\\LLVM\\bin\\lldb-vscode.exe",
-			args = { "-p", "${port}", "-g" },
-			detached = false,
-		},
+		type = 'executable',
+		id = 'lldb-vscode',
+		command = os.getenv("ProgramFiles") .. "\\LLVM\\bin\\lldb-vscode.exe",
+		env = function()
+			local variables = {}
+			for k, v in pairs(vim.fn.environ()) do
+				table.insert(variables, string.format("%s=%s", k, v))
+			end
+			return variables
+		end,
 	}
 
 	dap.adapters["cppvsdbg"] = {
+		id = 'cppvsdbg',
+		vscode_pretend = true,
 		type = 'executable',
 		command = os.getenv("LOCALAPPDATA") ..
 			'\\nvim-data\\mason\\packages\\cpptools\\extension\\debugAdapters\\vsdbg\\bin\\vsdbg.exe',
 		args = { "--interpreter=vscode", "--extConfigDir=%USERPROFILE%\\.cppvsdbg\\extensions" },
-		detached = false
+		detached = false,
 	}
-
-	-- dap.adapters["lldb-vscode"] = {
-	-- 	type = 'executable',
-	-- 	command = os.getenv("ProgramFiles") .. "\\LLVM\\bin\\lldb-vscode.exe",
-	-- 	name = 'lldb-vscode',
-	-- 	id = 'lldb-vscode',
-	-- 	options = {
-	-- 		detached = false,
-	-- 	},
-	-- }
 else
 
 end

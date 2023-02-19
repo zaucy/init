@@ -2,15 +2,15 @@ local wk = require('which-key')
 
 wk.register({
 	gitb = { "<cmd>Gitsign blame_line<CR>", "Git blame current line" },
-	qf = { "<cmd>Telescope quickfix<CR>", "Quick Fix" },
+	qf = { "<cmd>Telescope quickfix theme=ivy<CR>", "Quick Fix" },
 	f = {
 		name = "file",
-		f = { "<cmd>Telescope find_files<CR>", "Find File" },
-		s = { "<cmd>Telescope live_grep<CR>", "Search Files" },
-		h = { "<cmd>Telescope help_tags<CR>", "Search Help Tags" },
-		y = { "<cmd>Telescope treesitter<CR>", "Search Current Buffer Symbols (Treesitter)" },
-		z = { "<cmd>Telescope zoxide list theme=dropdown<CR>", "Open Directory (Zoxide)" },
-		b = { "<cmd>Telescope buffers theme=dropdown<CR>", "Find Buffer" },
+		f = { "<cmd>Telescope find_files theme=ivy<CR>", "Find File" },
+		s = { "<cmd>Telescope live_grep theme=ivy<CR>", "Search Files" },
+		h = { "<cmd>Telescope help_tags theme=ivy<CR>", "Search Help Tags" },
+		y = { "<cmd>Telescope treesitter theme=ivy<CR>", "Search Current Buffer Symbols (Treesitter)" },
+		z = { "<cmd>Telescope zoxide list theme=ivy<CR>", "Open Directory (Zoxide)" },
+		b = { "<cmd>Telescope buffers theme=ivy<CR>", "Find Buffer" },
 		tt = { "<cmd>NvimTreeToggle<CR>", "Toggle File Tree" },
 		tf = { "<cmd>NvimTreeFocus<CR>", "Focus File Tree" },
 	},
@@ -24,13 +24,13 @@ wk.register({
 		r = { "<cmd>BazelRun<Cr>", "Bazel Run" },
 		b = { "<cmd>BazelBuild<Cr>", "Bazel Build" },
 		t = { "<cmd>BazelTest<Cr>", "Bazel Test" },
-		d = { "<cmd>BazelDebug<Cr>", "Bazel Debug Launch" },
+		d = { "<cmd>BazelDebug lldb<Cr>", "Bazel Debug Launch" },
 		s = {
 			name = "Bazel Source Contexts",
 			r = { "<cmd>BazelSourceTargetRun<Cr>", "Bazel Run (target with source)" },
 			b = { "<cmd>BazelSourceTargetBuild<Cr>", "Bazel Build (target with source)" },
 			t = { "<cmd>BazelSourceTargetTest<Cr>", "Bazel Test (target with source)" },
-			d = { "<cmd>BazelSourceTargetDebugLaunch<Cr>", "Bazel Debug Launch (target with source)" },
+			d = { "<cmd>BazelSourceTargetDebugLaunch lldb<Cr>", "Bazel Debug Launch (target with source)" },
 		},
 	}
 }, { prefix = "<leader>" })

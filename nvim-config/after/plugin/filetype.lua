@@ -3,6 +3,7 @@ require("filetype").setup {
 		bazel = "bazel",
 		bzl = "bazel",
 		ecsact = "ecsact",
+		html = "html",
 	},
 	literal = {
 		WORKSPACE = "bazel",
