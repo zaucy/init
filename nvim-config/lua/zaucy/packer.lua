@@ -15,6 +15,27 @@ return require('packer').startup(function()
 	use 'hrsh7th/cmp-path'
 	use 'hrsh7th/nvim-cmp'
 	use 'folke/tokyonight.nvim'
+	use {
+		"folke/zen-mode.nvim",
+		config = function()
+			require("zen-mode").setup {
+				window = {
+					backdrop = 1,
+					width = 120,
+					height = 0.85,
+					options = {
+						number = false,
+						signcolumn = "no",
+						cursorline = false,
+						cursorcolumn = false,
+						foldcolumn = "0",
+						relativenumber = false,
+						list = false,
+					},
+				},
+			}
+		end
+	}
 	use 'nvim-lua/plenary.nvim'
 	use 'stevearc/dressing.nvim'
 	use 'lewis6991/gitsigns.nvim'

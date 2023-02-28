@@ -61,7 +61,7 @@ local function reopen_neovide_detached()
 end
 
 local function quit_neovim_now()
-	vim.api.nvim_command(":qa")
+	vim.api.nvim_command(":qa!")
 end
 
 local function reload_command()
