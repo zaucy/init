@@ -31,6 +31,7 @@ return require('packer').startup(function()
 						foldcolumn = "0",
 						relativenumber = false,
 						list = false,
+						colorcolumn = "0",
 					},
 				},
 			}
