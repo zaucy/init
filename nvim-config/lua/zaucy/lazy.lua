@@ -40,14 +40,23 @@ require("lazy").setup({
 
 	----------------------------------------------------------------------------
 	-- LSP and Autocomplete
+
 	{
 		'VonHeikemen/lsp-zero.nvim',
 		branch = 'v2.x',
 		dependencies = {
 			-- LSP Support
-			-- { '~/projects/zaucy/nvim-lspconfig', dev = true },
-			{ 'neovim/nvim-lspconfig' },
-			{ 'williamboman/mason.nvim' },
+			{
+				'neovim/nvim-lspconfig',
+				dir = '~/projects/zaucy/nvim-lspconfig',
+				dev = true,
+			},
+			{
+				'williamboman/mason.nvim',
+				dir = '~/projects/zaucy/mason.nvim',
+				dev = true,
+				cmd = 'Mason',
+			},
 			{ 'williamboman/mason-lspconfig.nvim' },
 
 			-- Autocompletion
@@ -57,14 +66,32 @@ require("lazy").setup({
 		},
 		config = function()
 			local lsp = require('lsp-zero').preset({})
+			local fmt_augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
 			lsp.on_attach(function(client, bufnr)
 				lsp.default_keymaps({ buffer = bufnr })
+
+				if client.name == "tsserver" then
+					-- formatting is handled by prettier
+					if require('prettier').config_exists() then
+						client.server_capabilities.documentFormattingProvider = false
+					end
+				elseif client.supports_method("textDocument/formatting") then
+					vim.api.nvim_clear_autocmds({ group = fmt_augroup, buffer = bufnr })
+					vim.api.nvim_create_autocmd("BufWritePre", {
+						group = fmt_augroup,
+						buffer = bufnr,
+						callback = function()
+							vim.lsp.buf.format({ bufnr = bufnr })
+						end,
+					})
+				end
 			end)
 
 			-- Configure lua language server for neovim
 			require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls())
 
+			lsp.setup_nvim_cmp();
 			lsp.setup()
 		end,
 	},
@@ -134,8 +161,8 @@ require("lazy").setup({
 	},
 	{ "folke/which-key.nvim", config = function() require 'zaucy.which-key' end },
 
-	-- 'mfussenegger/nvim-dap'
-	{ '~/projects/nvim-dap', dev = true },
+	'mfussenegger/nvim-dap',
+	-- { '~/projects/nvim-dap', dev = true },
 	'rcarriga/nvim-dap-ui',
 	{
 		'nvim-tree/nvim-tree.lua',
