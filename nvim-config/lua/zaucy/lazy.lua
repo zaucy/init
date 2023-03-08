@@ -165,14 +165,24 @@ require("lazy").setup({
 	-- { '~/projects/nvim-dap', dev = true },
 	'rcarriga/nvim-dap-ui',
 	{
-		'nvim-tree/nvim-tree.lua',
+		'nvim-neo-tree/neo-tree.nvim',
+		lazy = false,
+		cmd = { 'Neotree' },
+		branch = 'v2.x',
 		dependencies = {
-			'nvim-tree/nvim-web-devicons'
+			"nvim-lua/plenary.nvim",
+			"nvim-tree/nvim-web-devicons",
+			"MunifTanjim/nui.nvim",
 		},
-		tag = 'nightly',
-		config = function()
-			require('zaucy.nvim-tree')
-		end
+		opts = {
+			filesystem = {
+				hijack_netrw_behavior = "open_default",
+				group_empty_dirs = true,
+			},
+			window = {
+				position = 'right',
+			},
+		},
 	},
 	{
 		'numToStr/Comment.nvim',

@@ -3,6 +3,7 @@ local wk = require('which-key')
 wk.register({
 	gitb = { "<cmd>Gitsign blame_line<CR>", "Git blame current line" },
 	qf = { "<cmd>Telescope quickfix theme=ivy<CR>", "Quick Fix" },
+	tt = { "<cmd>Neotree toggle<CR>", "Tree Toggle" },
 	f = {
 		name = "file",
 		f = { "<cmd>Telescope find_files theme=ivy<CR>", "Find File" },
@@ -11,8 +12,6 @@ wk.register({
 		y = { "<cmd>Telescope treesitter theme=ivy<CR>", "Search Current Buffer Symbols (Treesitter)" },
 		z = { "<cmd>Telescope zoxide list theme=ivy<CR>", "Open Directory (Zoxide)" },
 		b = { "<cmd>Telescope buffers theme=ivy<CR>", "Find Buffer" },
-		tt = { "<cmd>NvimTreeToggle<CR>", "Toggle File Tree" },
-		tf = { "<cmd>NvimTreeFocus<CR>", "Focus File Tree" },
 	},
 	gh = {
 		name = "github",
