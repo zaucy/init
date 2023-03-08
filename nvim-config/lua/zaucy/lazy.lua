@@ -180,8 +180,25 @@ require("lazy").setup({
 			require('Comment').setup()
 		end
 	},
-	'zaucy/bazel.nvim',
-	'akinsho/toggleterm.nvim',
+	{
+		'zaucy/bazel.nvim',
+		opts = {
+			format_on_save = true,
+		},
+	},
+	{
+		'akinsho/toggleterm.nvim',
+		opts = {
+			size = function(term)
+				if term.direction == "horizontal" then
+					return 15
+				elseif term.direction == "vertical" then
+					return vim.o.columns * 0.4
+				end
+			end,
+			shell = "nu",
+		},
+	},
 	{ 'sindrets/diffview.nvim', dependencies = 'nvim-lua/plenary.nvim' },
 	{
 		'TimUntersberger/neogit',
