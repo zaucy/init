@@ -267,4 +267,6 @@ require("lazy").setup({
 			'jose-elias-alvarez/null-ls.nvim',
 		},
 	},
+}, {
+	lockfile = "~/projects/zaucy/init/nvim-config/lazy-lock.json",
 })
