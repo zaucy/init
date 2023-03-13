@@ -76,4 +76,6 @@ local function reload_command()
 	end
 end
 
-vim.api.nvim_create_user_command("Reload", reload_command, {})
+if not vim.g.vscode then
+	vim.api.nvim_create_user_command("Reload", reload_command, {})
+end

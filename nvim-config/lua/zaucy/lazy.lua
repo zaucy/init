@@ -15,7 +15,15 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
 	----------------------------------------------------------------------------
 	-- Color / theme plugins
-	{ 'folke/tokyonight.nvim', lazy = false, priority = 1000 },
+	{
+		'folke/tokyonight.nvim',
+		lazy = false,
+		priority = 1000,
+		cond = not vim.g.vscode,
+		config = function()
+			require('zaucy.color')
+		end,
+	},
 
 	----------------------------------------------------------------------------
 	-- File type
@@ -44,6 +52,7 @@ require("lazy").setup({
 	{
 		'VonHeikemen/lsp-zero.nvim',
 		branch = 'v2.x',
+		cond = not vim.g.vscode,
 		dependencies = {
 			-- LSP Support
 			{
@@ -91,12 +100,15 @@ require("lazy").setup({
 			-- Configure lua language server for neovim
 			require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls())
 
+			lsp.setup_servers { "ecsact" }
+
 			lsp.setup_nvim_cmp();
 			lsp.setup()
 		end,
 	},
 	{
 		'nvim-treesitter/nvim-treesitter',
+		cond = not vim.g.vscode,
 		config = function() require('zaucy.treesitter') end,
 	},
 	'simrat39/rust-tools.nvim',
@@ -118,6 +130,7 @@ require("lazy").setup({
 	{
 		"folke/zen-mode.nvim",
 		cmd = "ZenMode",
+		cond = not vim.g.vscode,
 		opts = {
 			window = {
 				backdrop = 1,
@@ -136,9 +149,14 @@ require("lazy").setup({
 			},
 		},
 	},
-	'nvim-lua/plenary.nvim',
-	'stevearc/dressing.nvim',
-	'lewis6991/gitsigns.nvim',
+	{
+		'stevearc/dressing.nvim',
+		opts = {},
+	},
+	{
+		'lewis6991/gitsigns.nvim',
+		opts = {},
+	},
 	{
 		'goolord/alpha-nvim',
 		dependencies = { 'nvim-tree/nvim-web-devicons' },
@@ -148,9 +166,13 @@ require("lazy").setup({
 	},
 	{
 		'nvim-lualine/lualine.nvim',
-		dependencies = { 'nvim-tree/nvim-web-devicons', opt = true }
+		cond = not vim.g.vscode,
+		dependencies = { 'nvim-tree/nvim-web-devicons', opt = true },
 	},
-	'j-hui/fidget.nvim',
+	{
+		'j-hui/fidget.nvim',
+		cond = not vim.g.vscode,
+	},
 	{
 		"tpope/vim-scriptease",
 		cmd = {
@@ -159,14 +181,24 @@ require("lazy").setup({
 			"Time", -- measure how long it takes to run some stuff.
 		},
 	},
-	{ "folke/which-key.nvim", config = function() require 'zaucy.which-key' end },
-
-	'mfussenegger/nvim-dap',
-	-- { '~/projects/nvim-dap', dev = true },
-	'rcarriga/nvim-dap-ui',
+	{
+		"folke/which-key.nvim",
+		config = function()
+			require 'zaucy.which-key'
+		end,
+	},
+	{
+		'mfussenegger/nvim-dap',
+		cond = not vim.g.vscode,
+	},
+	{
+		'rcarriga/nvim-dap-ui',
+		cond = not vim.g.vscode,
+	},
 	{
 		'nvim-neo-tree/neo-tree.nvim',
 		lazy = false,
+		cond = not vim.g.vscode,
 		cmd = { 'Neotree' },
 		branch = 'v2.x',
 		dependencies = {
@@ -178,6 +210,9 @@ require("lazy").setup({
 			filesystem = {
 				hijack_netrw_behavior = "open_default",
 				group_empty_dirs = true,
+				filtered_items = {
+					hide_dotfiles = false,
+				},
 			},
 			window = {
 				position = 'right',
@@ -212,6 +247,7 @@ require("lazy").setup({
 	{ 'sindrets/diffview.nvim', dependencies = 'nvim-lua/plenary.nvim' },
 	{
 		'TimUntersberger/neogit',
+		commit = '7be1e9358aaa617b0391e61952d936203e99fcf0',
 		opts = {
 			disable_context_highlighting = true,
 			commit_popup = {
