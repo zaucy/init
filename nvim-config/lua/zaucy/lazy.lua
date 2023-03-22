@@ -111,6 +111,13 @@ require("lazy").setup({
 		cond = not vim.g.vscode,
 		config = function() require('zaucy.treesitter') end,
 	},
+	{
+		'nvim-treesitter/nvim-treesitter-context',
+		opts = {},
+		dependencies = {
+			'nvim-treesitter/nvim-treesitter',
+		},
+	},
 	'simrat39/rust-tools.nvim',
 
 	----------------------------------------------------------------------------
@@ -267,6 +274,17 @@ require("lazy").setup({
 			'jose-elias-alvarez/null-ls.nvim',
 		},
 	},
+	{
+		'stevearc/aerial.nvim',
+		opts = {},
+		dependencies = {
+			'stevearc/stickybuf.nvim',
+		},
+	},
+	{
+		'stevearc/stickybuf.nvim',
+		opts = {},
+	}
 }, {
 	lockfile = "~/projects/zaucy/init/nvim-config/lazy-lock.json",
 })
