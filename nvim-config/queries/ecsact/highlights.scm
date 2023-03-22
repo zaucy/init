@@ -16,7 +16,7 @@
 (transient_statement name: (declaration_identifier) @type)
 (system_statement name: (declaration_identifier) @type)
 (action_statement name: (declaration_identifier) @type)
-(system_capability_statement component_name: (declaration_identifier) @type)
+(system_capability_statement component_lookup: (declaration_lookup) @type)
 (with_statement field_name: (declaration_identifier) @property)
 
 (enum_value_statement name: (declaration_identifier) @property)
