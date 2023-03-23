@@ -2,6 +2,8 @@ local nnoremap = require("zaucy.keymap").nnoremap
 
 nnoremap("<C-d>", "<C-d>zz")
 nnoremap("<C-u>", "<C-u>zz")
+nnoremap("j", "jzz")
+nnoremap("k", "kzz")
 nnoremap("n", "nzzzv")
 nnoremap("N", "Nzzzv")
 nnoremap("<C-S-e>", ":NvimTreeFindFile<CR>")

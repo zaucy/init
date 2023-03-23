@@ -154,6 +154,11 @@ require("lazy").setup({
 					colorcolumn = "0",
 				},
 			},
+			plugins = {
+				options = {
+					showcmd = false,
+				},
+			},
 		},
 	},
 	{
@@ -174,6 +179,7 @@ require("lazy").setup({
 	{
 		'nvim-lualine/lualine.nvim',
 		cond = not vim.g.vscode,
+		opts = {},
 		dependencies = { 'nvim-tree/nvim-web-devicons', opt = true },
 	},
 	{
@@ -276,7 +282,12 @@ require("lazy").setup({
 	},
 	{
 		'stevearc/aerial.nvim',
-		opts = {},
+		opts = {
+			layout = {
+				width = 40,
+				default_direction = "prefer_left",
+			},
+		},
 		dependencies = {
 			'stevearc/stickybuf.nvim',
 		},

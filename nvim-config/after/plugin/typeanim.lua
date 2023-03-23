@@ -7,10 +7,11 @@ local function type_anim_command(opts)
 	local curr_col = 0
 
 	vim.api.nvim_buf_set_lines(buf, 0, -1, false, {})
+	vim.api.nvim_command("")
 
 	vim.cmd('startinsert')
 	local timer = vim.loop.new_timer()
-	timer:start(100, 10, vim.schedule_wrap(function()
+	timer:start(100, 16, vim.schedule_wrap(function()
 		xpcall(function()
 			local original_line = original_lines[curr_row + 1]
 			if original_line == nil then

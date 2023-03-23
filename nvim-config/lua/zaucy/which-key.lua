@@ -6,6 +6,7 @@ wk.register({
 	tt = { "<cmd>Neotree toggle<CR>", "Tree Toggle" },
 	tr = { "<cmd>Neotree reveal<CR>", "Reveal in Tree" },
 	tgs = { "<cmd>Neotree git_status position=float<CR>", "Tree Git Status" },
+	gs = { "<cmd>AerialOpen left<CR>", "Go to Aerial Symbols Panel" },
 	f = {
 		name = "file",
 		f = { "<cmd>Telescope find_files theme=ivy<CR>", "Find File" },
