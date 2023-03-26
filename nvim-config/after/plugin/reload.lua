@@ -70,7 +70,9 @@ local function reload_command()
 	if sysname == "Windows_NT" then
 		open_reloading_dialog()
 		run_init_ps1(function()
-			reopen_neovide_detached()
+			if vim.g.neovide then
+				reopen_neovide_detached()
+			end
 			quit_neovim_now()
 		end)
 	end

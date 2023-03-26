@@ -295,6 +295,10 @@ require("lazy").setup({
 	{
 		'stevearc/stickybuf.nvim',
 		opts = {},
+	},
+	{
+		'nvim-tree/nvim-web-devicons',
+		opts = {},
 	}
 }, {
 	lockfile = "~/projects/zaucy/init/nvim-config/lazy-lock.json",

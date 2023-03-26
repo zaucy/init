@@ -1,9 +1,14 @@
 font:
+  size: 13.0
   normal:
-    family: Fira Code
+    family: FuraMono NF
 
 shell:
   program: nu
+
+colors:
+  primary:
+    background: '#24283b'
 
 # TODO: make this compatible across operating systems
 working_directory: 'C:/Users/zekew'
