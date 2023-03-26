@@ -54,21 +54,17 @@ if ((Get-Command "jq.exe" -errorAction SilentlyContinue) -eq $false)
 
 if ((Get-Command "nvim.exe" -errorAction SilentlyContinue) -eq $false)
 {
-	winget install Neovim.Neovim
-}
-
-if ((Get-Command "wezterm-gui.exe" -errorAction SilentlyContinue) -eq $false)
-{
-	winget install wez.wezterm
+	gh -R neovim/neovim release download nightly -p nvim-win64.msi -O "$env:TEMP\nvim-win64.msi"
+	msiexec.exe /I "$env:TEMP\nvim-win64.msi" /quiet
 }
 
 $NeovimConfigDir = "$env:LOCALAPPDATA\nvim"
 mkdir $NeovimConfigDir -Force | Out-Null
 Copy-Item -Path ".\nvim-config\*" -Destination "$NeovimConfigDir" -Recurse -Force
 
-$WeztermConfigDir = "$env:USERPROFILE\.config\wezterm"
-mkdir $WeztermConfigDir -Force | Out-Null
-Copy-Item -Path ".\wezterm\*" -Destination "$WeztermConfigDir" -Recurse -Force
+$AlacrittyConfigDir = "$env:APPDATA\alacritty"
+mkdir $AlacrittyConfigDir -Force | Out-Null
+Copy-Item -Path ".\alacritty\*" -Destination "$AlacrittyConfigDir" -Recurse -Force
 
 if ((Get-Command "cargo.exe" -errorAction SilentlyContinue) -eq $false)
 {
