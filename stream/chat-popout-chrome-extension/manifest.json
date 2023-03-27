@@ -1,0 +1,17 @@
+{
+	"name": "zaucy stream popout window",
+	"version": "1.0",
+	"description": "",
+	"manifest_version": 3,
+	"content_scripts": [
+		{
+			"matches": ["https://www.twitch.tv/popout/zauucy/chat?popout="],
+			"js": ["chat-popout-window.js"],
+			"run_at": "document_start"
+		}
+	],
+	"host_permissions": [
+		"https://www.twitch.tv/popout/zauucy/chat?popout="
+	],
+	"permissions": ["scripting", "tabs"]
+}
