@@ -66,6 +66,10 @@ $AlacrittyConfigDir = "$env:APPDATA\alacritty"
 mkdir $AlacrittyConfigDir -Force | Out-Null
 Copy-Item -Path ".\alacritty\*" -Destination "$AlacrittyConfigDir" -Recurse -Force
 
+$NushellConfigDir = "$env:APPDATA\nushell"
+mkdir $NushellConfigDir -Force | Out-Null
+Copy-Item -Path ".\nushell\*" -Destination "$NushellConfigDir" -Recurse -Force
+
 if ((Get-Command "cargo.exe" -errorAction SilentlyContinue) -eq $false)
 {
 	# Get rust + cargo

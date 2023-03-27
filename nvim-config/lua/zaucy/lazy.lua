@@ -299,6 +299,11 @@ require("lazy").setup({
 	{
 		'nvim-tree/nvim-web-devicons',
 		opts = {},
+	},
+	{
+		'zaucy/nvim-nu',
+		dir = '~/projects/zaucy/nvim-nu',
+		dev = true,
 	}
 }, {
 	lockfile = "~/projects/zaucy/init/nvim-config/lazy-lock.json",
