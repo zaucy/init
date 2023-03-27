@@ -170,13 +170,6 @@ require("lazy").setup({
 		opts = {},
 	},
 	{
-		'goolord/alpha-nvim',
-		dependencies = { 'nvim-tree/nvim-web-devicons' },
-		config = function()
-			require('alpha').setup(require('alpha.themes.theta').config)
-		end
-	},
-	{
 		'nvim-lualine/lualine.nvim',
 		cond = not vim.g.vscode,
 		opts = {},
@@ -210,7 +203,6 @@ require("lazy").setup({
 	},
 	{
 		'nvim-neo-tree/neo-tree.nvim',
-		lazy = false,
 		cond = not vim.g.vscode,
 		cmd = { 'Neotree' },
 		branch = 'v2.x',
@@ -221,7 +213,7 @@ require("lazy").setup({
 		},
 		opts = {
 			filesystem = {
-				hijack_netrw_behavior = "open_default",
+				hijack_netrw_behavior = "open_current",
 				group_empty_dirs = true,
 				filtered_items = {
 					hide_dotfiles = false,
@@ -304,6 +296,12 @@ require("lazy").setup({
 		'zaucy/nvim-nu',
 		dir = '~/projects/zaucy/nvim-nu',
 		dev = true,
+	},
+	{
+		'prichrd/netrw.nvim',
+		opts = {
+			use_devicons = true,
+		},
 	}
 }, {
 	lockfile = "~/projects/zaucy/init/nvim-config/lazy-lock.json",
