@@ -7,6 +7,7 @@
 		{
 			"matches": ["https://www.twitch.tv/popout/zauucy/chat?popout="],
 			"js": ["chat-popout-window.js"],
+			"css": ["chat-popout-window.css"],
 			"run_at": "document_start"
 		}
 	],
