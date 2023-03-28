@@ -18,3 +18,6 @@ vim.opt.listchars = {
 
 -- I'm using nathom/filetype.nvim
 vim.g.did_load_filetypes = 1
+
+-- netrw settings
+vim.g.netrw_keepdir = 0
