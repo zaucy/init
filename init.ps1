@@ -5,6 +5,11 @@ $ErrorActionPreference = 'Stop'
 # GitHub requires TLS 1.2
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+if ((Get-Command "nu.exe" -errorAction SilentlyContinue) -eq $false)
+{
+	winget install nushell
+}
+
 $BinDirectory = "$Home\.local\bin"
 
 New-Item -ItemType Directory -Force -Path $BinDirectory | Out-Null
@@ -93,11 +98,6 @@ if ((Get-Command "fd.exe" -errorAction SilentlyContinue) -eq $false)
 if ((Get-Command "rg.exe" -errorAction SilentlyContinue) -eq $false)
 {
 	scoop install ripgrep
-}
-
-if ((Get-Command "nu.exe" -errorAction SilentlyContinue) -eq $false)
-{
-	cargo install nu --features=extra
 }
 
 # TODO(zaucy): init WSL + WSLg
