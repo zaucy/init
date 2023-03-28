@@ -13,6 +13,14 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+	{
+		'lewis6991/impatient.nvim',
+		lazy = false,
+		priority = 2000,
+		config = function()
+			require('impatient')
+		end,
+	},
 	----------------------------------------------------------------------------
 	-- Color / theme plugins
 	{
@@ -302,7 +310,28 @@ require("lazy").setup({
 		opts = {
 			use_devicons = true,
 		},
-	}
+	},
+	{
+		'rcarriga/nvim-notify',
+		config = function()
+			require('notify').setup {
+				top_down = false,
+			}
+			vim.notify = require('notify')
+		end,
+	},
+	{
+		'euclio/vim-markdown-composer',
+		build = 'cargo build --release',
+		config = function()
+			if vim.loop.os_uname().sysname == "Windows_NT" then
+				local firefox = os.getenv("ProgramFiles") .. "/Mozilla Firefox/firefox.exe"
+				vim.g.markdown_composer_browser = '"' .. firefox .. '" -url'
+			end
+
+			vim.g.markdown_composer_syntax_theme = 'Dark'
+		end,
+	},
 }, {
 	lockfile = "~/projects/zaucy/init/nvim-config/lazy-lock.json",
 })
