@@ -317,6 +317,7 @@ require("lazy").setup({
 			require('notify').setup {
 				top_down = false,
 				max_width = 60,
+				render = 'compact',
 			}
 			vim.notify = require('notify')
 		end,
