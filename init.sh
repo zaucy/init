@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
@@ -20,6 +20,12 @@ else
   git pull
 fi
 
+mkdir -p $HOME/.config/nvim
+cp ./nvim-config/* $HOME/.config/nvim --force --recursive
+
+mkdir -p $HOME/.config/nushell
+cp ./nushell/* $HOME/.config/nushell --force --recursive
+
 if [ -z "$(which gh)" ]; then
   type -p curl >/dev/null || sudo apt install curl -y
   curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
@@ -40,8 +46,9 @@ if [ -z "$(which nvim)" ]; then
   sudo apt-get install neovim -y
 fi
 
-mkdir -p $HOME/.config/nvim
-cp ./nvim-config/* $HOME/.config/nvim --force --recursive
+touch ~/.zoxide.nu
+touch ~/.fnm/fnm_config.nu
+touch ~/.fnm/fnm_env.nu
 
 if [ -z "$(which cargo)" ]; then
   curl https://sh.rustup.rs -sSf | sh
@@ -53,16 +60,5 @@ fi
 
 if [ -z "$(which zoxide)" ]; then
   cargo install zoxide
-fi
-
-if [ -z "$(which neovide)" ]; then
-  sudo apt install -y curl \
-    gnupg ca-certificates git \
-    gcc-multilib g++-multilib cmake libssl-dev pkg-config \
-    libfreetype6-dev libasound2-dev libexpat1-dev libxcb-composite0-dev \
-    libbz2-dev libsndio-dev freeglut3-dev libxmu-dev libxi-dev libfontconfig1-dev \
-    libxcursor-dev
-
-  cargo install --git https://github.com/neovide/neovide
 fi
 

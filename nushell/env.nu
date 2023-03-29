@@ -38,6 +38,27 @@ let-env ENV_CONVERSIONS = {
 	}
 }
 
+def-env PATH-prepend [p] {
+	if 'PATH' in $env {
+		$env.PATH = ($env.PATH | prepend $p)
+	}
+
+	if 'Path' in $env {
+		$env.Path = ($env.Path | prepend $p)
+	}
+}
+
+def-env PATH-append [p] {
+	if 'PATH' in $env {
+		$env.PATH = ($env.PATH | append $p)
+	}
+
+	if 'Path' in $env {
+		$env.Path = ($env.Path | append $p)
+	}
+}
+
+
 let-env NU_LIB_DIRS = [
 	($nu.config-path | path dirname | path join 'scripts')
 ]
@@ -45,5 +66,8 @@ let-env NU_LIB_DIRS = [
 let-env NU_PLUGIN_DIRS = [
 	($nu.config-path | path dirname | path join 'plugins')
 ]
+
+PATH-append '~/.local/bin'
+PATH-append '~/.cargo/bin'
 
 source-env ~/.fnm/fnm_env.nu
