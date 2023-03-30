@@ -3,6 +3,8 @@ def create_left_prompt [] {
 
 	if ('USERPROFILE' in $env) and ($pwd | str starts-with $env.USERPROFILE) {
 		$pwd = '~' + ($pwd | str substring [($env.USERPROFILE | str length) ($pwd | str length)])
+	} else if ('HOME' in $env) and ($pwd | str starts-with $env.HOME) {
+		$pwd = '~' + ($pwd | str substring [($env.HOME | str length) ($pwd | str length)])
 	}
 
 	$pwd = ($pwd | str replace '\\' '/' --all)
