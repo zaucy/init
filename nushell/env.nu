@@ -7,10 +7,14 @@ def create_left_prompt [] {
 
 	$pwd = ($pwd | str replace '\\' '/' --all)
 
-	let path_segment = if (is-admin) {
+	mut path_segment = if (is-admin) {
 		$"(ansi red_bold)($pwd) 🛡 "
 	} else {
 		$"(ansi green_bold)($pwd)"
+	}
+
+	if 'WSLENV' in $env {
+		$path_segment = $"(ansi -e {fg: '#dd4814'}) ($path_segment)"
 	}
 
 	$path_segment
