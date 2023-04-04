@@ -85,6 +85,17 @@ require("lazy").setup({
 			local lsp = require('lsp-zero').preset({})
 			local fmt_augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
+			vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
+			vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
+			vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+			vim.keymap.set('n', 'gd', vim.lsp.buf.definition)
+			vim.keymap.set('n', 'gD', vim.lsp.buf.declaration)
+			vim.keymap.set('n', 'gi', vim.lsp.buf.implementation)
+			vim.keymap.set('n', 'go', vim.lsp.buf.type_definition)
+			vim.keymap.set('n', 'gr', vim.lsp.buf.references)
+			vim.keymap.set('n', 'gs', vim.lsp.buf.signature_help)
+			vim.keymap.set('n', 'gl', vim.diagnostic.open_float)
+
 			lsp.on_attach(function(client, bufnr)
 				lsp.default_keymaps({ buffer = bufnr })
 
