@@ -5,8 +5,8 @@ let nvim = if 'LOCALAPPDATA' in $env {
 	})
 } else {
 	({
-		data_path: '~/.config/nvim-data',
-		config_path: '~/.local/share/nvim',
+		data_path: '~/.local/share/nvim',
+		config_path: '~/.config/nvim',
 	})
 }
 
