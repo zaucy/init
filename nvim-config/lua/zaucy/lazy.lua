@@ -212,6 +212,7 @@ require("lazy").setup({
 			"nvim-lua/plenary.nvim",
 			"nvim-tree/nvim-web-devicons",
 			"MunifTanjim/nui.nvim",
+			"s1n7ax/nvim-window-picker",
 		},
 		opts = {
 			filesystem = {
@@ -221,10 +222,49 @@ require("lazy").setup({
 					hide_dotfiles = false,
 				},
 			},
+			use_default_mappings = false,
 			window = {
 				position = 'right',
+				mappings = {
+					["<2-LeftMouse>"] = "open",
+					["<cr>"] = "open",
+					["<esc>"] = "revert_preview",
+					["P"] = { "toggle_preview", config = { use_float = true } },
+					["l"] = "focus_preview",
+					["S"] = "open_split",
+					["s"] = "open_vsplit",
+					["t"] = "open_tabnew",
+					["w"] = "open_with_window_picker",
+					["C"] = "close_node",
+					["z"] = "close_all_nodes",
+					["Z"] = "expand_all_nodes",
+					["R"] = "refresh",
+					["a"] = {
+						"add",
+						config = {
+							show_path = "none", -- "none", "relative", "absolute"
+						}
+					},
+					["A"] = "add_directory",
+					["d"] = "delete",
+					["r"] = "rename",
+					["y"] = "copy_to_clipboard",
+					["x"] = "cut_to_clipboard",
+					["p"] = "paste_from_clipboard",
+					["c"] = "copy",
+					["m"] = "move",
+					["e"] = "toggle_auto_expand_width",
+					["q"] = "close_window",
+					["?"] = "show_help",
+					["<"] = "prev_source",
+					[">"] = "next_source",
+				},
 			},
 		},
+	},
+	{
+		"s1n7ax/nvim-window-picker",
+		opts = {},
 	},
 	{
 		'numToStr/Comment.nvim',
