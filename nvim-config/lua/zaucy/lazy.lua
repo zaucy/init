@@ -83,7 +83,6 @@ require("lazy").setup({
 		},
 		config = function()
 			local lsp = require('lsp-zero').preset({})
-			local fmt_augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
 			vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
 			vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
@@ -97,35 +96,7 @@ require("lazy").setup({
 			vim.keymap.set('n', 'gl', vim.diagnostic.open_float)
 
 			lsp.on_attach(function(client, bufnr)
-				lsp.default_keymaps({ buffer = bufnr })
-
-				if client.name == "tsserver" then
-					-- formatting is handled by prettier
-					if require('prettier').config_exists() then
-						client.server_capabilities.documentFormattingProvider = false
-					end
-				elseif client.supports_method("textDocument/formatting") then
-					vim.api.nvim_clear_autocmds({ group = fmt_augroup, buffer = bufnr })
-					vim.api.nvim_create_autocmd("BufWritePre", {
-						group = fmt_augroup,
-						buffer = bufnr,
-						callback = function()
-							vim.lsp.buf.format({ bufnr = bufnr })
-						end,
-					})
-				end
-
-				if client.name == "omnisharp" then
-					client.server_capabilities.semanticTokensProvider.legend = {
-						tokenModifiers = { "static" },
-						tokenTypes = { "comment", "excluded", "identifier", "keyword", "keyword", "number", "operator", "operator",
-							"preprocessor", "string", "whitespace", "text", "static", "preprocessor", "punctuation", "string", "string",
-							"class", "delegate", "enum", "interface", "module", "struct", "typeParameter", "field", "enumMember", "constant",
-							"local", "parameter", "method", "method", "property", "event", "namespace", "label", "xml", "xml", "xml", "xml",
-							"xml", "xml", "xml", "xml", "xml", "xml", "xml", "xml", "xml", "xml", "xml", "xml", "xml", "xml", "xml", "xml",
-							"xml", "regexp", "regexp", "regexp", "regexp", "regexp", "regexp", "regexp", "regexp", "regexp" }
-					}
-				end
+				require('zaucy.lsp').on_attach(lsp, client, bufnr)
 			end)
 
 			-- Configure lua language server for neovim
