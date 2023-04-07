@@ -3,6 +3,8 @@ local M = {}
 local fmt_augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
 M.on_attach = function(lsp, client, bufnr)
+	local util = require('lspconfig.util')
+
 	lsp.default_keymaps({ buffer = bufnr })
 
 	if client.name == "tsserver" then
@@ -10,6 +12,14 @@ M.on_attach = function(lsp, client, bufnr)
 		if require('prettier').config_exists() then
 			client.server_capabilities.documentFormattingProvider = false
 		end
+	elseif util.path.is_file('.clang-format') then
+		vim.notify("Using clang-format")
+		vim.api.nvim_clear_autocmds({ group = fmt_augroup, buffer = bufnr })
+		vim.api.nvim_create_autocmd("BufWritePre", {
+			group = fmt_augroup,
+			buffer = bufnr,
+			command = "%!clang-format --assume-filename=@%",
+		})
 	elseif client.supports_method("textDocument/formatting") then
 		vim.api.nvim_clear_autocmds({ group = fmt_augroup, buffer = bufnr })
 		vim.api.nvim_create_autocmd("BufWritePre", {
