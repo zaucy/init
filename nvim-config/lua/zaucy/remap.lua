@@ -6,7 +6,9 @@ nnoremap("j", "jzz")
 nnoremap("k", "kzz")
 nnoremap("n", "nzzzv")
 nnoremap("N", "Nzzzv")
-nnoremap("<C-S-e>", ":NvimTreeFindFile<CR>")
+
+nnoremap("[qf", ":cprevious<CR>")
+nnoremap("]qf", ":cnext<CR>")
 
 vim.keymap.set(
 	"n",
