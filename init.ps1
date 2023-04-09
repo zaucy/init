@@ -50,8 +50,7 @@ if ($Force || (Get-Command "jq.exe" -errorAction SilentlyContinue) -eq $false)
 
 if ($Force || (Get-Command "nvim.exe" -errorAction SilentlyContinue) -eq $false)
 {
-	gh -R neovim/neovim release download nightly -p nvim-win64.msi -O "$env:TEMP\nvim-win64.msi" --clobber
-	msiexec.exe /I "$env:TEMP\nvim-win64.msi" /quiet /passive
+	winget install Neovim.Neovim
 }
 
 $NeovimConfigDir = "$env:LOCALAPPDATA\nvim"
