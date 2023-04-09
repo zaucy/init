@@ -226,6 +226,8 @@ require("lazy").setup({
 			window = {
 				position = 'right',
 				mappings = {
+					["."] = "set_root",
+					["H"] = "toggle_hidden",
 					["<2-LeftMouse>"] = "open",
 					["<cr>"] = "open",
 					["<esc>"] = "revert_preview",
