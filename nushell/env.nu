@@ -2,9 +2,9 @@ def create_left_prompt [] {
 	mut pwd = ($env.PWD)
 
 	if ('USERPROFILE' in $env) and ($pwd | str starts-with $env.USERPROFILE) {
-		$pwd = '~' + ($pwd | str substring [($env.USERPROFILE | str length) ($pwd | str length)])
+		$pwd = '~' + ($pwd | str substring ($env.USERPROFILE | str length)..($pwd | str length))
 	} else if ('HOME' in $env) and ($pwd | str starts-with $env.HOME) {
-		$pwd = '~' + ($pwd | str substring [($env.HOME | str length) ($pwd | str length)])
+		$pwd = '~' + ($pwd | str substring ($env.HOME | str length)..($pwd | str length))
 	}
 
 	$pwd = ($pwd | str replace '\\' '/' --all)
@@ -25,13 +25,13 @@ def create_left_prompt [] {
 def create_right_prompt [] {
 }
 
-let-env PROMPT_COMMAND = { create_left_prompt }
-let-env PROMPT_COMMAND_RIGHT = { create_right_prompt }
+let-env PROMPT_COMMAND = {|| create_left_prompt }
+let-env PROMPT_COMMAND_RIGHT = {|| create_right_prompt }
 
-let-env PROMPT_INDICATOR = { "〉" }
-let-env PROMPT_INDICATOR_VI_INSERT = { ": " }
-let-env PROMPT_INDICATOR_VI_NORMAL = { "〉" }
-let-env PROMPT_MULTILINE_INDICATOR = { "::: " }
+let-env PROMPT_INDICATOR = {|| "〉" }
+let-env PROMPT_INDICATOR_VI_INSERT = {|| ": " }
+let-env PROMPT_INDICATOR_VI_NORMAL = {|| "〉" }
+let-env PROMPT_MULTILINE_INDICATOR = {|| "::: " }
 
 let-env ENV_CONVERSIONS = {
 	"PATH": {
