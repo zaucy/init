@@ -1,5 +1,6 @@
 :root {
 	--chat-top-offset: 40px;
+	--color-background-base: transparent !important;
 }
 
 body {
