@@ -38,18 +38,18 @@ require("lazy").setup({
 	{
 		'nathom/filetype.nvim',
 		opts = {
-			extensions = {
-				bazel = "bazel",
-				bzl = "bazel",
-				ecsact = "ecsact",
-				html = "html",
-			},
-			literal = {
-				WORKSPACE = "bazel",
-				BUILD = "bazel",
-			},
 			overrides = {
-				ecsact = "ecsact",
+				extensions = {
+					bazel = "bazel",
+					bzl = "bazel",
+					ecsact = "ecsact",
+					html = "html",
+					h = "cpp",
+				},
+				literal = {
+					WORKSPACE = "bazel",
+					BUILD = "bazel",
+				},
 			},
 		},
 	},
