@@ -13,12 +13,15 @@ M.on_attach = function(lsp, client, bufnr)
 			client.server_capabilities.documentFormattingProvider = false
 		end
 	elseif client.name ~= 'clangd' and util.path.is_file('.clang-format') then
-		vim.api.nvim_clear_autocmds({ group = fmt_augroup, buffer = bufnr })
-		vim.api.nvim_create_autocmd("BufWritePre", {
-			group = fmt_augroup,
-			buffer = bufnr,
-			command = "%!clang-format --assume-filename=@% --style=file",
-		})
+		local ft = vim.bo.filetype
+		if ft == "cs" then
+			vim.api.nvim_clear_autocmds({ group = fmt_augroup, buffer = bufnr })
+			vim.api.nvim_create_autocmd("BufWritePre", {
+				group = fmt_augroup,
+				buffer = bufnr,
+				command = "%!clang-format --assume-filename=@% --style=file",
+			})
+		end
 	elseif client.supports_method("textDocument/formatting") then
 		vim.api.nvim_clear_autocmds({ group = fmt_augroup, buffer = bufnr })
 		vim.api.nvim_create_autocmd("BufWritePre", {

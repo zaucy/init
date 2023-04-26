@@ -276,6 +276,8 @@ require("lazy").setup({
 	},
 	{
 		'zaucy/bazel.nvim',
+		dir = '~/projects/zaucy/bazel.nvim',
+		dev = true,
 		opts = {
 			format_on_save = true,
 		},
@@ -369,6 +371,31 @@ require("lazy").setup({
 
 			vim.g.markdown_composer_syntax_theme = 'Dark'
 		end,
+	},
+	{
+		'zaucy/pretty-fold.nvim',
+		commit = 'f8e8b1ff190cad4c2d2b146b268a9ed764e5d80f',
+		config = function()
+			local pretty_fold = require('pretty-fold')
+			pretty_fold.setup {
+				keep_indentation = true,
+				fill_char = '━',
+				sections = {
+					left = { 'content', '┣' },
+					right = {
+						'┫ ',
+						'number_of_folded_lines',
+						': ',
+						'percentage',
+						' ┣━━',
+					},
+				},
+			}
+		end,
+	},
+	{
+		'RaafatTurki/hex.nvim',
+		opts = {},
 	},
 }, {
 	lockfile = "~/projects/zaucy/init/nvim-config/lazy-lock.json",
