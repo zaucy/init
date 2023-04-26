@@ -15,7 +15,7 @@ if [ -z "$(which git)" ]; then
 fi
 
 if [ ! -d ".git" ]; then
-  git clone https://github.com/zaucy/init.git .
+  git clone --recurse-submodules https://github.com/zaucy/init.git .
 else
   git pull
 fi

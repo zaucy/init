@@ -27,7 +27,7 @@ if %ErrorLevel% neq 0 (
 )
 
 if not exist .\.git (
-  git clone https://github.com/zaucy/init.git .
+  git clone --recurse-submodules https://github.com/zaucy/init.git .
 ) else {
   git pull
 }
