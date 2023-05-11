@@ -42,6 +42,7 @@ require("lazy").setup({
 				extensions = {
 					bazel = "bazel",
 					bzl = "bazel",
+					bazelrc = "bazelrc",
 					ecsact = "ecsact",
 					html = "html",
 					h = "cpp",
@@ -70,8 +71,6 @@ require("lazy").setup({
 			},
 			{
 				'williamboman/mason.nvim',
-				dir = '~/projects/zaucy/mason.nvim',
-				dev = true,
 				cmd = 'Mason',
 			},
 			{ 'williamboman/mason-lspconfig.nvim' },
@@ -395,6 +394,10 @@ require("lazy").setup({
 	},
 	{
 		'RaafatTurki/hex.nvim',
+		opts = {},
+	},
+	{
+		'ThePrimeagen/harpoon',
 		opts = {},
 	},
 }, {

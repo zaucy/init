@@ -1,6 +1,8 @@
 local wk = require('which-key')
 
-wk.register({
+local config = { prefix = "<leader>" }
+
+local keys = {
 	gitb = { "<cmd>Gitsign blame_line<CR>", "Git blame current line" },
 	qf = { "<cmd>Telescope quickfix theme=ivy<CR>", "Quick Fix" },
 	tt = { "<cmd>Neotree toggle<CR>", "Tree Toggle" },
@@ -34,5 +36,11 @@ wk.register({
 			t = { "<cmd>BazelSourceTargetTest<Cr>", "Bazel Test (target with source)" },
 			d = { "<cmd>BazelSourceTargetDebugLaunch lldb<Cr>", "Bazel Debug Launch (target with source)" },
 		},
-	}
-}, { prefix = "<leader>" })
+	},
+	m = { function() require("harpoon.mark").add_file() end, "Harpoon Mark" },
+	vm = { function() require("harpoon.ui").toggle_quick_menu() end, "Show Harpoon List" },
+	['['] = { function() require("harpoon.ui").nav_prev() end, "Harpoon Previous" },
+	[']'] = { function() require("harpoon.ui").nav_next() end, "Harpoon Next" },
+}
+
+wk.register(keys, config)
