@@ -5,8 +5,8 @@ local config = { prefix = "<leader>" }
 local keys = {
 	gitb = { "<cmd>Gitsign blame_line<CR>", "Git blame current line" },
 	qf = { "<cmd>Telescope quickfix theme=ivy<CR>", "Quick Fix" },
-	tt = { "<cmd>Neotree toggle<CR>", "Tree Toggle" },
-	tr = { "<cmd>Neotree reveal<CR>", "Reveal in Tree" },
+	tt = { "<cmd>Neotree toggle position=float<CR>", "Tree Toggle" },
+	tr = { "<cmd>Neotree reveal position=float<CR>", "Reveal in Tree" },
 	tgs = { "<cmd>Neotree git_status position=float<CR>", "Tree Git Status" },
 	gs = { "<cmd>AerialOpen left<CR>", "Go to Aerial Symbols Panel" },
 	f = {

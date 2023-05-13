@@ -227,6 +227,7 @@ require("lazy").setup({
 				mappings = {
 					["."] = "set_root",
 					["H"] = "toggle_hidden",
+					["f"] = "fuzzy_finder",
 					["<2-LeftMouse>"] = "open",
 					["<cr>"] = "open",
 					["<esc>"] = "revert_preview",
