@@ -1,17 +1,47 @@
-def "nu-complete bazel targets" [] {
-	^bzlq targets | lines | each {|it| $it | from json | rename -c [label value] }
+def "nu-complete bazel build-targets" [] {
+	let completions = (bzlq targets "" | lines | each {|it| $it | from json | rename -c [label value] } | prepend {value: "//...", description: "all targets"});
+	
+	{
+		completions: $completions,
+		options: {
+			case_sensitive: false,
+			positional: false,
+			should_sort: false,
+			completion_algorithm: "prefix",
+		}
+	}
 }
 
 def "nu-complete bazel run-targets" [] {
-	^bzlq targets --run-only | lines | each {|it| $it | from json | rename -c [label value] }
+	let completions = (bzlq targets --run-only "" | lines | each {|it| $it | from json | rename -c [label value] });
+	
+	{
+		completions: $completions,
+		options: {
+			case_sensitive: false,
+			positional: false,
+			should_sort: false,
+			completion_algorithm: "prefix",
+		}
+	}
 }
 
 def "nu-complete bazel test-targets" [] {
-	^bzlq targets --test-only | lines | each {|it| $it | from json | rename -c [label value] }
+	let completions = (bzlq targets --test-only "" | lines | each {|it| $it | from json | rename -c [label value] } | prepend {value: "//...", description: "all targets"});
+	
+	{
+		completions: $completions,
+		options: {
+			case_sensitive: false,
+			positional: false,
+			should_sort: false,
+			completion_algorithm: "prefix",
+		}
+	}
 }
 
 export extern "bazel build" [
-	...targets: string@"nu-complete bazel targets",
+	...targets: string@"nu-complete bazel build-targets",
 ]
 
 export extern "bazel run" [
