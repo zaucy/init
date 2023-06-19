@@ -37,6 +37,7 @@ require("lazy").setup({
 	-- File type
 	{
 		'nathom/filetype.nvim',
+		lazy = false,
 		opts = {
 			overrides = {
 				extensions = {
@@ -50,6 +51,9 @@ require("lazy").setup({
 				literal = {
 					WORKSPACE = "bazel",
 					BUILD = "bazel",
+					[".bazelrc"] = "bazelrc",
+					[".gitignore"] = "gitignore",
+					[".bazelignore"] = "gitignore",
 				},
 			},
 		},

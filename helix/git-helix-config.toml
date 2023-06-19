@@ -1,0 +1,24 @@
+theme = "base16_transparent"
+
+[editor.cursor-shape]
+normal = "block"
+insert= "bar"
+select = "underline"
+
+[editor.whitespace.render]
+space = "none"
+tab = "all"
+newline = "none"
+
+[editor.indent-guides]
+render = true
+
+[editor.statusline]
+left = ["mode", "file-name", "file-modification-indicator", "file-type"]
+center = []
+right = []
+separator = "│"
+mode.normal = "NORMAL"
+mode.insert = "INSERT"
+mode.select = "SELECT"
+

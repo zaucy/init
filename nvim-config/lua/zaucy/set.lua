@@ -21,3 +21,6 @@ vim.g.did_load_filetypes = 1
 
 -- netrw settings
 vim.g.netrw_keepdir = 0
+
+-- lsp, yo
+vim.lsp.set_log_level("off")

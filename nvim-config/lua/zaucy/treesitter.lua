@@ -11,6 +11,17 @@ parser_config.ecsact = {
 	filetype = "ecsact", -- if filetype does not match the parser name
 }
 
+parser_config.bazelrc = {
+	install_info = {
+		url = "~/projects/tree-sitter-bazelrc",
+		files = { "src/parser.c" },
+		branch = "main",
+		generate_requires_npm = false,
+		requires_generate_from_grammar = false,
+	},
+	filetype = "bazelrc",
+}
+
 local ft_to_parser = require "nvim-treesitter.parsers".filetype_to_parsername
 ft_to_parser.bazel = "python" -- no tree sitter for bazel. Python is close enough.
 

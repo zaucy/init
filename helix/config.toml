@@ -1,0 +1,25 @@
+theme = "tokyonight_storm"
+
+[editor.cursor-shape]
+normal = "block"
+insert= "bar"
+select = "underline"
+
+[editor.whitespace.render]
+space = "none"
+tab = "all"
+newline = "none"
+
+[editor.indent-guides]
+render = true
+
+
+[editor.statusline]
+left = ["mode", "spinner", "version-control", "file-name", "file-modification-indicator", "diagnostics"]
+center = []
+right = ["selections", "position", "file-encoding", "file-line-ending", "file-type"]
+separator = "│"
+mode.normal = "NORMAL"
+mode.insert = "INSERT"
+mode.select = "SELECT"
+
