@@ -52,3 +52,6 @@ export extern "bazel test" [
 	...targets: string@"nu-complete bazel test-targets",
 ]
 
+export extern "bazel-dbg" [
+	target: string@"nu-complete bazel run-targets",
+]
