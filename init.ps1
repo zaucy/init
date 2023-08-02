@@ -65,6 +65,10 @@ $NushellConfigDir = "$env:APPDATA\nushell"
 mkdir $NushellConfigDir -Force | Out-Null
 Copy-Item -Path ".\nushell\*" -Destination "$NushellConfigDir" -Recurse -Force
 
+$HelixConfigDir = "$env:APPDATA\helix"
+mkdir $HelixConfigDir -Force | Out-Null
+Copy-Item -Path ".\helix\*" -Destination "$HelixConfigDir" -Recurse -Force
+
 if ((Get-Command "cargo.exe" -errorAction SilentlyContinue) -eq $false)
 {
 	# Get rust + cargo

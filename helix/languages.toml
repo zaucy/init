@@ -1,0 +1,33 @@
+[language-server]
+ecsact_lsp_server = { command = "ecsact_lsp_server", args = ["--stdio"] }
+mdpls = { command = "mdpls", args = [] }
+
+[language-server.quick-lint-js]
+command = "quick-lint-js"
+args = [ "--lsp-server" ]
+
+[language-server.tailwindcss]
+command = "hx-tw"
+args = ["--stdio"]
+
+[[language]]
+name = "ecsact"
+scope = "source.ecsact"
+injection-regex = "ecsact"
+file-types = ["ecsact"]
+comment-token = "//"
+indent = { tab-width = 2, unit = "  " }
+language-servers = [ "ecsact_lsp_server" ]
+roots = []
+
+[[language]]
+name = "markdown"
+language-servers = [ "mdpls" ]
+
+[[grammar]]
+name = "ecsact"
+source = { git = "https://github.com/ecsact-dev/tree-sitter-ecsact", rev = "f499af600b3ac06353fa09c4b5f75f802a3aee34" }
+
+[[language]]
+name = "javascript"
+language-servers = ["typescript-language-server", "quick-lint-js"]

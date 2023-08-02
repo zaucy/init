@@ -15,7 +15,7 @@ def create_left_prompt [] {
 		$"(ansi green_bold)($pwd)"
 	}
 
-	if 'WSLENV' in $env {
+	if 'WSL_DISTRO_NAME' in $env {
 		$path_segment = $"(ansi -e {fg: '#dd4814'}) ($path_segment)"
 	}
 
