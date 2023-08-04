@@ -11,6 +11,11 @@ command = "hx-tw"
 args = ["--stdio"]
 
 [[language]]
+name = "starlark"
+formatter = { command = "buildifier" }
+auto-format = true
+
+[[language]]
 name = "ecsact"
 scope = "source.ecsact"
 injection-regex = "ecsact"
