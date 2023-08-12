@@ -44,6 +44,8 @@ let-env ENV_CONVERSIONS = {
 	}
 }
 
+let-env HELIX_RUNTIME = ('~/projects/helix-editor/helix/runtime' | path expand)
+
 def-env PATH-prepend [p] {
 	if 'PATH' in $env {
 		$env.PATH = ($env.PATH | prepend $p)

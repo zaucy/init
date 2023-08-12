@@ -25,6 +25,8 @@ cp ./nvim-config/* $HOME/.config/nvim --force --recursive
 
 mkdir -p $HOME/.config/nushell
 cp ./nushell/* $HOME/.config/nushell --force --recursive
+mkdir -p $HOME/.config/helix
+cp ./helix/* $HOME/.config/helix --force --recursive
 
 if [ -z "$(which gh)" ]; then
   type -p curl >/dev/null || sudo apt install curl -y
