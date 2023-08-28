@@ -75,6 +75,8 @@ let-env NU_PLUGIN_DIRS = [
 	($nu.config-path | path dirname | path join 'plugins')
 ]
 
+let-env HELIX_RUNTIME = ("~/projects/helix-editor/helix/runtime" | path expand)
+
 PATH-append '~/.local/bin'
 PATH-append '~/.cargo/bin'
 
