@@ -69,6 +69,11 @@ $HelixConfigDir = "$env:APPDATA\helix"
 mkdir $HelixConfigDir -Force | Out-Null
 Copy-Item -Path ".\helix\*" -Destination "$HelixConfigDir" -Recurse -Force
 
+$WindowsStartupDir = "$env:APPDATA\Microsoft\Windows\Start Menu\Startup"
+mkdir $WindowsStartupDir -Force | Out-Null
+Copy-Item -Path ".\windows\startup\*" -Destination "$WindowsStartupDir" -Recurse -Force
+.\windows\startup\winkey-power-toys-run.ahk
+
 if ((Get-Command "cargo.exe" -errorAction SilentlyContinue) -eq $false)
 {
 	# Get rust + cargo
