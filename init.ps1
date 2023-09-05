@@ -69,7 +69,7 @@ $HelixConfigDir = "$env:APPDATA\helix"
 mkdir $HelixConfigDir -Force | Out-Null
 Copy-Item -Path ".\helix\*" -Destination "$HelixConfigDir" -Recurse -Force
 
-$WindowsStartupDir = "$env:APPDATA\Microsoft\Windows\Start Menu\Startup"
+$WindowsStartupDir = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup"
 mkdir $WindowsStartupDir -Force | Out-Null
 Copy-Item -Path ".\windows\startup\*" -Destination "$WindowsStartupDir" -Recurse -Force
 .\windows\startup\winkey-power-toys-run.ahk
