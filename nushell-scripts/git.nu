@@ -29,3 +29,39 @@ def "git-prune-branches" [] {
 	}
 }
 
+export def-env "ghpr" [$query = ""] {
+	let prs = (gh search prs $query --author=zaucy --state=open --json=title,repository,number | from json | each {|item| {
+		title: $item.title,
+		repository: $item.repository.nameWithOwner,
+		id: $item.number,
+	}})
+
+	if ($prs | length) == 0 {
+		print $"(ansi rb)Cannot find any pr with search '($query)'";
+		return;
+	}
+
+	let pr = if ($prs | length) > 1 {
+		$prs | input list -f 'select pr'
+	} else {
+		$prs | get 0
+	}
+
+	if $pr == "" {
+		return;
+	}
+
+	let pr_dir = ($"~/projects/($pr.repository)" | path expand);
+
+	if not ($pr_dir | path exists) {
+		mkdir $pr_dir
+	}
+
+	if not ($"($pr_dir)/.git" | path exists) {
+		gh repo clone $pr.repository $pr_dir
+	}
+
+	cd $pr_dir;
+
+	gh pr checkout $pr.id
+}
