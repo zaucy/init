@@ -1,5 +1,9 @@
 theme = "zaucy"
 
+[editor]
+line-number = "relative"
+default-line-ending = "lf"
+
 [editor.cursor-shape]
 normal = "block"
 insert= "bar"

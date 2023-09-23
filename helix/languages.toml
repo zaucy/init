@@ -1,6 +1,7 @@
 [language-server]
 ecsact_lsp_server = { command = "ecsact_lsp_server", args = ["--stdio"] }
 mdpls = { command = "mdpls", args = [] }
+clangd = { command = "clangd", args = ["--enable-config"] }
 
 [language-server.quick-lint-js]
 command = "quick-lint-js"
