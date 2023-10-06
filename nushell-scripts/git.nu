@@ -1,6 +1,8 @@
 def gac [] { git add .; git commit }
 def "gac typo" [] { git add .; git commit -m "fix: typo" }
 
+def gap [] { git add -N .; git commit -p }
+
 def "git-prune-branches" [] {
 	^git fetch -p;
 	let branches = (^git branch -vv | find 'gone');
