@@ -5,5 +5,7 @@ def wsl-cd [] {
 		$pwd = '~' + ($pwd | str substring ($env.USERPROFILE | str length)..($pwd | str length));
   }
 
+	$pwd = ($pwd | str replace '\' '/' -a);
+
   wsl --cd $pwd
 }

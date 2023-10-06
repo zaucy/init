@@ -7,6 +7,7 @@ source ~/.fnm/fnm_config.nu
 source ~/projects/zaucy/init/stream/scripts/chat-popout.nu
 source ~/projects/zaucy/init/nushell-scripts/nvim.nu
 source ~/projects/zaucy/init/nushell-scripts/git.nu
+source ~/projects/zaucy/init/nushell-scripts/wsl.nu
 source ~/projects/zaucy/init/nushell-scripts/zoxide.nu
 source ~/projects/zaucy/init/nushell-scripts/ecsact.nu
 source ~/projects/zaucy/init/nushell-scripts/bazel.nu
