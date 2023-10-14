@@ -65,10 +65,6 @@ $NushellConfigDir = "$env:APPDATA\nushell"
 mkdir $NushellConfigDir -Force | Out-Null
 Copy-Item -Path ".\nushell\*" -Destination "$NushellConfigDir" -Recurse -Force
 
-$HelixConfigDir = "$env:APPDATA\helix"
-mkdir $HelixConfigDir -Force | Out-Null
-Copy-Item -Path ".\helix\*" -Destination "$HelixConfigDir" -Recurse -Force
-
 $WindowsStartupDir = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup"
 mkdir $WindowsStartupDir -Force | Out-Null
 Copy-Item -Path ".\windows\startup\*" -Destination "$WindowsStartupDir" -Recurse -Force
@@ -109,5 +105,7 @@ if ((Get-Command "rg.exe" -errorAction SilentlyContinue) -eq $false)
 {
 	scoop update ripgrep
 }
+
+nu init.nu
 
 # TODO(zaucy): init WSL + WSLg
