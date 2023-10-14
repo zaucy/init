@@ -37,3 +37,7 @@ source = { git = "https://github.com/ecsact-dev/tree-sitter-ecsact", rev = "f499
 [[language]]
 name = "javascript"
 language-servers = ["typescript-language-server", "quick-lint-js"]
+
+[[language]]
+name = "cpp"
+auto-format = true

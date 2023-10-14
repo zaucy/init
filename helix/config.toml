@@ -19,11 +19,10 @@ render = true
 
 
 [editor.statusline]
-left = ["mode", "spinner", "spacer", "version-control", "file-name", "file-modification-indicator", "diagnostics"]
-center = []
-right = ["selections", "position", "file-encoding", "file-line-ending", "file-type"]
+left = ["mode", "spinner", "spacer", "version-control", "diagnostics"]
+center = ["file-base-name", "file-modification-indicator"]
+right = ["selections", "position", "file-line-ending"]
 separator = "│"
-mode.normal = "NORMAL"
-mode.insert = "INSERT"
-mode.select = "SELECT"
-
+mode.normal = "⌬"
+mode.insert = "✎"
+mode.select = "⌨"
