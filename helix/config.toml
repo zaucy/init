@@ -19,8 +19,8 @@ render = true
 
 
 [editor.statusline]
-left = ["mode", "spinner", "spacer", "version-control", "diagnostics"]
-center = ["file-base-name", "file-modification-indicator"]
+left = ["mode", "spinner", "spacer", "version-control"]
+center = ["file-modification-indicator", "file-base-name", "diagnostics"]
 right = ["selections", "position", "file-line-ending"]
 separator = "│"
 mode.normal = "⌬"
