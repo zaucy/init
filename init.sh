@@ -25,8 +25,7 @@ cp ./nvim-config/* $HOME/.config/nvim --force --recursive
 
 mkdir -p $HOME/.config/nushell
 cp ./nushell/* $HOME/.config/nushell --force --recursive
-mkdir -p $HOME/.config/helix
-cp ./helix/* $HOME/.config/helix --force --recursive
+
 mkdir -p $HOME/.config/wezterm
 cp ./wezterm/* $HOME/.config/wezterm --force --recursive
 
@@ -66,3 +65,4 @@ if [ -z "$(which zoxide)" ]; then
   cargo install zoxide
 fi
 
+nu init.nu

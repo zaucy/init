@@ -30,9 +30,9 @@ roots = []
 name = "markdown"
 language-servers = [ "mdpls" ]
 
-[[grammar]]
-name = "ecsact"
-source = { git = "https://github.com/ecsact-dev/tree-sitter-ecsact", rev = "f499af600b3ac06353fa09c4b5f75f802a3aee34" }
+# [[grammar]]
+# name = "ecsact"
+# source = { git = "https://github.com/ecsact-dev/tree-sitter-ecsact", rev = "f499af600b3ac06353fa09c4b5f75f802a3aee34" }
 
 [[language]]
 name = "javascript"
