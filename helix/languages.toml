@@ -3,6 +3,9 @@ ecsact_lsp_server = { command = "ecsact_lsp_server", args = ["--stdio"] }
 mdpls = { command = "mdpls", args = [] }
 clangd = { command = "clangd", args = ["--enable-config"] }
 
+# Unity projects take forever to load
+omnisharp = { command = "OmniSharp", args = [ "--languageserver" ], timeout = 3000 }
+
 [language-server.quick-lint-js]
 command = "quick-lint-js"
 args = [ "--lsp-server" ]
@@ -17,6 +20,61 @@ formatter = { command = "buildifier" }
 auto-format = true
 
 [[language]]
+name = "unity-meta"
+scope = "source.yaml"
+file-types = ["meta"]
+roots = ["ProjectSettings/ProjectVersion.txt"]
+comment-token = "#"
+indent = { tab-width = 2, unit = "  " }
+language-servers = [ "yaml-language-server" ]
+grammar = "yaml"
+icon = { text = "", color = "#626262" }
+
+[[language]]
+name = "unity-asset"
+scope = "source.yaml"
+file-types = ["asset"]
+roots = ["ProjectSettings/ProjectVersion.txt"]
+comment-token = "#"
+indent = { tab-width = 2, unit = "  " }
+language-servers = [ "yaml-language-server" ]
+grammar = "yaml"
+icon = { text = "", color = "#00cccc" }
+
+[[language]]
+name = "unity-anim"
+scope = "source.yaml"
+file-types = ["anim"]
+roots = ["ProjectSettings/ProjectVersion.txt"]
+comment-token = "#"
+indent = { tab-width = 2, unit = "  " }
+language-servers = [ "yaml-language-server" ]
+grammar = "yaml"
+icon = { text = "", color = "#b83c82" }
+
+[[language]]
+name = "unity-controller"
+scope = "source.yaml"
+file-types = ["controller"]
+roots = ["ProjectSettings/ProjectVersion.txt"]
+comment-token = "#"
+indent = { tab-width = 2, unit = "  " }
+language-servers = [ "yaml-language-server" ]
+grammar = "yaml"
+icon = { text = "", color = "#ff7f33" }
+
+[[language]]
+name = "unity-scene"
+scope = "source.yaml"
+file-types = ["unity"]
+roots = ["ProjectSettings/ProjectVersion.txt"]
+comment-token = "#"
+indent = { tab-width = 2, unit = "  " }
+language-servers = [ "yaml-language-server" ]
+grammar = "yaml"
+icon = { text = "", color = "#ff0066" }
+
+[[language]]
 name = "ecsact"
 scope = "source.ecsact"
 injection-regex = "ecsact"
@@ -25,6 +83,7 @@ comment-token = "//"
 indent = { tab-width = 2, unit = "  " }
 language-servers = [ "ecsact_lsp_server" ]
 roots = []
+icon = { text = "", color = "#cf9114" }
 
 [[language]]
 name = "markdown"
