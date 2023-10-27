@@ -20,6 +20,7 @@ return {
 	initial_rows = 50,
 	initial_cols = 200,
 	font_size = 20.0,
+	font = wezterm.font_with_fallback { 'FiraCode Nerd Font Mono' },
 	max_fps = 144,
 	animation_fps = 1,
 	cursor_blink_ease_in = 'Constant',
