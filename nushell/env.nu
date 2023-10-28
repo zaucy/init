@@ -1,3 +1,11 @@
+def get_box_color [] {
+	if ($env.LAST_EXIT_CODE == 0) {
+		ansi grey
+	} else {
+		ansi red
+	}
+}
+
 def create_left_prompt [] {
 	mut pwd = ($env.PWD)
 
@@ -7,31 +15,39 @@ def create_left_prompt [] {
 		$pwd = '~' + ($pwd | str substring ($env.HOME | str length)..($pwd | str length))
 	}
 
-	$pwd = ($pwd | str replace '\\' '/' --all)
+	$pwd = ($pwd | str replace '\' '/' --all)
+	mut prefix = "";
 
-	mut path_segment = if (is-admin) {
-		$"(ansi red_bold)($pwd) 🛡 "
+	let main_color = if (is-admin) {
+		ansi red_bold
 	} else {
-		$"(ansi green_bold)($pwd)"
+		ansi green_bold
+	};
+
+	let box_color = get_box_color;
+
+	if (is-admin) {
+		$prefix += "🛡 ";
 	}
 
 	if 'WSL_DISTRO_NAME' in $env {
-		$path_segment = $"(ansi -e {fg: '#dd4814'}) ($path_segment)"
+		$prefix += $"(ansi -e {fg: '#dd4814'}) ";
 	}
 
-	$path_segment
+	($"($box_color)╭─⦗" + $prefix + $"($main_color)($pwd)" + $"($box_color) ⦘(ansi reset)")
 }
 
 def create_right_prompt [] {
+	$nothing
 }
 
 $env.PROMPT_COMMAND = {|| create_left_prompt }
 $env.PROMPT_COMMAND_RIGHT = {|| create_right_prompt }
 
-$env.PROMPT_INDICATOR = {|| "〉" }
+$env.PROMPT_INDICATOR = {|| $"\r\n(get_box_color)╰〉(ansi reset)" }
 $env.PROMPT_INDICATOR_VI_INSERT = {|| ": " }
 $env.PROMPT_INDICATOR_VI_NORMAL = {|| "〉" }
-$env.PROMPT_MULTILINE_INDICATOR = {|| "::: " }
+$env.PROMPT_MULTILINE_INDICATOR = {|| ":: " }
 
 $env.ENV_CONVERSIONS = {
 	"PATH": {
