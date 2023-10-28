@@ -1,8 +1,27 @@
+use ~/projects/zaucy/init/nushell-scripts/nu_scripts/modules/prompt/async_git_prompt/async-git-prompt.nu *
+
 def get_box_color [] {
 	if ($env.LAST_EXIT_CODE == 0) {
 		ansi grey
 	} else {
 		ansi red
+	}
+}
+
+def prompt-concat [parts: table] {
+	$parts
+	| where (not ($it.text | is-empty))
+	| each { |it| $"($it.color)($it.text)" }
+	| str join ' '
+}
+
+def prompt-git-branch [] {
+	let branch = do -i { git rev-parse --abbrev-ref HEAD | str trim -r};
+
+	if ($branch | is-empty) {
+		""
+	} else {
+		(" " + $branch)
 	}
 }
 
@@ -27,14 +46,21 @@ def create_left_prompt [] {
 	let box_color = get_box_color;
 
 	if (is-admin) {
-		$prefix += "🛡 ";
+		$prefix += $"(ansi red) ";
 	}
 
 	if 'WSL_DISTRO_NAME' in $env {
-		$prefix += $"(ansi -e {fg: '#dd4814'}) ";
+		$prefix += $"(ansi -e {fg: '#dd4814'}) (ansi reset)";
 	}
 
-	($"($box_color)╭─⦗" + $prefix + $"($main_color)($pwd)" + $"($box_color) ⦘(ansi reset)")
+	prompt-concat [
+		[text color];
+		["╭─⦗" $box_color]
+		[$prefix $main_color]
+		[$pwd $main_color]
+		["⦘" $box_color]
+		# [(prompt-git-branch)  (ansi blue_bold)]
+	]
 }
 
 def create_right_prompt [] {
