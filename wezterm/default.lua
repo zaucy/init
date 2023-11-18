@@ -1,8 +1,71 @@
 local wezterm = require('wezterm')
+local io = require('io')
 local act = wezterm.action
 
 local terminal_panes = {}
 
+local function is_file(path)
+	local f=io.open(path,"r")
+	if f~=nil then io.close(f) return true else return false end
+end
+
+local function is_dir(path)
+	return false
+end
+
+function exists(file)
+   local ok, err, code = os.rename(file, file)
+   if not ok then
+      if code == 13 then
+         -- Permission denied, but it exists
+         return true
+      end
+   end
+   return ok, err
+end
+
+local function get_dir_icon(dir)
+	if is_file(dir .. "ProjectSettings/ProjectVersion.txt") then
+		return "󰚯"
+	elseif is_file(dir .. "MODULE.bazel") then
+		return ""
+	elseif exists(dir .. "node_modules") then
+		return "󰎙"
+	elseif exists(dir .. "Cargo.toml") then
+		return "󱘗"
+	elseif exists(dir .. "go.mod") then
+		return "󰟓"
+	else
+		return "󰉋"
+	end
+end
+
+local function tab_title(tab_info)
+	local title = tab_info.tab_title
+	-- if the tab title is explicitly set, take that
+	if title and #title > 0 then
+		return title
+	end
+
+	local cwd = tab_info.active_pane.current_working_dir:gsub("file:///", "")
+	local dirname = cwd:match("^.+/(.+)/$")
+
+	return get_dir_icon(cwd) .. "   " .. dirname
+end
+
+wezterm.on(
+	'format-tab-title',
+	function(tab)
+		local title = tab_title(tab)
+		if tab.is_active then
+			return {
+				{ Background = { Color = '#1f2335' } },
+				{ Text = ' ' .. title .. ' ' },
+			}
+		end
+		return ' ' .. title .. ' '
+	end
+)
 return {
 	font_size = 20.0,
 	font = wezterm.font_with_fallback { 'FiraCode Nerd Font' },
@@ -12,11 +75,16 @@ return {
 	cursor_blink_ease_out = 'Constant',
 	cursor_blink_rate = 300,
 	cursor_thickness = "1px",
-	hide_tab_bar_if_only_one_tab = true,
+	hide_tab_bar_if_only_one_tab = false,
 	show_tab_index_in_tab_bar = false,
+	use_fancy_tab_bar = true,
 	tab_max_width = 100,
 	default_prog = { "nu" },
-	window_decorations = "INTEGRATED_BUTTONS",
+	window_decorations = "INTEGRATED_BUTTONS|RESIZE",
+	window_frame = {
+		active_titlebar_bg = "#161316",
+		font_size = 12.0,
+	},
 	window_padding = {
 		left = 0,
 		right = 0,
@@ -38,7 +106,77 @@ return {
 		saturation = 0.9,
 	},
 	colors = {
+		tab_bar = {
+			-- The color of the strip that goes along the top of the window
+			-- (does not apply when fancy tab bar is in use)
+			background = 'none',
 
+			-- The active tab is the one that has focus in the window
+			active_tab = {
+				-- The color of the background area for the tab
+				bg_color = 'none',
+				-- The color of the text for the tab
+				fg_color = '#c0c0c0',
+
+				-- Specify whether you want "Half", "Normal" or "Bold" intensity for the
+				-- label shown for this tab.
+				-- The default is "Normal"
+				intensity = 'Normal',
+
+				-- Specify whether you want "None", "Single" or "Double" underline for
+				-- label shown for this tab.
+				-- The default is "None"
+				underline = 'None',
+
+				-- Specify whether you want the text to be italic (true) or not (false)
+				-- for this tab.  The default is false.
+				italic = false,
+
+				-- Specify whether you want the text to be rendered with strikethrough (true)
+				-- or not for this tab.  The default is false.
+				strikethrough = false,
+			},
+
+			-- Inactive tabs are the tabs that do not have focus
+			inactive_tab = {
+				bg_color = 'none',
+				fg_color = '#808080',
+
+				-- The same options that were listed under the `active_tab` section above
+				-- can also be used for `inactive_tab`.
+			},
+
+			-- You can configure some alternate styling when the mouse pointer
+			-- moves over inactive tabs
+			inactive_tab_hover = {
+				bg_color = '#3b3052',
+				fg_color = '#909090',
+				italic = true,
+
+				-- The same options that were listed under the `active_tab` section above
+				-- can also be used for `inactive_tab_hover`.
+			},
+
+			-- The new tab button that let you create new tabs
+			new_tab = {
+				bg_color = 'none',
+				fg_color = '#808080',
+
+				-- The same options that were listed under the `active_tab` section above
+				-- can also be used for `new_tab`.
+			},
+
+			-- You can configure some alternate styling when the mouse pointer
+			-- moves over the new tab button
+			new_tab_hover = {
+				bg_color = '#3b3052',
+				fg_color = '#909090',
+				italic = true,
+
+				-- The same options that were listed under the `active_tab` section above
+				-- can also be used for `new_tab_hover`.
+			},
+		},
 	},
 	keys = {
 		{
