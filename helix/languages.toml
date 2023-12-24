@@ -14,9 +14,14 @@ args = [ "--lsp-server" ]
 command = "hx-tw"
 args = ["--stdio"]
 
+[language-server.starlark]
+command = "starlark"
+args = ["--bazel", "--lsp"]
+
 [[language]]
 name = "starlark"
 formatter = { command = "buildifier" }
+language-servers = ["starlark"]
 auto-format = true
 
 [[language]]
@@ -89,10 +94,6 @@ icon = { text = "", color = "#cf9114" }
 name = "markdown"
 language-servers = [ "mdpls" ]
 
-[[grammar]]
-name = "ecsact"
-source = { git = "https://github.com/ecsact-dev/tree-sitter-ecsact", rev = "572a812765eb861af11fd0debfd894160003ccf9" }
-copy-queries = true
 
 [[language]]
 name = "javascript"
@@ -101,3 +102,17 @@ language-servers = ["typescript-language-server", "quick-lint-js"]
 [[language]]
 name = "cpp"
 auto-format = true
+
+[[language]]
+name = "cpp2"
+scope = "cpp2"
+file-types = ["cpp2"]
+
+[[grammar]]
+name = "ecsact"
+source = { git = "https://github.com/ecsact-dev/tree-sitter-ecsact", rev = "572a812765eb861af11fd0debfd894160003ccf9" }
+copy-queries = true
+
+[[grammar]]
+name = "cpp2"
+source = { git = "https://github.com/APokorny/tree-sitter-cpp2", rev = "02d261f5377663a77ae4dfa1a970e815f56ad7f6" }
