@@ -31,7 +31,7 @@ def "git-prune-branches" [] {
 	}
 }
 
-export def-env "ghpr" [$query = ""] {
+def --env "ghpr" [query = ""] {
 	let prs = (gh search prs $query --author=zaucy --state=open --visibility=public --json=title,repository,number | from json | each {|item| {
 		title: $item.title,
 		repository: $item.repository.nameWithOwner,

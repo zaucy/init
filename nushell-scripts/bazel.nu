@@ -1,5 +1,5 @@
 def "nu-complete bazel build-targets" [] {
-	let completions = (bzlq targets "" | lines | each {|it| $it | from json | rename -c [label value] } | prepend {value: "//...", description: "all targets"});
+	let completions = (bzlq targets "" | lines | each {|it| $it | from json | rename -c {label: value} } | prepend {value: "//...", description: "all targets"});
 	
 	{
 		completions: $completions,
@@ -13,7 +13,7 @@ def "nu-complete bazel build-targets" [] {
 }
 
 def "nu-complete bazel run-targets" [] {
-	let completions = (bzlq targets --run-only "" | lines | each {|it| $it | from json | rename -c [label value] });
+	let completions = (bzlq targets --run-only "" | lines | each {|it| $it | from json | rename -c {label: value} });
 	
 	{
 		completions: $completions,
@@ -27,7 +27,7 @@ def "nu-complete bazel run-targets" [] {
 }
 
 def "nu-complete bazel test-targets" [] {
-	let completions = (bzlq targets --test-only "" | lines | each {|it| $it | from json | rename -c [label value] } | prepend {value: "//...", description: "all targets"});
+	let completions = (bzlq targets --test-only "" | lines | each {|it| $it | from json | rename -c {label: value} } | prepend {value: "//...", description: "all targets"});
 	
 	{
 		completions: $completions,

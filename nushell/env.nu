@@ -64,7 +64,7 @@ def create_left_prompt [] {
 }
 
 def create_right_prompt [] {
-	$nothing
+	""
 }
 
 $env.PROMPT_COMMAND = {|| create_left_prompt }
@@ -88,7 +88,7 @@ $env.ENV_CONVERSIONS = {
 
 $env.HELIX_RUNTIME = ('~/projects/helix-editor/helix/runtime' | path expand)
 
-def-env PATH-prepend [p] {
+def --env PATH-prepend [p] {
 	if 'PATH' in $env {
 		$env.PATH = ($env.PATH | prepend $p)
 	}
@@ -98,7 +98,7 @@ def-env PATH-prepend [p] {
 	}
 }
 
-def-env PATH-append [p] {
+def --env PATH-append [p] {
 	if 'PATH' in $env {
 		$env.PATH = ($env.PATH | append $p)
 	}
