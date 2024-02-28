@@ -21,7 +21,7 @@ render = true
 [editor.statusline]
 left = ["mode", "spinner", "spacer", "version-control"]
 center = ["file-modification-indicator", "file-base-name", "diagnostics"]
-right = ["position", "file-line-ending", "file-icon"]
+right = ["position", "file-line-ending"]
 separator = "│"
 mode.normal = "⌬"
 mode.insert = "✎"

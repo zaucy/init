@@ -33,7 +33,7 @@ comment-token = "#"
 indent = { tab-width = 2, unit = "  " }
 language-servers = [ "yaml-language-server" ]
 grammar = "yaml"
-icon = { text = "", color = "#626262" }
+# icon = { text = "", color = "#626262" }
 
 [[language]]
 name = "unity-asset"
@@ -44,7 +44,7 @@ comment-token = "#"
 indent = { tab-width = 2, unit = "  " }
 language-servers = [ "yaml-language-server" ]
 grammar = "yaml"
-icon = { text = "", color = "#00cccc" }
+# icon = { text = "", color = "#00cccc" }
 
 [[language]]
 name = "unity-anim"
@@ -55,7 +55,7 @@ comment-token = "#"
 indent = { tab-width = 2, unit = "  " }
 language-servers = [ "yaml-language-server" ]
 grammar = "yaml"
-icon = { text = "", color = "#b83c82" }
+# icon = { text = "", color = "#b83c82" }
 
 [[language]]
 name = "unity-controller"
@@ -66,7 +66,7 @@ comment-token = "#"
 indent = { tab-width = 2, unit = "  " }
 language-servers = [ "yaml-language-server" ]
 grammar = "yaml"
-icon = { text = "", color = "#ff7f33" }
+# icon = { text = "", color = "#ff7f33" }
 
 [[language]]
 name = "unity-scene"
@@ -77,7 +77,7 @@ comment-token = "#"
 indent = { tab-width = 2, unit = "  " }
 language-servers = [ "yaml-language-server" ]
 grammar = "yaml"
-icon = { text = "", color = "#ff0066" }
+# icon = { text = "", color = "#ff0066" }
 
 [[language]]
 name = "ecsact"
@@ -88,7 +88,7 @@ comment-token = "//"
 indent = { tab-width = 2, unit = "  " }
 language-servers = [ "ecsact_lsp_server" ]
 roots = []
-icon = { text = "", color = "#cf9114" }
+# icon = { text = "", color = "#cf9114" }
 
 [[language]]
 name = "markdown"
