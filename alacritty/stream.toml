@@ -1,0 +1,20 @@
+import = ["~/projects/zaucy/init/alacritty/default.yml"]
+
+[font]
+size = 19.0
+
+[window]
+decorations = "none"
+startup_mode = "Windowed"
+
+[window.dimensions]
+columns = 132
+lines = 39
+
+[window.padding]
+x = 0
+y = 14
+
+[window.position]
+x = 0
+y = 0

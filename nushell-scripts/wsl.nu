@@ -9,3 +9,23 @@ def wsl-cd [] {
 
   wsl --cd $pwd
 }
+
+def --wrapped wsl-bazelisk [...args: string] {
+  wsl -e '/home/ezekiel/.local/bin/bazelisk' ...$args
+}
+
+def --wrapped wsl-bazel [...args: string] {
+  wsl -e '/home/ezekiel/.local/bin/bazel' ...$args
+}
+
+def --wrapped wsl-bazel-dbg [...args: string] {
+  wsl -e '/home/ezekiel/.cargo/bin/bazel-dbg' --bazel-path '/home/ezekiel/.local/bin/bazelisk' ...$args
+}
+
+def --wrapped wslx [executable: string, ...args: string] {
+  wsl -e $"/home/ezekiel/.local/bin/($executable)" ...$args
+}
+
+def --wrapped wslsh [...args: string] {
+  wsl --shell-type login -- ...$args
+}

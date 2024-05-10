@@ -111,7 +111,7 @@ file-types = ["cpp2"]
 [[grammar]]
 name = "ecsact"
 source = { git = "https://github.com/ecsact-dev/tree-sitter-ecsact", rev = "572a812765eb861af11fd0debfd894160003ccf9" }
-copy-queries = true
+# copy-queries = true
 
 [[grammar]]
 name = "cpp2"

@@ -47,8 +47,6 @@ if [ -z "$(which nvim)" ]; then
 fi
 
 touch ~/.zoxide.nu
-touch ~/.fnm/fnm_config.nu
-touch ~/.fnm/fnm_env.nu
 
 if [ -z "$(which cargo)" ]; then
   curl https://sh.rustup.rs -sSf | sh

@@ -106,6 +106,10 @@ if ((Get-Command "rg.exe" -errorAction SilentlyContinue) -eq $false)
 	scoop update ripgrep
 }
 
+winget install --id Microsoft.PowerToys --disable-interactivity --no-upgrade --silent
+
+$PowerToysRunPlugins = "$env:LocalAppData\Microsoft\PowerToys\PowerToys Run\Plugins\"
+
 nu init.nu
 
 # TODO(zaucy): init WSL + WSLg

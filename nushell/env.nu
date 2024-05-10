@@ -121,5 +121,3 @@ $env.HELIX_RUNTIME = ("~/projects/helix-editor/helix/runtime" | path expand)
 
 PATH-append '~/.local/bin'
 PATH-append '~/.cargo/bin'
-
-source-env ~/.fnm/fnm_env.nu
