@@ -203,7 +203,7 @@ return {
       {
         "<C-]>",
         function()
-          require("harpoon"):list():prev()
+          require("harpoon"):list():next()
         end,
       },
     },
