@@ -5,7 +5,8 @@
 vim.g.terminal_emulator = "nu"
 vim.go.shell = "nu"
 -- vim.go.showtable = 0
-vim.opt.guifont = "Agave Nerd Font"
+vim.opt.guifont = "FiraCode Nerd Font,Cascadia Code"
+
 vim.g.root_spec = { "cwd" }
 vim.opt.colorcolumn = { "80", "120" }
 vim.opt.fileformat = "unix"
