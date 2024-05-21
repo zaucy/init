@@ -46,11 +46,11 @@ return {
   },
   {
     "williamboman/mason.nvim",
-    opts = {
-      registries = {
-        "file:~/projects/mason-org/mason-registry",
-      },
-    },
+    -- opts = {
+    --   registries = {
+    --     "file:~/projects/mason-org/mason-registry",
+    --   },
+    -- },
   },
   {
     "sindrets/diffview.nvim",
@@ -148,6 +148,10 @@ return {
     keys = {
       { "<leader>z", "<cmd>Telescope zoxide list theme=ivy<cr>" },
     },
+  },
+  {
+    "nvim-telescope/telescope-fzf-native.nvim",
+    build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
   },
   {
     "folke/which-key.nvim",

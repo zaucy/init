@@ -1,4 +1,4 @@
-use ~/projects/zaucy/init/nushell-scripts/nu_scripts/modules/fnm/fnm.nu
+# use ~/projects/zaucy/init/nushell-scripts/nu_scripts/modules/fnm/fnm.nu
 
 $env.config = {
   show_banner: false,
