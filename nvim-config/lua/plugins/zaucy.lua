@@ -146,7 +146,7 @@ return {
   {
     "jvgrootveld/telescope-zoxide",
     keys = {
-      { "<leader>z", "<cmd>Telescope zoxide list theme=ivy<cr>" },
+      { "<leader>z", "<cmd>Telescope zoxide list<cr>" },
     },
   },
   {
