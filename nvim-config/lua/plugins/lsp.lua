@@ -7,6 +7,7 @@ return {
         gdscript = {},
         starpls = {},
       },
+      inlay_hints = { enabled = false },
     },
   },
 }

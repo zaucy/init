@@ -40,6 +40,7 @@ return {
         function()
           require("neo-tree.command").execute({
             reveal = true,
+            reveal_force_cwd = true,
             dir = vim.loop.cwd(),
           })
         end,
