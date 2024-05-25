@@ -15,7 +15,7 @@ local function goto_closest_file(filename)
   end
 end
 
-vim.keymap.set({ "n" }, "<leader>gbb", goto_closest_file("BUILD.bazel"), { desc = "Bazel Build File" })
-vim.keymap.set({ "n" }, "<leader>gbm", goto_closest_file("MODULE.bazel"), { desc = "Bazel Module File" })
-vim.keymap.set({ "n" }, "<leader>gbw", goto_closest_file("MODULE.bazel"), { desc = "Bazel Workspace File" })
-vim.keymap.set({ "n" }, "<leader>gbz", goto_closest_file(".bazelrc"), { desc = "Bazelrc File" })
+vim.keymap.set({ "n" }, "gbb", goto_closest_file("BUILD.bazel"), { desc = "Bazel Build File" })
+vim.keymap.set({ "n" }, "gbm", goto_closest_file("MODULE.bazel"), { desc = "Bazel Module File" })
+vim.keymap.set({ "n" }, "gbw", goto_closest_file("MODULE.bazel"), { desc = "Bazel Workspace File" })
+vim.keymap.set({ "n" }, "gbz", goto_closest_file(".bazelrc"), { desc = "Bazelrc File" })

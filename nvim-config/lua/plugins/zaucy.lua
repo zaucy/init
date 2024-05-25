@@ -164,48 +164,4 @@ return {
       layout = {},
     },
   },
-  {
-    "ThePrimeagen/harpoon",
-    branch = "harpoon2",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    opts = {
-      settings = {
-        save_on_toggle = true,
-        sync_on_ui_close = true,
-      },
-    },
-    init = function()
-      local cmp = require("cmp")
-      cmp.setup.filetype("harpoon", {
-        sources = cmp.config.sources({ name = "path" }, { name = "buffer" }),
-      })
-    end,
-    keys = {
-      {
-        "<leader>a",
-        function()
-          require("harpoon"):list():add()
-        end,
-      },
-      {
-        "<C-e>",
-        function()
-          local harpoon = require("harpoon")
-          harpoon.ui:toggle_quick_menu(harpoon:list())
-        end,
-      },
-      {
-        "<C-[>",
-        function()
-          require("harpoon"):list():prev()
-        end,
-      },
-      {
-        "<C-]>",
-        function()
-          require("harpoon"):list():next()
-        end,
-      },
-    },
-  },
 }

@@ -147,9 +147,17 @@ local function run_init_ps1(callback)
 end
 
 local function reopen_neovide_detached()
+  local current_file = vim.fn.expand("%:p")
+  local args = { "--", "+ReloadDone" .. tostring(vim.uv.os_getppid()) }
+
+  if current_file then
+    table.insert(args, "--")
+    table.insert(args, current_file)
+  end
+
   local handle = vim.uv.spawn("neovide", {
     cwd = vim.fn.getcwd(),
-    args = { "--", "+ReloadDone" .. tostring(vim.uv.os_getppid()) },
+    args = args,
     detached = true,
     hide = true,
   })
