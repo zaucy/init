@@ -162,10 +162,36 @@ return {
     end,
     opts = {
       layout = {},
+      defaults = {
+        gb = { name = "+bazel" },
+      },
     },
   },
   {
     "smjonas/inc-rename.nvim",
     opts = {},
+  },
+  {
+    "stevearc/stickybuf.nvim",
+  },
+  {
+    "stevearc/aerial.nvim",
+    dependencies = {
+      "nvim-telescope/telescope.nvim",
+    },
+    init = function()
+      require("telescope").load_extension("aerial")
+    end,
+    opts = {},
+    cmds = {
+      "AerialGo",
+      "AerialInfo",
+      "AerialNext",
+      "AerialPrev",
+      "AerialOpen",
+    },
+    keys = {
+      { "<leader>s", "<cmd>Telescope aerial theme=ivy<cr>", desc = "Goto Symbol" },
+    },
   },
 }

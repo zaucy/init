@@ -130,15 +130,6 @@ return {
       -- search
       { "<leader>uC", LazyVim.telescope("colorscheme", { enable_preview = true }), desc = "Colorscheme with Preview" },
       {
-        "<leader>s",
-        function()
-          require("telescope.builtin").lsp_document_symbols({
-            symbols = require("lazyvim.config").get_kind_filter(),
-          })
-        end,
-        desc = "Goto Symbol",
-      },
-      {
         "<leader>S",
         function()
           require("telescope.builtin").lsp_dynamic_workspace_symbols({
