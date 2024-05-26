@@ -12,7 +12,6 @@ return map({
   "nvimdev/dashboard-nvim",
   "folke/flash.nvim",
   "folke/trouble.nvim",
-  "folke/noice.nvim",
 }, function(m)
   return { m, enabled = false }
 end)

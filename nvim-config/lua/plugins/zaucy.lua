@@ -164,4 +164,8 @@ return {
       layout = {},
     },
   },
+  {
+    "smjonas/inc-rename.nvim",
+    opts = {},
+  },
 }
