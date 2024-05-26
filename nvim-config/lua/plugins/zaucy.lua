@@ -175,6 +175,10 @@ return {
     "stevearc/stickybuf.nvim",
   },
   {
+    "nvim-treesitter/nvim-treesitter-context",
+    opts = {},
+  },
+  {
     "stevearc/aerial.nvim",
     dependencies = {
       "nvim-telescope/telescope.nvim",
@@ -191,7 +195,7 @@ return {
       "AerialOpen",
     },
     keys = {
-      { "<leader>s", "<cmd>Telescope aerial theme=ivy<cr>", desc = "Goto Symbol" },
+      { "<leader>s", "<cmd>Telescope aerial sorting_strategy=descending<cr>", desc = "Goto Symbol" },
     },
   },
 }
