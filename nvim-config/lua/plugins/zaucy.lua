@@ -198,4 +198,8 @@ return {
       { "<leader>s", "<cmd>Telescope aerial sorting_strategy=descending<cr>", desc = "Goto Symbol" },
     },
   },
+  {
+    "levouh/tint.nvim",
+    opts = {},
+  },
 }

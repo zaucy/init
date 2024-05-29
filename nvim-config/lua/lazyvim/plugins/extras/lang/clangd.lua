@@ -90,7 +90,7 @@ return {
             "--fallback-style=llvm",
           },
           init_options = {
-            usePlaceholders = true,
+            usePlaceholders = false,
             completeUnimported = true,
             clangdFileStatus = true,
           },
