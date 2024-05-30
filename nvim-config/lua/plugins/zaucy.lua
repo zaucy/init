@@ -9,6 +9,33 @@ parser_config.nu = {
   },
 }
 
+local telescope_previewer_maker = function(filepath, bufnr, opts)
+  local previewers = require("telescope.previewers")
+  local no_preview_filepath_suffix = {
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".webp",
+    ".webm",
+    ".mp4",
+    ".avi",
+    ".dll",
+    ".exe",
+    ".pdb",
+    ".pdf",
+    ".unity",
+  }
+
+  for _, suffix in ipairs(no_preview_filepath_suffix) do
+    if vim.endswith(filepath, suffix) then
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { "BINARY" })
+      return
+    end
+  end
+
+  previewers.buffer_previewer_maker(filepath, bufnr, opts)
+end
+
 return {
   {
     "ecsact-dev/ecsact.nvim",
@@ -137,6 +164,7 @@ return {
         lsp_workspace_symbols = { theme = "ivy" },
         lsp_dynamic_workspace_symbols = { theme = "ivy" },
       }
+      opts.defaults.buffer_previewer_maker = telescope_previewer_maker
     end,
     keys = {
       { "<leader>?", "<cmd>Telescope keymaps theme=ivy<cr>", desc = "Keymaps" },
