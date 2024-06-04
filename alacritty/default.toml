@@ -4,6 +4,9 @@ background = "#24283b"
 [font]
 size = 18.0
 
+[font.normal]
+family = "FiraCode Nerd Font"
+
 [shell]
 program = "nu"
 
