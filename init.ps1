@@ -55,7 +55,7 @@ if ($Force || (Get-Command "nvim.exe" -errorAction SilentlyContinue) -eq $false)
 
 $NeovimConfigDir = "$env:LOCALAPPDATA\nvim"
 mkdir $NeovimConfigDir -Force | Out-Null
-Copy-Item -Path ".\nvim-config\*" -Destination "$NeovimConfigDir" -Recurse -Force
+Copy-Item -Path ".\nvim-config-minimal\*" -Destination "$NeovimConfigDir" -Recurse -Force
 
 $AlacrittyConfigDir = "$env:APPDATA\alacritty"
 mkdir $AlacrittyConfigDir -Force | Out-Null
