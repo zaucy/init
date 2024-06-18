@@ -8,7 +8,7 @@ glob helix/**/*.toml | each {|toml_path|
   symlink (['helix', $local_path] | path join) $config_file_path --force;
 };
 
-symlink ./nvim-config/ $nvim.config_path;
+symlink ./nvim-config-minimal/ $nvim.config_path;
 
 let local_wezterm_config_path = ([$env.FILE_PWD, "wezterm", "default.lua"] | path join);
 let wezterm_config_path = (["~", ".config", "wezterm", "wezterm.lua"] | path join | path expand);

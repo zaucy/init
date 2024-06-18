@@ -53,10 +53,6 @@ if ($Force || (Get-Command "nvim.exe" -errorAction SilentlyContinue) -eq $false)
 	winget install Neovim.Neovim
 }
 
-$NeovimConfigDir = "$env:LOCALAPPDATA\nvim"
-mkdir $NeovimConfigDir -Force | Out-Null
-Copy-Item -Path ".\nvim-config-minimal\*" -Destination "$NeovimConfigDir" -Recurse -Force
-
 $AlacrittyConfigDir = "$env:APPDATA\alacritty"
 mkdir $AlacrittyConfigDir -Force | Out-Null
 Copy-Item -Path ".\alacritty\*" -Destination "$AlacrittyConfigDir" -Recurse -Force
