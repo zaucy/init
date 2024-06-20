@@ -35,8 +35,16 @@ return {
 		cmd = { "Telescope" },
 		keys = {
 			{ "<leader>?", "<cmd>Telescope keymaps theme=ivy<cr>", desc = "Keymaps" },
-			{ "<leader>'", "<cmd>Telescope resume<cr>", desc = "Open last picker" },
-			{ "<leader>/", "<cmd>Telescope live_grep<cr>", desc = "Global search" },
+			{ "<leader>'", "<cmd>Telescope resume<cr>",            desc = "Open last picker" },
+			{ "<leader>/", "<cmd>Telescope live_grep<cr>",         desc = "Global search" },
+			{ "<leader>f", "<cmd>Telescope find_files<cr>",        desc = "Find files" },
+			{ "<leader>b", "<cmd>Telescope buffers<cr>",           desc = "Find buffers" },
+		},
+	},
+	{
+		"jvgrootveld/telescope-zoxide",
+		keys = {
+			{ "<leader>z", "<cmd>Telescope zoxide list<cr>" },
 		},
 	},
 }

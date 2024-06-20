@@ -1,11 +1,17 @@
 local lsp_setup_handlers = {
-	function (server_name)
+	function(server_name)
 		require("lspconfig")[server_name].setup({})
 	end,
-	["rust_analyzer"] = function ()
+	["rust_analyzer"] = function()
 		-- mrcjkb/rustaceanvim handles rust analyzer
 	end
 }
+
+vim.api.nvim_create_autocmd('BufWritePre', {
+	callback = function()
+		vim.lsp.buf.format({})
+	end,
+})
 
 return {
 	{
@@ -41,11 +47,31 @@ return {
 	},
 	{
 		"p00f/clangd_extensions.nvim",
-		ft = {"c", "cpp"},
+		ft = { "c", "cpp" },
 		opts = {},
 	},
 	{
 		"mrcjkb/rustaceanvim",
 		ft = "rs",
+	},
+	{
+		"stevearc/aerial.nvim",
+		dependencies = {
+			"nvim-telescope/telescope.nvim",
+		},
+		init = function()
+			require("telescope").load_extension("aerial")
+		end,
+		opts = {},
+		cmd = {
+			"AerialGo",
+			"AerialInfo",
+			"AerialNext",
+			"AerialPrev",
+			"AerialOpen",
+		},
+		keys = {
+			{ "<leader>s", "<cmd>Telescope aerial sorting_strategy=descending<cr>", desc = "Goto Symbol" },
+		},
 	},
 }
