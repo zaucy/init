@@ -17,6 +17,8 @@ vim.keymap.set({ "n" }, "gbw", goto_closest_file("WORKSPACE.bazel"), { desc = "B
 vim.keymap.set({ "n" }, "gbz", goto_closest_file(".bazelrc"), { desc = "Bazelrc File" })
 
 vim.keymap.set({ "n" }, "<C-_>", "<cmd>terminal<cr>", { desc = "Open Terminal" })
+vim.keymap.set({ "n" }, "<C-/>", "<cmd>terminal<cr>", { desc = "Open Terminal" })
 vim.keymap.set({ "t" }, "<esc><esc>", "<C-\\><C-n>", { desc = "Enter Normal Mode" })
-vim.keymap.set({ "t" }, "<C-w>", "<C-\\><C-n><C-w>", {})
+vim.keymap.set({ "t" }, "<C-w>", "<C-\\><C-n><cmd>WhichKey <C-w><cr>", {})
 vim.keymap.set({ "t" }, "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
+vim.keymap.set({ "t" }, "<C-_>", "<cmd>close<cr>", { desc = "Hide Terminal" })

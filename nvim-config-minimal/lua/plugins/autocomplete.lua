@@ -8,5 +8,9 @@ return {
 		end,
 		opts = {
 		},
-	}
+	},
+	{
+		"smolck/command-completion.nvim",
+		opts = {},
+	},
 }

@@ -3,6 +3,8 @@ vim.g.maplocalleader = "\\"
 
 vim.g.terminal_emulator = "nu"
 vim.go.shell = "nu"
+vim.opt.guifont = "FiraCode Nerd Font"
+vim.opt.colorcolumn = { "80", "120" }
 
 vim.opt.wrap = false
 vim.opt.cursorline = true
@@ -16,32 +18,88 @@ vim.filetype.add({
 		nu = "nu",
 	},
 })
+vim.filetype.add({
+	extension = {
+		bazelrc = "bazelrc",
+	},
+})
 
 if vim.g.neovide then
-	vim.g.neovide_scroll_animation_length = 0.08
+	-- scale factors that leave no space on the left/right with my preferred
+	-- font and resolution
+	-- TODO: somehow calculate this
+	local scale_factors = {
+		0.9133,
+		1.0365,
+		1.1032,
+		1.2807,
+		1.4377,
+	}
+
+	local function find_closest_current_scale_factor()
+		local closest_index = 1;
+		for i, v in ipairs(scale_factors) do
+			local dist = math.abs(v - vim.g.neovide_scale_factor)
+			local current_closest_dist = math.abs(scale_factors[closest_index] - vim.g.neovide_scale_factor)
+
+			if dist < current_closest_dist then
+				closest_index = i
+			end
+		end
+
+		return closest_index
+	end
+
+	local function refresh_scale_factor()
+		vim.opt.guifont = vim.opt.guifont
+	end
+
+	vim.g.neovide_scroll_animation_length = 0
 	vim.g.neovide_hide_mouse_when_typing = true
 	vim.g.neovide_cursor_animation_length = 0.04
 	vim.g.neovide_cursor_trail_size = 0.4
+	vim.g.neovide_fullscreen = false
 
-	local default_scale = 1.38
-	vim.g.neovide_scale_factor = default_scale
+	local default_scale_index = 3
+	vim.g.neovide_scale_factor = scale_factors[default_scale_index]
 
-	vim.api.nvim_set_keymap(
+	vim.keymap.set(
 		"n",
 		"<C-=>",
-		":lua vim.g.neovide_scale_factor = vim.g.neovide_scale_factor + 0.1<CR>",
-		{ silent = true }
+		function()
+			local next_index = find_closest_current_scale_factor() + 1
+			if next_index <= #scale_factors then
+				vim.g.neovide_scale_factor = scale_factors[next_index]
+				refresh_scale_factor()
+			end
+		end,
+		{ expr = true }
 	)
-	vim.api.nvim_set_keymap(
+	vim.keymap.set(
 		"n",
 		"<C-->",
-		":lua vim.g.neovide_scale_factor = vim.g.neovide_scale_factor - 0.1<CR>",
-		{ silent = true }
+		function()
+			local prev_index = find_closest_current_scale_factor() - 1;
+			if prev_index > 0 then
+				vim.g.neovide_scale_factor = scale_factors[prev_index]
+				refresh_scale_factor()
+			end
+		end,
+		{ expr = true }
+	)
+	vim.keymap.set(
+		"n",
+		"<C-0>",
+		function()
+			vim.g.neovide_scale_factor = scale_factors[default_scale_index]
+			refresh_scale_factor()
+		end,
+		{ expr = true }
 	)
 	vim.api.nvim_set_keymap(
 		"n",
-		"<C-0>",
-		":lua vim.g.neovide_scale_factor = " .. default_scale .. "<CR>",
+		"<F11>",
+		":lua vim.g.neovide_fullscreen = !vim.g.neovide_fullscreen<CR>",
 		{ silent = true }
 	)
 end
@@ -54,11 +112,32 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 vim.api.nvim_create_autocmd('InsertEnter', {
 	callback = function()
+		if vim.bo.buftype == "nofile" then return end
+		if vim.bo.buftype == "terminal" then return end
+
 		vim.opt.relativenumber = false
 	end,
 })
 vim.api.nvim_create_autocmd('InsertLeave', {
 	callback = function()
+		if vim.bo.buftype == "nofile" then return end
+		if vim.bo.buftype == "terminal" then return end
+
 		vim.opt.relativenumber = true
+	end,
+})
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufNew', 'BufWinEnter', 'TermOpen' }, {
+	callback = function()
+		if vim.bo.buftype == "nofile" then return end
+
+		if vim.bo.buftype == "terminal" then
+			vim.wo.signcolumn = "no"
+			vim.wo.number = false
+			vim.wo.relativenumber = false
+		else
+			vim.wo.signcolumn = "auto"
+			vim.wo.number = true
+			vim.wo.relativenumber = true
+		end
 	end,
 })
