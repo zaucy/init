@@ -18,6 +18,16 @@ local function treesitter_config()
 			requires_generate_from_grammar = false,
 		},
 	}
+	---@diagnostic disable-next-line: inject-field
+	parsers.cpp2 = {
+		install_info = {
+			url = "~/projects/tree-sitter-cpp2",
+			files = { "src/parser.c", "src/scanner.c" },
+			branch = "main",
+			generate_requires_npm = false,
+			requires_generate_from_grammar = false,
+		},
+	}
 
 	require("nvim-treesitter.configs").setup({
 		auto_install = false,

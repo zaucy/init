@@ -1,6 +1,9 @@
 local lsp_setup_handlers = {
 	function(server_name)
-		require("lspconfig")[server_name].setup({})
+		local capabilities = require('cmp_nvim_lsp').default_capabilities()
+		require("lspconfig")[server_name].setup({
+			capabilities = capabilities,
+		})
 	end,
 	["rust_analyzer"] = function()
 		-- mrcjkb/rustaceanvim handles rust analyzer
@@ -26,6 +29,8 @@ return {
 		dependencies = {
 			"williamboman/mason.nvim",
 			"neovim/nvim-lspconfig",
+			"hrsh7th/nvim-cmp",
+			"hrsh7th/cmp-nvim-lsp",
 		},
 		config = function()
 			require("mason-lspconfig").setup({
@@ -34,6 +39,7 @@ return {
 					"lua_ls",
 				},
 			})
+			lsp_setup_handlers[1]("starpls")
 			require("mason-lspconfig").setup_handlers(lsp_setup_handlers)
 		end,
 	},
@@ -72,6 +78,8 @@ return {
 		},
 		keys = {
 			{ "<leader>s", "<cmd>Telescope aerial sorting_strategy=descending<cr>", desc = "Goto Symbol" },
+			{ "]s",        "<cmd>AerialNext<cr>",                                   desc = "Next Symbol" },
+			{ "[s",        "<cmd>AerialPrev<cr>",                                   desc = "Previous Symbol" },
 		},
 	},
 }
