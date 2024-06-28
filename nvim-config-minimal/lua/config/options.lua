@@ -16,6 +16,7 @@ vim.opt.listchars = { space = ' ', tab = '\u{ebf9} ', trail = '·', lead = '·' 
 vim.filetype.add({ extension = { nu = "nu" } })
 vim.filetype.add({ extension = { bazelrc = "bazelrc" } })
 vim.filetype.add({ extension = { cpp2 = "cpp2" } })
+vim.filetype.add({ extension = { ecsact = "ecsact" } })
 
 if vim.g.neovide then
 	-- scale factors that leave no space on the left/right with my preferred
