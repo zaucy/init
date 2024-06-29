@@ -18,6 +18,17 @@ vim.filetype.add({ extension = { bazelrc = "bazelrc" } })
 vim.filetype.add({ extension = { cpp2 = "cpp2" } })
 vim.filetype.add({ extension = { ecsact = "ecsact" } })
 
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+	vim.lsp.diagnostic.on_publish_diagnostics, {
+		underline = true,
+		virtual_text = {
+			spacing = 4,
+		},
+		signs = false,
+		update_in_insert = false,
+	}
+)
+
 if vim.g.neovide then
 	-- scale factors that leave no space on the left/right with my preferred
 	-- font and resolution
@@ -129,7 +140,7 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufNew', 'BufWinEnter', 'TermOpen' },
 			vim.wo.number = false
 			vim.wo.relativenumber = false
 		else
-			vim.wo.signcolumn = "auto"
+			vim.wo.signcolumn = "auto:1-9"
 			vim.wo.number = true
 			vim.wo.relativenumber = true
 		end
