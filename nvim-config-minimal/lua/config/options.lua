@@ -66,6 +66,7 @@ if vim.g.neovide then
 	vim.g.neovide_cursor_trail_size = 0.4
 	vim.g.neovide_position_animation_length = 0
 	vim.g.neovide_fullscreen = false
+	vim.g.experimental_layer_grouping = true
 
 	local default_scale_index = 3
 	vim.g.neovide_scale_factor = scale_factors[default_scale_index]
@@ -121,6 +122,7 @@ vim.api.nvim_create_autocmd('InsertEnter', {
 	callback = function()
 		if vim.bo.buftype == "nofile" then return end
 		if vim.bo.buftype == "terminal" then return end
+		if vim.bo.buftype == "prompt" then return end
 
 		vim.opt.relativenumber = false
 	end,
@@ -129,6 +131,7 @@ vim.api.nvim_create_autocmd('InsertLeave', {
 	callback = function()
 		if vim.bo.buftype == "nofile" then return end
 		if vim.bo.buftype == "terminal" then return end
+		if vim.bo.buftype == "prompt" then return end
 
 		vim.opt.relativenumber = true
 	end,
@@ -136,6 +139,7 @@ vim.api.nvim_create_autocmd('InsertLeave', {
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufNew', 'BufWinEnter', 'TermOpen' }, {
 	callback = function()
 		if vim.bo.buftype == "nofile" then return end
+		if vim.bo.buftype == "prompt" then return end
 
 		if vim.bo.buftype == "terminal" then
 			vim.wo.signcolumn = "no"
