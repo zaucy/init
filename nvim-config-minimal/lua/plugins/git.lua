@@ -15,6 +15,7 @@ return {
 			{ "[h",         "<cmd>Gitsigns prev_hunk<cr>",                 desc = "Previous Git Hunk" },
 			{ "<leader>ga", "<cmd>Gitsigns stage_buffer<cr>",              desc = "Stage Current Buffer" },
 			{ "<leader>gd", "<cmd>Gitsigns diffthis<cr>",                  desc = "View Buffer Diff" },
+			{ "<leader>gs", "<cmd>Telescope git_status<cr>",               desc = "View Status" },
 		},
 	}
 }
