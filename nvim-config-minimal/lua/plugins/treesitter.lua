@@ -28,6 +28,16 @@ local function treesitter_config()
 			requires_generate_from_grammar = false,
 		},
 	}
+	---@diagnostic disable-next-line: inject-field
+	parsers.ecsact = {
+		install_info = {
+			url = "git@github.com:ecsact-dev/tree-sitter-ecsact.git",
+			files = { "src/parser.c" },
+			branch = "main",
+			generate_requires_npm = false,
+			requires_generate_from_grammar = false,
+		},
+	}
 
 	require("nvim-treesitter.configs").setup({
 		auto_install = false,
