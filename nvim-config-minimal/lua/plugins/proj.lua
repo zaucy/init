@@ -5,7 +5,6 @@ return {
 		'nvim-telescope/telescope.nvim',
 		'MunifTanjim/nui.nvim',
 	},
-	dir = "~/projects/zaucy/proj.nvim",
 	opts = {},
 	cmd = { "ProjInfo" },
 	keys = {
