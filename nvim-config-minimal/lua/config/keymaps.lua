@@ -22,7 +22,6 @@ local function is_bufvalid(buf)
 	local buftype = vim.bo[buf].buftype
 	if buftype == "prompt" then return false end
 	if buftype == "nofile" then return false end
-	print(buftype)
 	return true
 end
 
@@ -42,6 +41,97 @@ local function find_nearby_valid_buf(bufs, start_index)
 		offset = offset + 1
 	end
 end
+
+local function is_buf_similar(buf1, buf2)
+	if vim.bo[buf1].buftype ~= vim.bo[buf2].buftype then
+		return false
+	end
+
+	if vim.bo[buf1].filetype ~= vim.bo[buf2].filetype then
+		return false
+	end
+
+	return true
+end
+
+local function wrap_access(list, index)
+	-- zero-base this nerd
+	index = index - 1
+	local wrapped_index = index % #list
+	return list[wrapped_index + 1]
+end
+
+local function find_similar_buf(bufs, start_index, offset)
+	assert(start_index ~= nil, "start_index must be set")
+	assert(start_index > 0, "start_index must be greater than 0")
+	assert(start_index <= #bufs, "start_index must be within bufs range")
+	if #bufs < 2 then
+		return nil
+	end
+
+	local curbuf = vim.api.nvim_get_current_buf()
+
+	offset = offset or 1
+	for i = 0, #bufs - 1 do
+		local buf = wrap_access(bufs, start_index + i + offset)
+		if buf ~= curbuf and is_bufvalid(buf) then
+			if is_buf_similar(0, buf) then
+				return buf
+			end
+		end
+	end
+
+	return nil
+end
+
+local function get_buf_index(buf, bufs)
+	if buf == 0 then
+		buf = vim.api.nvim_get_current_buf()
+	end
+
+	assert(buf ~= nil)
+
+	if bufs == nil then
+		bufs = vim.api.nvim_list_bufs()
+	end
+
+	for i, _ in ipairs(bufs) do
+		if bufs[i] == buf then
+			return i
+		end
+	end
+
+	return nil
+end
+
+local function goto_next_similar_buffer()
+	local bufs = vim.api.nvim_list_bufs()
+	local curr_index = get_buf_index(0, bufs)
+	local buf = find_similar_buf(bufs, curr_index, 1)
+	if buf == nil then
+		vim.notify(
+			"No other similar buffers (buftype=" .. vim.bo.buftype .. ", filetype=" .. vim.bo.filetype .. ")",
+			vim.log.levels.WARN
+		)
+		return
+	end
+	vim.api.nvim_set_current_buf(buf)
+end
+
+local function goto_prev_similar_buffer()
+	local bufs = vim.api.nvim_list_bufs()
+	local curr_index = get_buf_index(0, bufs)
+	local buf = find_similar_buf(bufs, curr_index, -1)
+	if buf == nil then
+		vim.notify(
+			"No other similar buffers (buftype=" .. vim.bo.buftype .. ", filetype=" .. vim.bo.filetype .. ")",
+			vim.log.levels.WARN
+		)
+		return
+	end
+	vim.api.nvim_set_current_buf(buf)
+end
+
 
 local function close_terminal()
 	if vim.bo.buftype ~= "terminal" then
@@ -87,6 +177,9 @@ vim.keymap.set({ "t" }, "<esc><esc>", "<C-\\><C-n>", { desc = "Enter Normal Mode
 vim.keymap.set({ "t" }, "<C-w>", "<C-\\><C-n><cmd>WhichKey <C-w><cr>", {})
 vim.keymap.set({ "t" }, "<C-/>", close_terminal, { desc = "Hide Terminal" })
 vim.keymap.set({ "t" }, "<C-_>", close_terminal, { desc = "Hide Terminal" })
+
+vim.keymap.set({ "n" }, "]]", goto_next_similar_buffer, { desc = "Next Similar Buf" })
+vim.keymap.set({ "n" }, "[[", goto_prev_similar_buffer, { desc = "Next Similar Buf" })
 
 -- move lines
 vim.keymap.set({ "n" }, "<a-j>", "<cmd>m .+1<cr>==", { desc = "move down" })
