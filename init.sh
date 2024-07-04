@@ -20,9 +20,6 @@ else
   git pull
 fi
 
-mkdir -p $HOME/.config/nvim
-cp ./nvim-config/* $HOME/.config/nvim --force --recursive
-
 mkdir -p $HOME/.config/nushell
 cp ./nushell/* $HOME/.config/nushell --force --recursive
 
