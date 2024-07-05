@@ -37,7 +37,19 @@ local function reload_done_command(opts)
 	vim.uv.kill(reload_pid, "sigkill")
 end
 
+local function update_command()
+	vim.api.nvim_create_autocmd("User", {
+		pattern = "LazySync",
+		callback = function()
+			vim.cmd("Reload")
+		end,
+	})
+
+	vim.cmd("Lazy sync")
+end
+
 if not vim.g.vscode then
 	vim.api.nvim_create_user_command("Reload", reload_command, {})
 	vim.api.nvim_create_user_command("ReloadDone", reload_done_command, { nargs = 1 })
+	vim.api.nvim_create_user_command("Update", update_command, {})
 end
