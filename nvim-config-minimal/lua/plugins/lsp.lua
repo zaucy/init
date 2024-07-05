@@ -5,9 +5,6 @@ local lsp_setup_handlers = {
 			capabilities = capabilities,
 		})
 	end,
-	["rust_analyzer"] = function()
-		-- mrcjkb/rustaceanvim handles rust analyzer
-	end
 }
 
 return {
@@ -49,10 +46,6 @@ return {
 		"p00f/clangd_extensions.nvim",
 		ft = { "c", "cpp" },
 		opts = {},
-	},
-	{
-		"mrcjkb/rustaceanvim",
-		ft = "rs",
 	},
 	{
 		"stevearc/aerial.nvim",
