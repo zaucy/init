@@ -23,9 +23,9 @@ left = ["mode", "spinner", "spacer", "version-control"]
 center = ["file-modification-indicator", "file-base-name", "diagnostics"]
 right = ["position", "file-line-ending"]
 separator = "│"
-mode.normal = "⌬"
-mode.insert = "✎"
-mode.select = "⌨"
+mode.normal = "󰧾"
+mode.insert = "󰤌"
+mode.select = "󰨾"
 
 [keys.normal]
 # Move lines up and down
