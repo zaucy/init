@@ -3,6 +3,8 @@ vim.g.maplocalleader = "\\"
 
 vim.g.terminal_emulator = "nu"
 vim.go.shell = "nu"
+vim.go.shellcmdflag = "-c"
+vim.go.shellquote = "'"
 vim.opt.guifont = "FiraCode Nerd Font"
 vim.opt.colorcolumn = { "80", "120" }
 
