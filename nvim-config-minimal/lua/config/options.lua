@@ -15,6 +15,13 @@ vim.opt.relativenumber = true
 vim.opt.list = true
 vim.opt.listchars = { space = ' ', tab = '\u{ebf9} ', trail = '·', lead = '·' }
 
+-- Auto reload files when they change
+vim.o.autoread = true
+vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "CursorHoldI", "FocusGained" }, {
+	command = "if mode() != 'c' | checktime | endif",
+	pattern = { "*" },
+})
+
 vim.filetype.add({ extension = { nu = "nu" } })
 vim.filetype.add({ extension = { bazelrc = "bazelrc" } })
 vim.filetype.add({ extension = { cpp2 = "cpp2" } })
