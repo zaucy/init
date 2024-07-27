@@ -32,18 +32,30 @@ local function is_hidden_file(name, _)
 	if not dir then
 		return false
 	end
+	dir = vim.fs.normalize(dir)
 	-- Check if file is gitignored
 	return vim.list_contains(git_ignored[dir], name)
 end
 
+vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
+	pattern = "*/.gitignore",
+	callback = function(ev)
+		local dir = vim.fs.normalize(vim.fs.dirname(ev.file))
+		rawset(git_ignored, dir, nil)
+		require('oil.view').rerender_all_oil_buffers({ refetch = false })
+	end,
+})
+
 return {
 	{
 		"stevearc/oil.nvim",
+		dir = "~/projects/oil.nvim",
 		lazy = false,
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		opts = {
 			default_file_explorer = true,
 			skip_confirm_for_simple_edits = true,
+			watch_for_changes = true,
 			columns = {
 				{
 					"icon",
