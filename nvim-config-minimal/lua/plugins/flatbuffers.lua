@@ -1,0 +1,3 @@
+return {
+	"zchee/vim-flatbuffers",
+}
