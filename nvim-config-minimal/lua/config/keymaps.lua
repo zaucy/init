@@ -132,13 +132,23 @@ local function goto_prev_similar_buffer()
 	vim.api.nvim_set_current_buf(buf)
 end
 
+local last_buf_before_terminal = {}
 
 local function close_terminal()
 	if vim.bo.buftype ~= "terminal" then
 		return
 	end
 
-	local currbuf = vim.fn.winbufnr(0)
+	local win = vim.api.nvim_get_current_win()
+	local currbuf = vim.fn.winbufnr(win)
+
+	if is_bufvalid(last_buf_before_terminal[win]) then
+		vim.api.nvim_set_current_buf(last_buf_before_terminal[win])
+		return
+	end
+
+	last_buf_before_terminal[win] = nil
+
 	local allbufs = vim.api.nvim_list_bufs()
 	for i, buf in ipairs(allbufs) do
 		if buf == currbuf then
@@ -160,6 +170,8 @@ local function open_terminal()
 		close_terminal()
 		return
 	end
+
+	last_buf_before_terminal[vim.api.nvim_get_current_win()] = vim.api.nvim_get_current_buf()
 
 	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
 		if vim.bo[buf].buftype == "terminal" then
