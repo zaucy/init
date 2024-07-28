@@ -40,7 +40,7 @@ end
 vim.api.nvim_create_autocmd({ 'BufReadPre' }, {
 	pattern = "oil://*",
 	callback = function(ev)
-		local dir = vim.fs.normalize(vim.fs.dirname(ev.file))
+		local dir = vim.fs.normalize(require('oil').get_current_dir())
 		rawset(git_ignored, dir, nil)
 	end,
 })
@@ -49,6 +49,15 @@ vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
 	pattern = "*/.gitignore",
 	callback = function(ev)
 		local dir = vim.fs.normalize(vim.fs.dirname(ev.file))
+		rawset(git_ignored, dir, nil)
+		require('oil.view').rerender_all_oil_buffers({ refetch = false })
+	end,
+})
+
+vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
+	pattern = "oil://*",
+	callback = function(ev)
+		local dir = vim.fs.normalize(require('oil').get_current_dir())
 		rawset(git_ignored, dir, nil)
 		require('oil.view').rerender_all_oil_buffers({ refetch = false })
 	end,
