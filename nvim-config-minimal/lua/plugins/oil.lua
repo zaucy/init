@@ -37,6 +37,14 @@ local function is_hidden_file(name, _)
 	return vim.list_contains(git_ignored[dir], name)
 end
 
+vim.api.nvim_create_autocmd({ 'BufReadPre' }, {
+	pattern = "oil://*",
+	callback = function(ev)
+		local dir = vim.fs.normalize(vim.fs.dirname(ev.file))
+		rawset(git_ignored, dir, nil)
+	end,
+})
+
 vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
 	pattern = "*/.gitignore",
 	callback = function(ev)
