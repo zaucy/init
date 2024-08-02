@@ -10,7 +10,7 @@ return {
 		},
 	},
 	{
-		"smolck/command-completion.nvim",
+		"zaucy/command-completion.nvim",
 		opts = {},
 	},
 	{
