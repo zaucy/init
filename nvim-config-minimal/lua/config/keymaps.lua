@@ -156,13 +156,13 @@ local function close_terminal()
 			if nearby_buf ~= nil then
 				vim.api.nvim_set_current_buf(nearby_buf)
 			else
-				vim.cmd.close()
+				vim.cmd("enew")
 			end
 			return
 		end
 	end
 
-	vim.cmd.close()
+	vim.cmd("enew")
 end
 
 local function open_terminal()
