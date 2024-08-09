@@ -7,7 +7,7 @@ return {
 				timeout_ms = 500,
 			},
 			formatters_by_ft = {
-				cs = { "lsp" },
+				cs = { "lsp", "clang-format" },
 				starlark = { "buildifier" },
 				bzl = { "buildifier" },
 				javascript = { { "prettierd", "prettier" } },
