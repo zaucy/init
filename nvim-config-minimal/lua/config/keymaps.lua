@@ -218,3 +218,7 @@ vim.keymap.set({ "n" }, "gD", vim.lsp.buf.declaration, { desc = "Goto Declaratio
 vim.keymap.set({ "n" }, "gi", vim.lsp.buf.implementation, { desc = "Goto Implementation" })
 vim.keymap.set({ "n" }, "gri", vim.lsp.buf.incoming_calls, { desc = "vim.lsp.buf.incoming_calls()" })
 vim.keymap.set({ "n" }, "gro", vim.lsp.buf.outgoing_calls, { desc = "vim.lsp.buf.outgoing_calls()" })
+
+-- quickfix
+vim.keymap.set({ "n" }, "[q", "<cmd>cprevious<cr>", { desc = "prev qf item" })
+vim.keymap.set({ "n" }, "]q", "<cmd>cnext<cr>", { desc = "next qf item" })

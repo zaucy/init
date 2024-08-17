@@ -1,3 +1,4 @@
+local config_dir = "~/projects/zaucy/init/nvim-config-minimal"
 local telescope_opts = {
 	pickers = {
 		builtins = { theme = "ivy" },
@@ -34,11 +35,12 @@ return {
 		end,
 		cmd = { "Telescope" },
 		keys = {
-			{ "<leader>?", "<cmd>Telescope keymaps theme=ivy<cr>", desc = "Keymaps" },
-			{ "<leader>'", "<cmd>Telescope resume<cr>",            desc = "Open last picker" },
-			{ "<leader>/", "<cmd>Telescope live_grep<cr>",         desc = "Global search" },
-			{ "<leader>f", "<cmd>Telescope find_files<cr>",        desc = "Find files" },
-			{ "<leader>b", "<cmd>Telescope buffers<cr>",           desc = "Find buffers" },
+			{ "<leader>?", "<cmd>Telescope keymaps theme=ivy<cr>",                   desc = "Keymaps" },
+			{ "<leader>'", "<cmd>Telescope resume<cr>",                              desc = "Open last picker" },
+			{ "<leader>/", "<cmd>Telescope live_grep<cr>",                           desc = "Global search" },
+			{ "<leader>f", "<cmd>Telescope find_files<cr>",                          desc = "Find files" },
+			{ "<leader>b", "<cmd>Telescope buffers<cr>",                             desc = "Find buffers" },
+			{ "<leader>c", "<cmd>Telescope find_files cwd=" .. config_dir .. "<cr>", desc = "Config files" },
 		},
 	},
 	{
