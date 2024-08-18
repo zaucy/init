@@ -46,7 +46,7 @@ return {
 	{
 		"jvgrootveld/telescope-zoxide",
 		keys = {
-			{ "<leader>z", "<cmd>Telescope zoxide list<cr>" },
+			{ "<leader>z", "<cmd>Telescope zoxide list<cr>", desc = "Zoxide" },
 		},
 	},
 }
