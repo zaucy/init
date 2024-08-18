@@ -18,7 +18,7 @@ return {
 			)
 		end,
 		keys = {
-			{ "<leader>n", "<cmd>Telescope notify theme=ivy<cr>" },
+			{ "<leader>n", "<cmd>Telescope notify theme=ivy<cr>", desc = "Notifications" },
 		},
 	}
 }

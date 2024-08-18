@@ -2,10 +2,21 @@ return {
 	{
 		"folke/which-key.nvim",
 		event = "VeryLazy",
-		opts = {
-			preset = "helix",
-			delay = 0,
-		},
+		config = function()
+			require('which-key').setup({
+				preset = "helix",
+				delay = 0,
+				icons = {
+					separator = "",
+					keys = {
+						Esc = "󱊷",
+					},
+				},
+			})
+			require('which-key').add({
+				{ "<leader>u", group = "unreal" },
+			})
+		end,
 		keys = {
 			{ "<c-s-w>", function()
 				require("which-key").show({

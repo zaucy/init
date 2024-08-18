@@ -29,6 +29,7 @@ return {
 				function()
 					require("zen-mode").toggle()
 				end,
+				desc = "Zen Mode",
 			},
 		},
 	},
