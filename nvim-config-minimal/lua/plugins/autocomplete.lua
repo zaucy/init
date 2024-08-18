@@ -2,15 +2,22 @@ return {
 	{
 		"folke/which-key.nvim",
 		event = "VeryLazy",
-		init = function()
-			vim.o.timeout = true
-			vim.o.timeoutlen = 0
-		end,
 		opts = {
+			preset = "helix",
+			delay = 0,
+		},
+		keys = {
+			{ "<c-s-w>", function()
+				require("which-key").show({
+					keys = "<c-w>",
+					loop = true,
+				})
+			end },
 		},
 	},
 	{
 		"zaucy/command-completion.nvim",
+		dir = "~/projects/command-completion.nvim",
 		opts = {},
 	},
 	{

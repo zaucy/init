@@ -68,7 +68,9 @@ local function update_command()
 end
 
 if not vim.g.vscode then
-	vim.api.nvim_create_user_command("Reload", reload_command, {})
-	vim.api.nvim_create_user_command("ReloadDone", reload_done_command, { nargs = '*' })
-	vim.api.nvim_create_user_command("Update", update_command, {})
+	vim.api.nvim_create_user_command("Reload", reload_command,
+		{ desc = "Restarts neovide and re-opens the currently focused buffer" })
+	vim.api.nvim_create_user_command("ReloadDone", reload_done_command,
+		{ nargs = '*', desc = "internal: Used when running neovide command to do startup stuff after reload" })
+	vim.api.nvim_create_user_command("Update", update_command, { desc = "Pulls changes from init repo and run LazySync" })
 end
