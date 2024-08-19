@@ -28,7 +28,6 @@ return {
 	},
 	{
 		"zaucy/command-completion.nvim",
-		dir = "~/projects/command-completion.nvim",
 		opts = {},
 	},
 	{
