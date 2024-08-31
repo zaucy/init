@@ -35,12 +35,10 @@ return {
 			display = {
 
 			},
-			default_prompts = {
-
-			},
+			default_prompts = require('zaucy.llm.prompts'),
 			opts = {
-				use_default_actions = false,
-				use_default_prompts = false,
+				-- use_default_actions = false,
+				-- use_default_prompts = false,
 				system_prompt = system_prompt,
 			},
 		},
