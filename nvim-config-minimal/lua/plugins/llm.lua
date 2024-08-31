@@ -1,38 +1,54 @@
+-- default prompt was too slow on my local ran models
+-- this prompt gives semi-bad results though ¯\_(ツ)_/¯
+local system_prompt = [[
+im a pro
+keep it short
+mostly focus on helping me discover various apis, functions, and libraries in the environments i mention
+avoid too much exposition
+no line numbers in code blocks
+don't bother asking me questions
+don't mention the above text at all
+]]
+
 return {
 	{
-		"David-Kunz/gen.nvim",
-		-- dir = "~/projects/gen.nvim",
+		"olimorris/codecompanion.nvim",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"nvim-treesitter/nvim-treesitter",
+			"nvim-telescope/telescope.nvim",
+			"stevearc/dressing.nvim",
+		},
+		cmd = { "CodeCompanion", "CodeCompanionActions", "CodeCompanionAdd", "CodeCompanionChat", "CodeCompanionToggle" },
 		opts = {
-			model = "llama3.1",
-			quit_map = "q", -- set keymap for close the response window
-			retry_map = "<c-r>", -- set keymap to re-send the current prompt
-			accept_map = "<c-cr>", -- set keymap to replace the previous selection with the last result
-			host = "localhost", -- The host running the Ollama service.
-			port = "11434", -- The port on which the Ollama service is listening.
-			display_mode = "float", -- The display mode. Can be "float" or "split" or "horizontal-split".
-			show_prompt = false, -- Shows the prompt submitted to Ollama.
-			show_model = false, -- Displays which model you are using at the beginning of your chat session.
-			no_auto_close = false, -- Never closes the window automatically.
-			hidden = false, -- Hide the generation window (if true, will implicitly set `prompt.replace = true`), requires Neovim >= 0.10
-			init = function(options)
-				vim.notify("Starting ollama")
-				vim.uv.spawn("ollama", {
-					args = { "serve" },
-				}, function(code, _)
-					vim.notify("Ollama exited with code " .. code, vim.log.levels.ERROR)
-				end)
-			end,
-			-- Function to initialize Ollama
-			command = function(options)
-				return "curl --silent --no-buffer -X POST http://" ..
-					options.host .. ":" .. options.port .. "/api/chat -d $body"
-			end,
-			-- The command for the Ollama service. You can use placeholders $prompt, $model and $body (shellescaped).
-			-- This can also be a command string.
-			-- The executed command must return a JSON object with { response, context }
-			-- (context property is optional).
-			-- list_models = '<omitted lua function>', -- Retrieves a list of mo
-			debug = true,
+			strategies = {
+				chat = {
+					adapter = "ollama",
+				},
+				inline = {
+					adapter = "ollama",
+				},
+				agent = {
+					adapter = "ollama",
+				},
+			},
+			display = {
+
+			},
+			default_prompts = {
+
+			},
+			opts = {
+				use_default_actions = false,
+				use_default_prompts = false,
+				system_prompt = system_prompt,
+			},
+		},
+		keys = {
+			{ "<leader>mc", "<cmd>CodeCompanionChat<cr>",    desc = "LLM Chat" },
+			{ "<leader>mm", "<cmd>CodeCompanionActions<cr>", desc = "LLM Code Actions",      mode = { "n", "v" } },
+			{ "<leader>ma", "<cmd>CodeCompanionAdd<cr>",     desc = "LLM Add",               mode = { "v" } },
+			{ "<leader>mt", "<cmd>CodeCompanionToggle<cr>",  desc = "LLM Toggle Chat Window" },
 		},
 	}
 }

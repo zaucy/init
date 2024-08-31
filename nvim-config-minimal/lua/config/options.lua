@@ -6,7 +6,7 @@ vim.go.shell = "nu"
 vim.go.shellcmdflag = "-c"
 vim.go.shellquote = "'"
 vim.opt.guifont = "FiraCode Nerd Font"
-vim.opt.colorcolumn = { "80", "120" }
+vim.opt.colorcolumn = {}
 
 vim.opt.wrap = false
 vim.opt.cursorline = true
