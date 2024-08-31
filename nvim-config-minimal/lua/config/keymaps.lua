@@ -185,10 +185,10 @@ end
 
 vim.keymap.set({ "n" }, "<C-_>", open_terminal, { desc = "Open Terminal" })
 vim.keymap.set({ "n" }, "<C-/>", open_terminal, { desc = "Open Terminal" })
-vim.keymap.set({ "t" }, "<esc><esc>", "<C-\\><C-n>", { desc = "Enter Normal Mode" })
 vim.keymap.set({ "t" }, "<C-w>", "<C-\\><C-n><cmd>WhichKey <C-w><cr>", {})
 vim.keymap.set({ "t" }, "<C-/>", close_terminal, { desc = "Hide Terminal" })
 vim.keymap.set({ "t" }, "<C-_>", close_terminal, { desc = "Hide Terminal" })
+vim.keymap.set({ "t" }, "<S-Insert>", "<C-\\><C-n>\"+pi", { desc = "Paste In Terminal" })
 
 vim.keymap.set({ "n" }, "]]", goto_next_similar_buffer, { desc = "Next Similar Buf" })
 vim.keymap.set({ "n" }, "[[", goto_prev_similar_buffer, { desc = "Next Similar Buf" })
