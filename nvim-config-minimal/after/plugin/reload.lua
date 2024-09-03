@@ -4,7 +4,7 @@ local function make_reopen_neovide_detached_fn()
 	end
 
 	local current_file = vim.fs.normalize(vim.fn.expand("%:p"))
-	local reload_done_cmd = "+ReloadDone " .. tostring(vim.uv.os_getppid())
+	local neovide_args = {}
 	local files = {}
 
 	if current_file then
@@ -12,11 +12,25 @@ local function make_reopen_neovide_detached_fn()
 		table.insert(files, { current_file, line, col })
 	end
 
-	reload_done_cmd = reload_done_cmd .. " " .. vim.json.encode(files)
+	local nvim_args = {}
+
+	if vim.g.zaucy_streamer_mode then
+		table.insert(nvim_args, "+StreamerMode")
+		table.insert(neovide_args, "--frame=none")
+		table.insert(neovide_args, "--size=2000x1370")
+	end
+
+	table.insert(nvim_args, "+ReloadDone " .. tostring(vim.uv.os_getppid() .. " " .. vim.json.encode(files)))
+
+	table.insert(neovide_args, "--")
+	for _, nvim_arg in ipairs(nvim_args) do
+		table.insert(neovide_args, nvim_arg)
+	end
+	vim.notify(vim.inspect(neovide_args))
 	return function()
 		local handle = vim.uv.spawn("neovide", {
 			cwd = vim.fn.getcwd(),
-			args = { "--", reload_done_cmd },
+			args = neovide_args,
 			detached = true,
 			hide = true,
 		})
