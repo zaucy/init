@@ -26,7 +26,6 @@ local function make_reopen_neovide_detached_fn()
 	for _, nvim_arg in ipairs(nvim_args) do
 		table.insert(neovide_args, nvim_arg)
 	end
-	vim.notify(vim.inspect(neovide_args))
 	return function()
 		local handle = vim.uv.spawn("neovide", {
 			cwd = vim.fn.getcwd(),
