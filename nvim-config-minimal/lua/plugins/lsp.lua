@@ -62,7 +62,26 @@ return {
 		init = function()
 			require("telescope").load_extension("aerial")
 		end,
-		opts = {},
+		opts = {
+			layout = {
+				default_direction = "left",
+			},
+			close_automatic_events = { "unfocus", "switch_buffer", "unsupported" },
+			autojump = true,
+			close_on_select = true,
+			highlight_mode = "none",
+			highlight_closest = false,
+			highlight_on_hover = false,
+			highlight_on_jump = false,
+			float = {
+				border = "rounded",
+				relative = "win",
+				override = function(conf, _)
+					conf.col = 1
+					return conf
+				end,
+			},
+		},
 		cmd = {
 			"AerialGo",
 			"AerialInfo",
@@ -71,9 +90,9 @@ return {
 			"AerialOpen",
 		},
 		keys = {
-			{ "<leader>s", "<cmd>Telescope aerial sorting_strategy=descending<cr>", desc = "Goto Symbol" },
-			{ "]s",        "<cmd>AerialNext<cr>",                                   desc = "Next Symbol" },
-			{ "[s",        "<cmd>AerialPrev<cr>",                                   desc = "Previous Symbol" },
+			{ "<leader>s", "<cmd>AerialOpen<cr>", desc = "Goto Symbol" },
+			{ "]s",        "<cmd>AerialNext<cr>", desc = "Next Symbol" },
+			{ "[s",        "<cmd>AerialPrev<cr>", desc = "Previous Symbol" },
 		},
 	},
 }
