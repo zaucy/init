@@ -21,7 +21,7 @@ local function treesitter_config()
 	---@diagnostic disable-next-line: inject-field
 	parsers.cpp2 = {
 		install_info = {
-			url = "~/projects/tree-sitter-cpp2",
+			url = "https://github.com/tsoj/tree-sitter-cpp2.git",
 			files = { "src/parser.c", "src/scanner.c" },
 			branch = "main",
 			generate_requires_npm = false,
