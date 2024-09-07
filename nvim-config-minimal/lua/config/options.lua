@@ -2,9 +2,10 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
 vim.g.terminal_emulator = "nu"
-vim.go.shell = "nu"
-vim.go.shellcmdflag = "-c"
-vim.go.shellquote = "'"
+-- NOTE: I tried to use nu but too many plugins rely on the default shell being bash or cmd on Windows
+-- vim.go.shell = "nu"
+-- vim.go.shellcmdflag = "-c"
+-- vim.go.shellquote = "'"
 vim.opt.guifont = "FiraCode Nerd Font"
 vim.opt.colorcolumn = {}
 
@@ -72,6 +73,7 @@ if vim.g.neovide then
 	vim.g.neovide_position_animation_length = 0
 	vim.g.neovide_fullscreen = false
 	vim.g.experimental_layer_grouping = true
+	vim.g.neovide_floating_corner_radius = 0.5
 
 	local default_scale_index = 3
 	vim.g.neovide_scale_factor = scale_factors[default_scale_index]

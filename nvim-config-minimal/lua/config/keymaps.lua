@@ -180,7 +180,7 @@ local function open_terminal()
 		end
 	end
 
-	vim.cmd("terminal")
+	vim.cmd("terminal nu")
 end
 
 vim.keymap.set({ "n" }, "<C-_>", open_terminal, { desc = "Open Terminal" })
