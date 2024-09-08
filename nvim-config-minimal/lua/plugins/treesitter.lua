@@ -39,6 +39,7 @@ local function treesitter_config()
 		},
 	}
 
+	---@diagnostic disable-next-line: missing-fields
 	require("nvim-treesitter.configs").setup({
 		auto_install = false,
 		highlight = {
@@ -53,4 +54,12 @@ return {
 		build = ":TSUpdate",
 		config = treesitter_config,
 	},
+	{
+		"nvim-treesitter/nvim-treesitter-context",
+		event = "VeryLazy",
+		opts = {},
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
+		},
+	}
 }
