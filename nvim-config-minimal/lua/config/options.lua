@@ -9,6 +9,8 @@ vim.g.terminal_emulator = "nu"
 vim.opt.guifont = "FiraCode Nerd Font"
 vim.opt.colorcolumn = {}
 
+vim.opt.shadafile = "NONE" -- shadafiles are annoying and I never find them useful
+
 vim.opt.wrap = false
 vim.opt.cursorline = true
 vim.opt.number = true
