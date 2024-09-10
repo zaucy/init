@@ -21,7 +21,7 @@ return {
 		},
 		keys = {
 			{ "<leader>o", "<cmd>OverseerToggle!<cr>", desc = "Open Overseer" },
-			{ "<leader>r", "<cmd>OverseerRun<cr>",     desc = "Run Overseer Task" },
+			-- { "<leader>r", "<cmd>OverseerRun<cr>",     desc = "Run Overseer Task" },
 		},
 	},
 }
