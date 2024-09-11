@@ -213,11 +213,12 @@ vim.keymap.set({ "n" }, "[b", "<cmd>bprevious<cr>", { desc = "prev buffer" })
 vim.keymap.set({ "n" }, "]b", "<cmd>bnext<cr>", { desc = "next buffer" })
 
 -- lsp
-vim.keymap.set({ "n" }, "gd", vim.lsp.buf.definition, { desc = "Goto Definition" })
+vim.keymap.set({ "n" }, "gd", "<cmd>Telescope lsp_definitions<cr>", { desc = "Goto Definition" })
 vim.keymap.set({ "n" }, "gD", vim.lsp.buf.declaration, { desc = "Goto Declaration" })
 vim.keymap.set({ "n" }, "gi", vim.lsp.buf.implementation, { desc = "Goto Implementation" })
 vim.keymap.set({ "n" }, "gri", vim.lsp.buf.incoming_calls, { desc = "vim.lsp.buf.incoming_calls()" })
 vim.keymap.set({ "n" }, "gro", vim.lsp.buf.outgoing_calls, { desc = "vim.lsp.buf.outgoing_calls()" })
+vim.keymap.set({ "n" }, "grr", "<cmd>Telescope lsp_references<cr>", { desc = "vim.lsp.buf.outgoing_calls()" })
 
 -- quickfix
 vim.keymap.set({ "n" }, "[q", "<cmd>cprevious<cr>", { desc = "prev qf item" })
