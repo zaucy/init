@@ -1,3 +1,7 @@
+vim.keymap.set({ "v" }, 's', [[:s/\%V]])   -- subsitute in selection
+vim.keymap.set({ "n" }, 'S', [[:%s/]])     -- subsitute in whole file
+vim.keymap.set({ "v" }, '/', '<esc>/\\%V') -- search in selection
+
 local function goto_closest_file(filename)
 	return function()
 		local files = vim.fs.find(filename, {
