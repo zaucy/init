@@ -4,7 +4,6 @@ local function make_reopen_neovide_detached_fn()
 	end
 
 	local current_file = vim.fs.normalize(vim.fn.expand("%:p"))
-	vim.notify(current_file)
 	local neovide_args = {}
 	local files = {}
 
@@ -41,8 +40,6 @@ local function make_reopen_neovide_detached_fn()
 			neovide_exe = "/mnt/c/Users/zekew/.cargo/bin/neovide.exe"
 		end
 
-		vim.notify(vim.inspect(neovide_args))
-
 		local handle = vim.uv.spawn(neovide_exe, {
 			cwd = vim.fn.getcwd(),
 			args = neovide_args,
@@ -75,8 +72,6 @@ local function reload_done_command(opts)
 		vim.cmd(":NeovideFocus")
 	end
 
-	vim.notify(vim.inspect(opts.fargs))
-
 	local reload_pid = tonumber(opts.fargs[1])
 
 	---@diagnostic disable-next-line: param-type-mismatch
@@ -84,7 +79,6 @@ local function reload_done_command(opts)
 
 	for _, entry in ipairs(vim.json.decode(opts.fargs[2])) do
 		local file, line, col = unpack(entry)
-		vim.notify(vim.inspect(entry))
 		vim.cmd("e " .. file)
 		vim.api.nvim_win_set_cursor(0, { line, col - 1 })
 	end
