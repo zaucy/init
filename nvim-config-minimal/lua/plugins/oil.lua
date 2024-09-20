@@ -69,8 +69,9 @@ vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
 
 return {
 	{
-		"stevearc/oil.nvim",
-		dir = "~/projects/oil.nvim",
+		"zaucy/oil.nvim",
+		branch = "feat/hidden-highlights",
+		-- dir = "~/projects/oil.nvim",
 		lazy = false,
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		opts = {

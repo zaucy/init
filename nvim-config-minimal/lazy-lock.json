@@ -27,6 +27,7 @@
   "nvim-treesitter-context": { "branch": "master", "commit": "7f7eeaa99e5a9beab518f502292871ae5f20de6f" },
   "nvim-web-devicons": { "branch": "master", "commit": "31bd21ac46b2b6039aa0b856ca02b018cf549ef7" },
   "octo.nvim": { "branch": "master", "commit": "955f0fdd03b0da23ee1c3368d80bf806f0e36fa5" },
+  "oil.nvim": { "branch": "feat/hidden-highlights", "commit": "6092d11f90668101870f9748568fb6c222909238" },
   "overseer.nvim": { "branch": "master", "commit": "a2734d90c514eea27c4759c9f502adbcdfbce485" },
   "plenary.nvim": { "branch": "master", "commit": "2d9b06177a975543726ce5c73fca176cedbffe9d" },
   "proj.nvim": { "branch": "main", "commit": "5ff1f6860959aa11fb40b5a69b6fd5de1ae36fd2" },
@@ -37,6 +38,7 @@
   "tokyonight.nvim": { "branch": "main", "commit": "817bb6ffff1b9ce72cdd45d9fcfa8c9cd1ad3839" },
   "triptych.nvim": { "branch": "main", "commit": "94f3089a6391adad3eb72169429523719ee82d45" },
   "twilight.nvim": { "branch": "main", "commit": "1584c0b0a979b71fd86b18d302ba84e9aba85b1b" },
+  "uproject.nvim": { "branch": "main", "commit": "74e8364cb77276236909c0f5616161ac5d245385" },
   "vim-flatbuffers": { "branch": "master", "commit": "95c828bcc7dd83627f732bbb1d78888a3a870d6e" },
   "which-key.nvim": { "branch": "main", "commit": "fb070344402cfc662299d9914f5546d840a22126" },
   "zen-mode.nvim": { "branch": "main", "commit": "29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6" }
