@@ -47,8 +47,11 @@ local function make_reopen_neovide_detached_fn()
 			hide = true,
 		})
 
-		---@diagnostic disable-next-line: need-check-nil
-		handle:unref()
+		if handle ~= nil then
+			handle:unref()
+		else
+			vim.notify("failed to spawn neovide", vim.log.levels.ERROR)
+		end
 
 		if vim.g.wslenv then
 			local timer = vim.uv.new_timer()

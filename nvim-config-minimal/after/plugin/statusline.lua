@@ -25,7 +25,7 @@ if sysname == "Linux" and vim.g.wslenv then
 end
 
 local function colorize_path()
-	local file_path = vim.fn.fnamemodify(vim.fn.expand('%:f'), ':.:h')
+	local file_path = vim.fn.expand('%:f')
 	local filename = vim.fn.expand('%:t')
 	local scheme = ""
 
@@ -55,7 +55,8 @@ local function colorize_path()
 		dir_color = term_color
 		file_path = file_path:sub(6) -- strip out 'term:/'
 	else
-		dir = vim.fs.normalize(file_path)
+		file_path = vim.fs.normalize(file_path)
+		dir = file_path:sub(1, #file_path - #filename - 1)
 		if #filename > 0 then
 			dir = dir .. "/"
 		end
