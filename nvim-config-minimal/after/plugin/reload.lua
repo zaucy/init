@@ -4,8 +4,13 @@ local function make_reopen_neovide_detached_fn()
 	end
 
 	local current_file = vim.fs.normalize(vim.fn.expand("%:p"))
+	vim.notify(current_file)
 	local neovide_args = {}
 	local files = {}
+
+	if vim.g.wslenv then
+		table.insert(neovide_args, "--wsl")
+	end
 
 	if current_file then
 		local _, line, col = unpack(vim.fn.getcursorcharpos())
@@ -20,7 +25,10 @@ local function make_reopen_neovide_detached_fn()
 		table.insert(neovide_args, "--size=2000x1370")
 	end
 
-	table.insert(nvim_args, "+ReloadDone " .. tostring(vim.uv.os_getppid() .. " " .. vim.json.encode(files)))
+	-- TODO: This just plain doesn't work with neovide --wsl
+	if not vim.g.wslenv then
+		table.insert(nvim_args, "+ReloadDone " .. tostring(vim.uv.os_getppid() .. " " .. vim.json.encode(files)))
+	end
 
 	table.insert(neovide_args, "--")
 	for _, nvim_arg in ipairs(nvim_args) do
@@ -29,9 +37,12 @@ local function make_reopen_neovide_detached_fn()
 	return function()
 		local neovide_exe = "neovide"
 		if vim.g.wslenv then
-			vim.notify("Cannot reload in WSL (yet)", vim.log.levels.ERROR)
-			return
+			-- TODO: do a 'where' in cmd or something on the windows side to find the preferred neovide executable
+			neovide_exe = "/mnt/c/Users/zekew/.cargo/bin/neovide.exe"
 		end
+
+		vim.notify(vim.inspect(neovide_args))
+
 		local handle = vim.uv.spawn(neovide_exe, {
 			cwd = vim.fn.getcwd(),
 			args = neovide_args,
@@ -41,6 +52,15 @@ local function make_reopen_neovide_detached_fn()
 
 		---@diagnostic disable-next-line: need-check-nil
 		handle:unref()
+
+		if vim.g.wslenv then
+			local timer = vim.uv.new_timer()
+			timer:start(1000, 0, function()
+				vim.schedule(function()
+					vim.cmd [[qa!]]
+				end)
+			end)
+		end
 	end
 end
 
@@ -55,6 +75,8 @@ local function reload_done_command(opts)
 		vim.cmd(":NeovideFocus")
 	end
 
+	vim.notify(vim.inspect(opts.fargs))
+
 	local reload_pid = tonumber(opts.fargs[1])
 
 	---@diagnostic disable-next-line: param-type-mismatch
@@ -62,6 +84,7 @@ local function reload_done_command(opts)
 
 	for _, entry in ipairs(vim.json.decode(opts.fargs[2])) do
 		local file, line, col = unpack(entry)
+		vim.notify(vim.inspect(entry))
 		vim.cmd("e " .. file)
 		vim.api.nvim_win_set_cursor(0, { line, col - 1 })
 	end
