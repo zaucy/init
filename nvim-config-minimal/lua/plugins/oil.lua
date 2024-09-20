@@ -1,3 +1,8 @@
+local default_hidden = {
+	[".git"] = true,
+	[".."] = true,
+}
+
 local git_ignored = setmetatable({}, {
 	__index = function(self, key)
 		local proc = vim.system(
@@ -23,8 +28,7 @@ local git_ignored = setmetatable({}, {
 })
 
 local function is_hidden_file(name, _)
-	-- dotfiles are always considered hidden
-	if vim.startswith(name, ".") then
+	if default_hidden[name] then
 		return true
 	end
 	local dir = require("oil").get_current_dir()
