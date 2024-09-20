@@ -55,7 +55,7 @@ local function colorize_path()
 		dir_color = term_color
 		file_path = file_path:sub(6) -- strip out 'term:/'
 	else
-		dir = file_path
+		dir = vim.fs.normalize(file_path)
 		if #filename > 0 then
 			dir = dir .. "/"
 		end
