@@ -27,7 +27,12 @@ local function make_reopen_neovide_detached_fn()
 		table.insert(neovide_args, nvim_arg)
 	end
 	return function()
-		local handle = vim.uv.spawn("neovide", {
+		local neovide_exe = "neovide"
+		if vim.g.wslenv then
+			vim.notify("Cannot reload in WSL (yet)", vim.log.levels.ERROR)
+			return
+		end
+		local handle = vim.uv.spawn(neovide_exe, {
 			cwd = vim.fn.getcwd(),
 			args = neovide_args,
 			detached = true,
