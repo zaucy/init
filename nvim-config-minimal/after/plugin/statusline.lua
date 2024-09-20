@@ -2,7 +2,8 @@
 local sysname = vim.uv.os_uname().sysname
 local sys_icon = ""
 
-if sysname == "Linux" then
+-- show a system icon when using WSL because sometimes its confusing which os I'm on
+if sysname == "Linux" and vim.g.wslenv then
 	local distro_name = ""
 	local file = io.open("/etc/os-release", "r")
 	if not file then return nil end
@@ -21,8 +22,6 @@ if sysname == "Linux" then
 	else
 		sys_icon = "%#DevIconUbuntu# %*"
 	end
-elseif sysname == "Windows" then
-	sys_icon = "%#DevIconWindows# %*"
 end
 
 local function colorize_path()
@@ -30,27 +29,37 @@ local function colorize_path()
 	local filename = vim.fn.expand('%:t')
 	local scheme = ""
 
-	local dir_color = "%#Comment#"
+	local dir_color = "%#@punctuation#"
 	local file_color = "%#@include#"
 	local oil_color = "%#@text.note#"
+	local term_color = "%#@attribute.builtin#"
 
 	local dir = ""
 
 	if vim.startswith(file_path, "oil://") then
 		scheme = oil_color .. " 󱧯 %*"
 		dir_color = oil_color
-		file_path = file_path:sub(7) -- strip out 'oil://'
-		file_path = vim.fn.fnamemodify(file_path, ":.:h")
-		dir = file_path .. " "
+		if sysname == "Windows_NT" then
+			file_path = file_path:sub(8) -- strip out 'oil:///'
+			local drive_letter = file_path:sub(1, 1)
+			file_path = drive_letter .. ':/' .. file_path:sub(3)
+			file_path = vim.fs.normalize(vim.fn.fnamemodify(file_path, ":.:h"))
+			dir = file_path .. " "
+		else
+			file_path = file_path:sub(7) -- strip out 'oil://'
+			file_path = vim.fn.fnamemodify(file_path, ":.:h")
+			dir = file_path .. " "
+		end
+	elseif vim.startswith(file_path, "term:") then
+		scheme = term_color .. "  %*"
+		dir_color = term_color
+		file_path = file_path:sub(6) -- strip out 'term:/'
 	else
-		dir = file_path:sub(1, #file_path - #filename - 1)
+		dir = vim.fs.normalize(file_path:sub(1, #file_path - #filename - 1))
 		if #filename > 0 then
 			dir = dir .. "/"
-		else
-			dir = "[No Name]"
 		end
 	end
-
 
 	return scheme .. dir_color .. dir .. file_color .. filename
 end
@@ -63,6 +72,6 @@ vim.cmd([[
   augroup Statusline
   au!
   au WinEnter,BufEnter * setlocal statusline=%!v:lua.ZaucyStatusline()
-  au WinLeave,BufLeave * setlocal statusline=%f
+  au WinLeave,BufLeave * setlocal statusline=%{substitute(expand('%f'),'\\\\','/','g')}
   augroup END
 ]], false)
