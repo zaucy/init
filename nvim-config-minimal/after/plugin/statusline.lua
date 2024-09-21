@@ -1,5 +1,6 @@
 ---@diagnostic disable: unused-function
 local sysname = vim.uv.os_uname().sysname
+local homedir = vim.fn.substitute(vim.fn.expand('~'), '\\\\', '/', 'g')
 local sys_icon = ""
 
 -- show a system icon when using WSL because sometimes its confusing which os I'm on
@@ -55,7 +56,10 @@ local function colorize_path()
 		dir_color = term_color
 		file_path = file_path:sub(6) -- strip out 'term:/'
 	else
-		file_path = vim.fs.normalize(file_path)
+		file_path = vim.fn.substitute(file_path, '\\\\', '/', 'g')
+		if vim.startswith(file_path, homedir) then
+			file_path = '~' .. file_path:sub(#homedir + 1)
+		end
 		dir = file_path:sub(1, #file_path - #filename - 1)
 		if #filename > 0 then
 			dir = dir .. "/"
