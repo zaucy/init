@@ -34,6 +34,7 @@ local function colorize_path()
 	local file_color = "%#@include#"
 	local oil_color = "%#@text.note#"
 	local term_color = "%#@attribute.builtin#"
+	local git_color = "%#GitSignsAdd#"
 
 	local dir = ""
 
@@ -51,6 +52,14 @@ local function colorize_path()
 			file_path = vim.fn.fnamemodify(file_path, ":.:h")
 			dir = file_path .. " "
 		end
+	elseif vim.startswith(file_path, "gitsigns://") then
+		scheme = term_color .. "  %*"
+		dir_color = git_color
+		file_path = file_path:sub(11) -- strip out 'gitsigns://'
+		local _, path_start, head = file_path:find("//(.+):")
+		scheme = scheme .. head .. " "
+		dir = file_path:sub(path_start + 1)
+		filename = ""
 	elseif vim.startswith(file_path, "term:") then
 		scheme = term_color .. "  %*"
 		dir_color = term_color
