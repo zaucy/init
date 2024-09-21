@@ -95,4 +95,10 @@ return {
 			{ "[s",        "<cmd>AerialPrev<cr>", desc = "Previous Symbol" },
 		},
 	},
+	{
+		"smjonas/inc-rename.nvim",
+		cmd = { "IncRename" },
+		opts = {
+		},
+	},
 }

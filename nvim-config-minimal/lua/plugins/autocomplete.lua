@@ -1,3 +1,10 @@
+local slow_completion_prefix = {
+	'!', -- shell autocomplete is really slow on Windows
+	'\'', -- autocompelte on selections just doesn't work very well
+	'%',
+	'Q', -- I prefix commands I don't type manually with this so that my cmdline autocomplete can be snappy and no flickering occurs
+}
+
 return {
 	{
 		"folke/which-key.nvim",
@@ -28,7 +35,20 @@ return {
 	},
 	{
 		"zaucy/command-completion.nvim",
-		opts = {},
+		opts = {
+			filter_completion = function(input)
+				if input == '' then
+					return false
+				end
+
+				for _, prefix in ipairs(slow_completion_prefix) do
+					if vim.startswith(input, prefix) then
+						return false
+					end
+				end
+				return true
+			end,
+		},
 	},
 	{
 		"hrsh7th/nvim-cmp",
@@ -63,8 +83,10 @@ return {
 				TypeParameter = '  ',
 			}
 			cmp.setup({
+				---@diagnostic disable-next-line: missing-fields
 				formatting = {
 					format = function(_, vim_item)
+						---@diagnostic disable-next-line: return-type-mismatch
 						if vim_item == nil then return vim_item end
 						vim_item.kind = (cmp_kinds[vim_item.kind] or '') .. vim_item.kind
 						return vim_item
