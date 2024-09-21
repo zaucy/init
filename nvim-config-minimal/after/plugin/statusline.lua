@@ -60,6 +60,11 @@ local function colorize_path()
 		scheme = scheme .. head .. " "
 		dir = file_path:sub(path_start + 1)
 		filename = ""
+	elseif vim.startswith(file_path, "diffview://") then
+		scheme = term_color .. "  %*"
+		dir_color = git_color
+		file_path = file_path:sub(11) -- strip out 'diffview://'
+		dir = vim.fs.normalize(vim.fn.fnamemodify(file_path:sub(2, #file_path - #filename), ':.:h')):sub(6) .. '/'
 	elseif vim.startswith(file_path, "term:") then
 		scheme = term_color .. "  %*"
 		dir_color = term_color

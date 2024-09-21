@@ -30,10 +30,34 @@ return {
 					local gitsigns = require('gitsigns')
 					local toggle = gitsigns.toggle_deleted()
 					gitsigns.toggle_linehl(toggle)
-					gitsigns.toggle_word_diff(toggle)
+					-- gitsigns.toggle_word_diff(toggle)
 				end,
 				desc = "Toggle All"
 			},
+
+			{
+				"<C-,>",
+				function()
+					vim.notify("file history (back)")
+				end,
+				desc = "Diff back",
+			},
+			{
+				"<C-.>",
+				function()
+					vim.notify("file history (forward)")
+				end,
+				desc = "Diff forward",
+			}
+		},
+	},
+	{
+		"sindrets/diffview.nvim",
+		cmd = { "DiffviewFileHistory" },
+		opts = {},
+		keys = {
+			{ "<a-left>",   "<cmd>DiffviewFileHistory %<cr>", desc = "File history" },
+			{ "<leader>gq", "<cmd>DiffviewClose<cr>",         desc = "Close diffview" },
 		},
 	}
 }
