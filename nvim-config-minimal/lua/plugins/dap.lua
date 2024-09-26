@@ -71,6 +71,7 @@ local function debug_attach()
 			function(choice)
 				if choice ~= nil then
 					local dap = require('dap')
+					---@diagnostic disable-next-line: missing-parameter
 					dap.launch({
 						type = "executable",
 						command = "lldb-dap-18",
@@ -81,7 +82,16 @@ local function debug_attach()
 						type = "lldb-dap",
 						request = "attach",
 						pid = choice.pid,
-						program = choice.name,
+						stopOnEntry = false,
+						-- program = choice.name,
+						initCommands = {
+							'process handle -s false -n false SIGWINCH',
+						},
+						postRunCommands = {
+							'settings set target.language c++20',
+							'breakpoint set -E c++ -G true',
+							'settings set target.source-map /proc/self/cwd ' .. vim.uv.cwd(),
+						},
 					})
 				end
 			end
@@ -99,6 +109,10 @@ local function debug_disconnect()
 	end)
 end
 
+local function toggle_breakpoint()
+	require('dap').toggle_breakpoint()
+end
+
 return {
 	"mfussenegger/nvim-dap",
 	dependencies = {
@@ -106,9 +120,10 @@ return {
 		"nvim-neotest/nvim-nio",
 	},
 	keys = {
-		{ "<leader>da", debug_attach,     desc = "Debug Attach" },
-		{ "<leader>dq", debug_disconnect, desc = "Disconnect Debugger" },
-		{ "<leader>dd", toggle_debug_ui,  desc = "Debug UI Toggle" },
+		{ "<leader>da", debug_attach,      desc = "Debug Attach" },
+		{ "<leader>dq", debug_disconnect,  desc = "Disconnect Debugger" },
+		{ "<leader>dd", toggle_debug_ui,   desc = "Debug UI Toggle" },
+		{ "<leader>db", toggle_breakpoint, desc = "Toggle breakpoint" },
 	},
 	config = function()
 		local dap = require('dap')
