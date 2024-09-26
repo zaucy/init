@@ -73,7 +73,7 @@ local function debug_attach()
 					local dap = require('dap')
 					dap.launch({
 						type = "executable",
-						command = "lldb-dap",
+						command = "lldb-dap-18",
 						args = {},
 						options = {},
 					}, {
@@ -115,7 +115,7 @@ return {
 		local dapui = require('dapui')
 		dap.adapters.lldb = {
 			type = 'executable',
-			command = 'lldb-dap',
+			command = 'lldb-dap-18',
 			name = 'lldb'
 		}
 		dap.listeners.before.attach.dapui_config = function()
