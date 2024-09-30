@@ -120,6 +120,10 @@ local function toggle_breakpoint()
 	require('dap').toggle_breakpoint()
 end
 
+local function halt_process()
+	require('dap').repl.execute('process interrupt')
+end
+
 return {
 	"mfussenegger/nvim-dap",
 	dependencies = {
@@ -131,6 +135,7 @@ return {
 		{ "<leader>dq", debug_disconnect,  desc = "Disconnect Debugger" },
 		{ "<leader>dd", toggle_debug_ui,   desc = "Debug UI Toggle" },
 		{ "<leader>db", toggle_breakpoint, desc = "Toggle breakpoint" },
+		{ "<leader>dh", halt_process,      desc = "Halt Process " },
 	},
 	config = function()
 		local dap = require('dap')
