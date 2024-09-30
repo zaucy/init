@@ -19,7 +19,12 @@ local function get_procs(cb)
 		if is_windows then
 			return vim.fn.trim(parts[1], '"')
 		else
-			return table.concat({ unpack(parts, 5) }, ' ')
+			local proc_path = table.concat({ unpack(parts, 5) }, ' ')
+			if vim.startswith(proc_path, '/') then
+				return vim.fn.fnamemodify(proc_path, ":t")
+			else
+				return nil
+			end
 		end
 	end
 
@@ -35,7 +40,9 @@ local function get_procs(cb)
 					local parts = vim.fn.split(vim.fn.trim(line), separator)
 					local pid, name = get_pid(parts), get_process_name(parts)
 					pid = tonumber(pid)
-					table.insert(procs, { name = name, pid = pid })
+					if name ~= nil then
+						table.insert(procs, { name = name, pid = pid })
+					end
 				end
 				cb(procs)
 			else
