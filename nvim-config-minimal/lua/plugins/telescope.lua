@@ -1,8 +1,13 @@
 local config_dir = "~/projects/zaucy/init/nvim-config-minimal"
 local telescope_opts = {
+	defaults = {
+		path_display = {
+			"truncate",
+		},
+	},
 	pickers = {
-		builtins = { theme = "ivy" },
-		live_grep = { theme = "ivy" },
+		builtins = { theme = "ivy", path_display = { "truncate" } },
+		live_grep = { theme = "ivy", path_display = { "truncate" } },
 		vim_options = { theme = "ivy" },
 		colorscheme = { theme = "ivy" },
 		find_files = { theme = "ivy" },
@@ -13,7 +18,7 @@ local telescope_opts = {
 		git_bcommits = { theme = "ivy" },
 		git_branches = { theme = "ivy" },
 		git_bcommits_range = { theme = "ivy" },
-		buffers = { theme = "ivy" },
+		buffers = { theme = "ivy", path_display = { "truncate" } },
 		lsp_references = { theme = "ivy" },
 		lsp_definitions = { theme = "ivy" },
 		lsp_incoming_calls = { theme = "ivy" },
