@@ -124,6 +124,22 @@ local function halt_process()
 	require('dap').repl.execute('process interrupt')
 end
 
+local function dap_continue()
+	require('dap').continue({ new = false })
+end
+
+local function step_over()
+	require('dap').step_over()
+end
+
+local function step_into()
+	require('dap').step_into()
+end
+
+local function step_out()
+	require('dap').step_out()
+end
+
 return {
 	"mfussenegger/nvim-dap",
 	dependencies = {
@@ -131,11 +147,15 @@ return {
 		"nvim-neotest/nvim-nio",
 	},
 	keys = {
-		{ "<leader>da", debug_attach,      desc = "Debug Attach" },
-		{ "<leader>dq", debug_disconnect,  desc = "Disconnect Debugger" },
-		{ "<leader>dd", toggle_debug_ui,   desc = "Debug UI Toggle" },
-		{ "<leader>db", toggle_breakpoint, desc = "Toggle breakpoint" },
-		{ "<leader>dh", halt_process,      desc = "Halt Process " },
+		{ "<leader>da",       debug_attach,      desc = "Debug Attach" },
+		{ "<leader>dq",       debug_disconnect,  desc = "Disconnect Debugger" },
+		{ "<leader>dd",       toggle_debug_ui,   desc = "Debug UI Toggle" },
+		{ "<leader>db",       toggle_breakpoint, desc = "Toggle breakpoint" },
+		{ "<leader>dh",       halt_process,      desc = "Halt Process" },
+		{ "<leader>dc",       dap_continue,      desc = "Continue" },
+		{ "<leader>d<right>", step_over,         desc = "Step Over" },
+		{ "<leader>d<up>",    step_into,         desc = "Step Into" },
+		{ "<leader>d<down>",  step_out,          desc = "Step Out" },
 	},
 	config = function()
 		local dap = require('dap')
