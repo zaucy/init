@@ -18,7 +18,11 @@ local function streamer_mode()
 	vim.g.neovide_padding_top = 5
 	vim.g.neovide_padding_left = 5
 	vim.o.title = true
-	vim.o.titlestring = "neovide (streamer mode)"
+	if vim.g.wslenv then
+		vim.o.titlestring = "neovide (streamer mode) (wsl)"
+	else
+		vim.o.titlestring = "neovide (streamer mode)"
+	end
 
 	require('proj').add_exclude_dir(vim.fn.expand('~/projects/priv'))
 end
