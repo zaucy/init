@@ -5,11 +5,18 @@ local lsp_setup_handlers = {
 			capabilities = capabilities,
 		})
 	end,
+	['clangd'] = function()
+		local capabilities = require('cmp_nvim_lsp').default_capabilities()
+		require("lspconfig").clangd.setup({
+			capabilities = capabilities,
+			filetypes = { "c", "cpp", "objc", "objcpp", "cuda" }
+		})
+	end,
 }
 
 return {
 	{
-		"neovim/nvim-lspconfig",
+		"neovim/nvim-lspconfig"
 	},
 	{
 		"williamboman/mason.nvim",
@@ -32,7 +39,8 @@ return {
 			})
 			lsp_setup_handlers[1]("starpls")
 			require("mason-lspconfig").setup_handlers(lsp_setup_handlers)
-			require 'lspconfig'.nushell.setup {}
+			require('lspconfig').nushell.setup({})
+			require('lspconfig').protols.setup({})
 		end,
 	},
 	{
