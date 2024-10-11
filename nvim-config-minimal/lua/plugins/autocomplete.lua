@@ -3,6 +3,14 @@ local slow_completion_prefix = {
 	'\'', -- autocompelte on selections just doesn't work very well
 	'%',
 	'Q', -- I prefix commands I don't type manually with this so that my cmdline autocomplete can be snappy and no flickering occurs
+	'te',
+	'ter',
+	'term',
+	'termi',
+	'termin',
+	'termina',
+	'terminal',
+	'terminal ',
 }
 
 return {
