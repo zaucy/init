@@ -153,9 +153,9 @@ return {
 		{ "<leader>db",       toggle_breakpoint, desc = "Toggle breakpoint" },
 		{ "<leader>dh",       halt_process,      desc = "Halt Process" },
 		{ "<leader>dc",       dap_continue,      desc = "Continue" },
-		{ "<leader>d<right>", step_over,         desc = "Step Over" },
-		{ "<leader>d<up>",    step_into,         desc = "Step Into" },
-		{ "<leader>d<down>",  step_out,          desc = "Step Out" },
+		{ "<leader>d<down>",  step_over,         desc = "Step Over" },
+		{ "<leader>d<right>", step_into,         desc = "Step Into" },
+		{ "<leader>d<left>",  step_out,          desc = "Step Out" },
 	},
 	config = function()
 		local dap = require('dap')
