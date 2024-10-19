@@ -137,6 +137,15 @@ local function goto_prev_similar_buffer()
 end
 
 local last_buf_before_terminal = {}
+local last_term_buf = nil
+
+vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
+	callback = function()
+		if vim.bo.buftype == "terminal" then
+			last_term_buf = vim.api.nvim_get_current_buf()
+		end
+	end,
+})
 
 local function close_terminal()
 	if vim.bo.buftype ~= "terminal" then
@@ -177,9 +186,16 @@ local function open_terminal()
 
 	last_buf_before_terminal[vim.api.nvim_get_current_win()] = vim.api.nvim_get_current_buf()
 
+	if is_bufvalid(last_term_buf) then
+		---@diagnostic disable-next-line: param-type-mismatch
+		vim.api.nvim_set_current_buf(last_term_buf)
+		return
+	end
+
 	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
 		if vim.bo[buf].buftype == "terminal" then
 			vim.api.nvim_set_current_buf(buf)
+			last_term_buf = buf
 			return
 		end
 	end
