@@ -7,6 +7,7 @@ local channel = require("plenary.async.control").channel
 local sorters = require("telescope.sorters")
 local conf = require("telescope.config").values
 local actions = require('telescope.actions')
+local themes = require('telescope.themes')
 
 local get_filename_fn = function()
 	local bufnr_name_cache = {}
@@ -204,7 +205,7 @@ end
 function M.dynamic_workspace_symbols(opts)
 	local bufnr = opts.bufnr or vim.api.nvim_get_current_buf()
 	pickers
-		.new(opts, {
+		.new(opts, themes.get_ivy({
 			prompt_title = "Workspace Symbols",
 			finder = finders.new_dynamic {
 				entry_maker = M.make_entry_symbols(opts),
@@ -216,7 +217,7 @@ function M.dynamic_workspace_symbols(opts)
 				map("i", "<c-space>", actions.to_fuzzy_refine)
 				return true
 			end,
-		})
+		}))
 		:find()
 end
 
