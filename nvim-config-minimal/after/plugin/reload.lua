@@ -3,7 +3,7 @@ local function make_reopen_neovide_detached_fn()
 		return function() end
 	end
 
-	local current_file = vim.fs.normalize(vim.fn.expand("%:p"))
+	local current_file = vim.fn.expand("%:p"):gsub("\\", "/")
 	local neovide_args = {}
 	local files = {}
 
@@ -82,8 +82,10 @@ local function reload_done_command(opts)
 
 	for _, entry in ipairs(vim.json.decode(opts.fargs[2])) do
 		local file, line, col = unpack(entry)
-		vim.cmd("e " .. file)
-		vim.api.nvim_win_set_cursor(0, { line, col - 1 })
+		if file and #vim.trim(file) > 0 then
+			vim.cmd.edit(file)
+			pcall(vim.api.nvim_win_set_cursor, 0, { line, col - 1 })
+		end
 	end
 end
 
