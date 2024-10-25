@@ -243,11 +243,7 @@ vim.keymap.set({ "n" }, "grn", ":IncRename ", { desc = "rename" })
 vim.keymap.set(
 	{ "n", "v" },
 	"<leader>S",
-	function()
-		require('telescope.builtin').lsp_dynamic_workspace_symbols({
-			entry_maker = require('zaucy.lsp').make_entry_symbols({}),
-		})
-	end,
+	function() require('zaucy.lsp').dynamic_workspace_symbols({ theme = "ivy" }) end,
 	{ desc = "Workspace symbols" }
 )
 
