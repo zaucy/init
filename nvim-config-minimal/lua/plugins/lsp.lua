@@ -74,6 +74,8 @@ return {
 		opts = {
 			layout = {
 				default_direction = "left",
+				width = nil,
+				resize_to_content = true,
 			},
 			close_automatic_events = { "unfocus", "switch_buffer", "unsupported" },
 			autojump = true,

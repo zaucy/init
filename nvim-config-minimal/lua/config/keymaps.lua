@@ -240,6 +240,17 @@ vim.keymap.set({ "n" }, "gri", vim.lsp.buf.incoming_calls, { desc = "vim.lsp.buf
 vim.keymap.set({ "n" }, "gro", vim.lsp.buf.outgoing_calls, { desc = "vim.lsp.buf.outgoing_calls()" })
 vim.keymap.set({ "n" }, "grr", "<cmd>Telescope lsp_references<cr>", { desc = "vim.lsp.buf.outgoing_calls()" })
 vim.keymap.set({ "n" }, "grn", ":IncRename ", { desc = "rename" })
+vim.keymap.set(
+	{ "n", "v" },
+	"<leader>S",
+	function()
+		require('telescope.builtin').lsp_dynamic_workspace_symbols({
+			entry_maker = require('zaucy.lsp').make_entry_symbols({}),
+		})
+	end,
+	{ desc = "Workspace symbols" }
+)
+
 
 -- quickfix
 vim.keymap.set({ "n" }, "[q", "<cmd>cprevious<cr>", { desc = "prev qf item" })
