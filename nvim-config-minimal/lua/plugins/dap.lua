@@ -120,6 +120,12 @@ local function toggle_breakpoint()
 	require('dap').toggle_breakpoint()
 end
 
+local function toggle_conditional_breakpoint()
+	vim.ui.input({ prompt = 'Condition' }, function(condition)
+		require('dap').toggle_breakpoint(condition)
+	end)
+end
+
 local function halt_process()
 	require('dap').repl.execute('process interrupt')
 end
@@ -141,44 +147,57 @@ local function step_out()
 end
 
 return {
-	"mfussenegger/nvim-dap",
-	dependencies = {
-		"rcarriga/nvim-dap-ui",
-		"nvim-neotest/nvim-nio",
-	},
-	keys = {
-		{ "<leader>da",       debug_attach,      desc = "Debug Attach" },
-		{ "<leader>dq",       debug_disconnect,  desc = "Disconnect Debugger" },
-		{ "<leader>dd",       toggle_debug_ui,   desc = "Debug UI Toggle" },
-		{ "<leader>db",       toggle_breakpoint, desc = "Toggle breakpoint" },
-		{ "<leader>dh",       halt_process,      desc = "Halt Process" },
-		{ "<leader>dc",       dap_continue,      desc = "Continue" },
-		{ "<leader>d<down>",  step_over,         desc = "Step Over" },
-		{ "<leader>d<right>", step_into,         desc = "Step Into" },
-		{ "<leader>d<left>",  step_out,          desc = "Step Out" },
-	},
-	config = function()
-		local dap = require('dap')
-		local dapui = require('dapui')
-		dap.adapters.lldb = {
-			type = 'executable',
-			command = 'lldb-dap-18',
-			name = 'lldb'
-		}
-		dap.listeners.before.attach.dapui_config = function()
-			dapui.open()
-		end
-		dap.listeners.before.launch.dapui_config = function()
-			dapui.open()
-		end
-		dap.listeners.before.event_terminated.dapui_config = function()
-			dapui.close()
-		end
-		dap.listeners.before.event_exited.dapui_config = function()
-			dapui.close()
-		end
+	{
+		"mfussenegger/nvim-dap",
+		dependencies = {
+			"rcarriga/nvim-dap-ui",
+			"nvim-neotest/nvim-nio",
+		},
+		keys = {
+			{ "<leader>da",       debug_attach,                  desc = "Debug Attach" },
+			{ "<leader>dq",       debug_disconnect,              desc = "Disconnect Debugger" },
+			{ "<leader>dd",       toggle_debug_ui,               desc = "Debug UI Toggle" },
+			{ "<leader>db",       toggle_breakpoint,             desc = "Toggle breakpoint" },
+			{ "<leader>dB",       toggle_conditional_breakpoint, desc = "Toggle conditional breakpoint" },
+			{ "<leader>dh",       halt_process,                  desc = "Halt Process" },
+			{ "<leader>dc",       dap_continue,                  desc = "Continue" },
+			{ "<leader>d<down>",  step_over,                     desc = "Step Over" },
+			{ "<leader>d<right>", step_into,                     desc = "Step Into" },
+			{ "<leader>d<left>",  step_out,                      desc = "Step Out" },
+		},
+		config = function()
+			local dap = require('dap')
+			local dapui = require('dapui')
+			dap.adapters.lldb = {
+				type = 'executable',
+				command = 'lldb-dap-18',
+				name = 'lldb'
+			}
+			dap.listeners.before.attach.dapui_config = function()
+				dapui.open()
+			end
+			dap.listeners.before.launch.dapui_config = function()
+				dapui.open()
+			end
+			dap.listeners.before.event_process.dapui_config = function()
+				dapui.open()
+			end
+			dap.listeners.before.event_terminated.dapui_config = function()
+				dapui.close()
+			end
+			dap.listeners.before.event_exited.dapui_config = function()
+				dapui.close()
+			end
 
-		---@diagnostic disable-next-line: missing-fields
-		dapui.setup({})
-	end,
+			---@diagnostic disable-next-line: missing-fields
+			dapui.setup({})
+		end,
+	},
+	{
+		"theHamsta/nvim-dap-virtual-text",
+		dependencies = {
+			"mfussenegger/nvim-dap",
+		},
+		opts = {},
+	},
 }

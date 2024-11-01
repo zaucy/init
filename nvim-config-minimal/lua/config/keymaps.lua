@@ -20,6 +20,9 @@ vim.keymap.set({ "n" }, "gbm", goto_closest_file("MODULE.bazel"), { desc = "Baze
 vim.keymap.set({ "n" }, "gbw", goto_closest_file("WORKSPACE.bazel"), { desc = "Bazel Workspace File" })
 vim.keymap.set({ "n" }, "gbz", goto_closest_file(".bazelrc"), { desc = "Bazelrc File" })
 
+vim.keymap.set({ "n", "v" }, "<leader>qd", "<cmd>BazelDebug<cr>",
+	{ desc = "Build and launch bazel target with nvim-dap" })
+
 local function is_bufvalid(buf)
 	if buf == nil then return false end
 	if not vim.api.nvim_buf_is_valid(buf) then return false end
