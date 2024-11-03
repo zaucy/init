@@ -254,3 +254,6 @@ vim.keymap.set(
 -- quickfix
 vim.keymap.set({ "n" }, "[q", "<cmd>cprevious<cr>", { desc = "prev qf item" })
 vim.keymap.set({ "n" }, "]q", "<cmd>cnext<cr>", { desc = "next qf item" })
+
+-- some script runners
+vim.keymap.set({ "n", "v" }, "<C-S-B>", function() end, { desc = "" })
