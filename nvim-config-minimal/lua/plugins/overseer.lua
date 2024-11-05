@@ -2,7 +2,7 @@ return {
 	{
 		"stevearc/overseer.nvim",
 		opts = {
-			templates = { "zaucy.build", "zaucy.open", "zaucy.play" },
+			templates = { "vscode", "zaucy.build", "zaucy.open", "zaucy.play" },
 			task_win = {
 				padding = 0,
 				border = "rounded",
