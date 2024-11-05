@@ -23,10 +23,23 @@ vim.keymap.set({ "n" }, "gbz", goto_closest_file(".bazelrc"), { desc = "Bazelrc 
 vim.keymap.set({ "n", "v" }, "<leader>qd", "<cmd>BazelDebug<cr>",
 	{ desc = "Build and launch bazel target with nvim-dap" })
 
+local term_buf_closed = {}
+
+vim.api.nvim_create_autocmd("TermClose", {
+	callback = function(event)
+		term_buf_closed[event.buf] = true
+	end
+})
+
 local function is_bufvalid(buf)
 	if buf == nil then return false end
 	if not vim.api.nvim_buf_is_valid(buf) then return false end
 	local buftype = vim.bo[buf].buftype
+
+	if buftype == "terminal" then
+		return not term_buf_closed[buf]
+	end
+
 	if buftype == "prompt" then return false end
 	if buftype == "nofile" then return false end
 	return true
@@ -196,7 +209,7 @@ local function open_terminal()
 	end
 
 	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-		if vim.bo[buf].buftype == "terminal" then
+		if vim.bo[buf].buftype == "terminal" and is_bufvalid(buf) then
 			vim.api.nvim_set_current_buf(buf)
 			last_term_buf = buf
 			return
