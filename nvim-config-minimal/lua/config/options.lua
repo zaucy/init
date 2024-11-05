@@ -132,6 +132,7 @@ vim.api.nvim_create_autocmd('InsertEnter', {
 		if vim.bo.buftype == "nofile" then return end
 		if vim.bo.buftype == "terminal" then return end
 		if vim.bo.buftype == "prompt" then return end
+		if vim.bo.buftype == "acwrite" then return end
 
 		vim.opt.relativenumber = false
 	end,
@@ -141,6 +142,7 @@ vim.api.nvim_create_autocmd('InsertLeave', {
 		if vim.bo.buftype == "nofile" then return end
 		if vim.bo.buftype == "terminal" then return end
 		if vim.bo.buftype == "prompt" then return end
+		if vim.bo.buftype == "acwrite" then return end
 
 		vim.opt.relativenumber = true
 	end,
@@ -149,6 +151,7 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufNew', 'BufWinEnter', 'TermOpen' },
 	callback = function()
 		if vim.bo.buftype == "nofile" then return end
 		if vim.bo.buftype == "prompt" then return end
+		if vim.bo.buftype == "acwrite" then return end
 
 		if vim.bo.buftype == "terminal" then
 			vim.wo.signcolumn = "no"
