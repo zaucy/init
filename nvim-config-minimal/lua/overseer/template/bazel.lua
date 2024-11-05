@@ -37,7 +37,7 @@ return {
 					name = " " .. target.label .. " (" .. target.kind .. ")",
 					params = params_scheme,
 					builder = function(params)
-						local cmd = { "bazel", params.subcommand or default_subcommand, target.label }
+						local cmd = { "bazel", params.subcommand, target.label }
 
 						if #params.args > 0 then
 							table.insert(cmd, "--")
