@@ -219,11 +219,21 @@ local function open_terminal()
 	vim.cmd("terminal nu")
 end
 
+local function sigint_terminal()
+	if vim.bo.buftype ~= "terminal" then
+		return
+	end
+
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-c>', true, false, true), 'n', true)
+	vim.api.nvim_command('startinsert')
+end
+
 vim.keymap.set({ "n" }, "<C-_>", open_terminal, { desc = "Open Terminal" })
 vim.keymap.set({ "n" }, "<C-/>", open_terminal, { desc = "Open Terminal" })
 vim.keymap.set({ "t" }, "<C-w>", "<C-\\><C-n><cmd>WhichKey <C-w><cr>", {})
 vim.keymap.set({ "t" }, "<C-/>", close_terminal, { desc = "Hide Terminal" })
 vim.keymap.set({ "t" }, "<C-_>", close_terminal, { desc = "Hide Terminal" })
+vim.keymap.set({ "n", "v" }, "<C-c>", sigint_terminal, { desc = "Ctrl-C terminal", noremap = true, silent = true })
 vim.keymap.set({ "t" }, "<S-Insert>", "<C-\\><C-n>\"+pi", { desc = "Paste In Terminal" })
 
 vim.keymap.set({ "n" }, "]]", goto_next_similar_buffer, { desc = "Next Similar Buf" })
