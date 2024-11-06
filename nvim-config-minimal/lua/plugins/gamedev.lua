@@ -1,7 +1,6 @@
 return {
 	{
 		"zaucy/uproject.nvim",
-		-- dir = "~/projects/zaucy/uproject.nvim",
 		cmd = { "Uproject" },
 		lazy = false,
 		opts = {},

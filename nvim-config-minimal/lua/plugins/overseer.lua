@@ -1,10 +1,14 @@
 return {
 	{
 		"stevearc/overseer.nvim",
+		dependencies = {
+			"zaucy/uproject.nvim", -- for uproject.build
+		},
 		opts = {
 			templates = {
 				"vscode",
 				"bazel",
+				"uproject.build",
 				"zaucy.build",
 				"zaucy.open",
 				"zaucy.play",
