@@ -1,6 +1,8 @@
 return {
 	{
 		"stevearc/overseer.nvim",
+		-- until https://github.com/stevearc/overseer.nvim/pull/379 is merged
+		commit = "301ceb1df1879d4ea467b3f4a035d7503ce1a857",
 		dependencies = {
 			"zaucy/uproject.nvim", -- for uproject.build
 		},
