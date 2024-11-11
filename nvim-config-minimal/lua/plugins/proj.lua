@@ -1,6 +1,5 @@
 return {
 	"zaucy/proj.nvim",
-	dir = "~/projects/zaucy/proj.nvim",
 	dependencies = {
 		'nvim-lua/plenary.nvim',
 		'nvim-telescope/telescope.nvim',

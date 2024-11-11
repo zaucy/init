@@ -38,6 +38,7 @@
   "oil.nvim": { "branch": "feat/hidden-highlights", "commit": "6092d11f90668101870f9748568fb6c222909238" },
   "overseer.nvim": { "branch": "master", "commit": "301ceb1df1879d4ea467b3f4a035d7503ce1a857" },
   "plenary.nvim": { "branch": "master", "commit": "2d9b06177a975543726ce5c73fca176cedbffe9d" },
+  "proj.nvim": { "branch": "main", "commit": "90bc68091b634965f61b87a23d21ac88343346c1" },
   "render-markdown.nvim": { "branch": "main", "commit": "d69a885e1bf21cb329d2eafe56fd80b6de627216" },
   "telescope-zoxide": { "branch": "main", "commit": "54bfe630bad08dc9891ec78c7cf8db38dd725c97" },
   "telescope.nvim": { "branch": "master", "commit": "85922dde3767e01d42a08e750a773effbffaea3e" },
