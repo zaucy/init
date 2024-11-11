@@ -42,7 +42,6 @@
   "telescope-zoxide": { "branch": "main", "commit": "54bfe630bad08dc9891ec78c7cf8db38dd725c97" },
   "telescope.nvim": { "branch": "master", "commit": "85922dde3767e01d42a08e750a773effbffaea3e" },
   "tokyonight.nvim": { "branch": "main", "commit": "ce91ba480070c95f40753e4663e32b4632ac6db3" },
-  "triptych.nvim": { "branch": "main", "commit": "86f42b4b33071a95c714bd8c823709a2d5ae226d" },
   "twilight.nvim": { "branch": "main", "commit": "1584c0b0a979b71fd86b18d302ba84e9aba85b1b" },
   "uproject.nvim": { "branch": "main", "commit": "81b917573c7e9f7cd846e1697e486af84f8cc37b" },
   "vim-flatbuffers": { "branch": "master", "commit": "95c828bcc7dd83627f732bbb1d78888a3a870d6e" },
