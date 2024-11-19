@@ -8,7 +8,7 @@ vim.g.terminal_emulator = "nu"
 -- vim.go.shellquote = "'"
 vim.opt.guifont = "FiraCode Nerd Font"
 vim.opt.colorcolumn = {}
-
+vim.opt.swapfile = false
 vim.opt.shadafile = "NONE" -- shadafiles are annoying and I never find them useful
 
 vim.opt.wrap = false

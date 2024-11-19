@@ -16,7 +16,10 @@ local lsp_setup_handlers = {
 
 return {
 	{
-		"neovim/nvim-lspconfig"
+		"neovim/nvim-lspconfig",
+		init = function()
+			vim.lsp.set_log_level("off")
+		end,
 	},
 	{
 		"williamboman/mason.nvim",
