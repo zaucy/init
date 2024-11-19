@@ -18,6 +18,8 @@ vim.opt.relativenumber = true
 vim.opt.list = true
 vim.opt.listchars = { space = ' ', tab = '\u{ebf9} ', trail = '·', lead = '·' }
 
+vim.opt.tabline = "%!v:lua.require'zaucy.tabline'.draw()"
+
 -- Auto reload files when they change
 vim.o.autoread = true
 vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "CursorHoldI", "FocusGained" }, {
