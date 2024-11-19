@@ -71,7 +71,6 @@ return {
 	{
 		"zaucy/oil.nvim",
 		branch = "feat/hidden-highlights",
-		-- dir = "~/projects/oil.nvim",
 		lazy = false,
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		opts = {
