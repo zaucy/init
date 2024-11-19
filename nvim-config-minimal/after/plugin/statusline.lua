@@ -84,7 +84,14 @@ local function colorize_path()
 end
 
 function ZaucyStatusline()
-	return sys_icon .. colorize_path() .. [[%* %h%m%r %=%-14.(%l,%c%V%) %P]]
+	local status_str = sys_icon .. colorize_path() .. [[%* %h%m%r %=%-14.(%l,%c%V%) %P]]
+	if package.loaded.dap then
+		local session = require("dap").session()
+		if session ~= nil then
+			status_str = '%#@text.danger#' .. status_str
+		end
+	end
+	return status_str
 end
 
 vim.cmd([[
