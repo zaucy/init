@@ -1,14 +1,19 @@
+local ns_id = vim.api.nvim_create_namespace('ZaucySubstituteNS')
+
+vim.cmd("highlight ZaucySubstituteSelect guibg=#151521")
+
 local setcmdline_delayed = vim.schedule_wrap(function (cmdline, pos)
 	vim.fn.setcmdline(cmdline, pos)
 	-- TODO: somehow trigger an update on the cmdline
 end)
 
-local function start_cmdline_with_temp_cr(initial_cmdline, initial_cmdline_pos, cr_handler)
+local function start_cmdline_with_temp_cr(opts)
 	local original_mapping = vim.fn.maparg('<CR>', 'c', false, true)
 	local cleanup_group = vim.api.nvim_create_augroup('TempCmdlineMapping', { clear = true })
 	vim.api.nvim_create_autocmd('CmdlineLeave', {
 		group = cleanup_group,
 		callback = function()
+			---@diagnostic disable-next-line: param-type-mismatch
 			if not vim.tbl_isempty(original_mapping) then
 				vim.keymap.set('c', '<CR>', original_mapping.rhs, {
 					silent = original_mapping.silent == 1,
@@ -19,20 +24,54 @@ local function start_cmdline_with_temp_cr(initial_cmdline, initial_cmdline_pos, 
 				vim.keymap.del('c', '<CR>')
 			end
 			vim.api.nvim_del_augroup_by_name('TempCmdlineMapping')
+			if opts.cleanup then
+				return opts.cleanup()
+			end
 		end,
 		once = true,
 	})
 
 	vim.keymap.set('c', '<CR>', function()
-		if cr_handler then
-			return cr_handler()
+		if opts.cr_handler then
+			return opts.cr_handler()
 		end
 		return '<CR>'
 	end, { expr = true, replace_keycodes = true })
 
 	vim.fn.feedkeys(":")
 
-	setcmdline_delayed(initial_cmdline, initial_cmdline_pos)
+	setcmdline_delayed(opts.initial_cmdline, opts.initial_cmdline_pos)
+end
+
+local function generate_range_pattern(start_pos, end_pos)
+	local start_row = start_pos[1]
+	local start_col = start_pos[2] + 1
+	local end_row = end_pos[1]
+	local end_col = end_pos[2] + 1
+	local range = string.format("%d,%d", start_row, end_row)
+	local col_pattern
+	if start_row == end_row then
+		col_pattern = string.format(
+			"\\%%%dl\\%%>%dc\\%%<%dc",
+			start_row,
+			start_col - 1,  -- -1 to make it inclusive
+			end_col + 1     -- +1 to make it inclusive
+		)
+	else
+		col_pattern = string.format(
+			"\\(\\%%%dl\\%%>%dc\\|\\%%%dl\\%%<%dc%s\\)",
+			start_row,
+			start_col - 1,
+			end_row,
+			end_col + 1,
+			start_row + 1 < end_row and string.format("\\|\\%%>%dl\\%%<%dl", start_row, end_row) or ""
+		)
+	end
+	return {
+		range = range,
+		col_pattern = col_pattern,
+		full_pattern = range .. "s/" .. col_pattern
+	}
 end
 
 ---@diagnostic disable-next-line: unused-local
@@ -49,17 +88,30 @@ function _G.zaucy_subst_op(motion_type)
 	)
 
 	if #lines > 1 then
-		local cmdline = "'<,'>s/\\V"
-		start_cmdline_with_temp_cr(cmdline, #cmdline + 1, function()
-			cmdline = vim.fn.getcmdline()
-			if vim.endswith(cmdline, "/g") then
-				return "<cr>"
-			else
-				cmdline = cmdline .. "//g"
-				vim.fn.setcmdline(cmdline, #cmdline - 1)
-				return ""
+		local r = generate_range_pattern(start_pos, end_pos)
+		local cmdline = r.full_pattern .. "\\V"
+		local highlight_id = vim.api.nvim_buf_set_extmark(0, ns_id, start_pos[1] - 1, start_pos[2], {
+			end_line = end_pos[1] - 1,
+			end_col = end_pos[2],
+			hl_group = "ZaucySubstituteSelect"
+		})
+		start_cmdline_with_temp_cr({
+			initial_cmdline = cmdline,
+			initial_cmdline_pos = #cmdline + 1,
+			cr_handler = function()
+				cmdline = vim.fn.getcmdline()
+				if vim.endswith(cmdline, "/g") then
+					return "<cr>"
+				else
+					cmdline = cmdline .. "//g"
+					vim.fn.setcmdline(cmdline, #cmdline - 1)
+					return ""
+				end
+			end,
+			cleanup = function()
+				vim.api.nvim_buf_del_extmark(0, ns_id, highlight_id)
 			end
-		end)
+		})
 	else
 		local content = table.concat(lines, "\n"):gsub("/", "\\/")
 		local cmdline = "%s/\\V" .. content .. "/" .. content .. "/g"
