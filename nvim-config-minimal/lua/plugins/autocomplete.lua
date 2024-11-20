@@ -1,4 +1,5 @@
 local slow_completion_prefix = {
+	'\'',
 	'!', -- shell autocomplete is really slow on Windows
 	'\'', -- autocompelte on selections just doesn't work very well
 	'%',

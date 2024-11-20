@@ -45,12 +45,28 @@ local function treesitter_config()
 		highlight = {
 			enable = true,
 		},
+		textobjects = {
+			select = {
+				enable = true,
+				lookahead = true,
+				keymaps = {
+					["af"] = { query = "@function.outer", desc = "Select around function" },
+					["if"] = { query = "@function.inner", desc = "Select inside function" },
+					["ac"] = { query = "@class.outer", desc = "Select around class" },
+					["ic"] = { query = "@class.inner", desc = "Select inner part of a class region" },
+					["as"] = { query = "@local.scope", query_group = "locals", desc = "Select language scope" },
+				},
+			},
+		},
 	})
 end
 
 return {
 	{
 		"nvim-treesitter/nvim-treesitter",
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter-textobjects",
+		},
 		build = ":TSUpdate",
 		config = treesitter_config,
 	},

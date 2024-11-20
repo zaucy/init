@@ -1,3 +1,40 @@
+local setcmdline_delayed = vim.schedule_wrap(function (cmdline, pos)
+	vim.fn.setcmdline(cmdline, pos)
+	-- TODO: somehow trigger an update on the cmdline
+end)
+
+local function start_cmdline_with_temp_cr(initial_cmdline, initial_cmdline_pos, cr_handler)
+	local original_mapping = vim.fn.maparg('<CR>', 'c', false, true)
+	local cleanup_group = vim.api.nvim_create_augroup('TempCmdlineMapping', { clear = true })
+	vim.api.nvim_create_autocmd('CmdlineLeave', {
+		group = cleanup_group,
+		callback = function()
+			if not vim.tbl_isempty(original_mapping) then
+				vim.keymap.set('c', '<CR>', original_mapping.rhs, {
+					silent = original_mapping.silent == 1,
+					expr = original_mapping.expr == 1,
+					noremap = original_mapping.noremap == 1,
+				})
+			else
+				vim.keymap.del('c', '<CR>')
+			end
+			vim.api.nvim_del_augroup_by_name('TempCmdlineMapping')
+		end,
+		once = true,
+	})
+
+	vim.keymap.set('c', '<CR>', function()
+		if cr_handler then
+			return cr_handler()
+		end
+		return '<CR>'
+	end, { expr = true, replace_keycodes = true })
+
+	vim.fn.feedkeys(":")
+
+	setcmdline_delayed(initial_cmdline, initial_cmdline_pos)
+end
+
 ---@diagnostic disable-next-line: unused-local
 function _G.zaucy_subst_op(motion_type)
 	local start_pos = vim.api.nvim_buf_get_mark(0, '[')
@@ -10,10 +47,25 @@ function _G.zaucy_subst_op(motion_type)
 		end_pos[2] + 1,
 		{}
 	)
-	local content = table.concat(lines, "\n"):gsub("/", "\\/")
-	local cmdline = "%s/\\V" .. content .. "/" .. content .. "/g"
-	vim.fn.feedkeys(":" .. cmdline)
-	vim.schedule_wrap(vim.fn.setcmdline)(cmdline, #cmdline - 1)
+
+	if #lines > 1 then
+		local cmdline = "'<,'>s/\\V"
+		start_cmdline_with_temp_cr(cmdline, #cmdline + 1, function()
+			cmdline = vim.fn.getcmdline()
+			if vim.endswith(cmdline, "/g") then
+				return "<cr>"
+			else
+				cmdline = cmdline .. "//g"
+				vim.fn.setcmdline(cmdline, #cmdline - 1)
+				return ""
+			end
+		end)
+	else
+		local content = table.concat(lines, "\n"):gsub("/", "\\/")
+		local cmdline = "%s/\\V" .. content .. "/" .. content .. "/g"
+		vim.fn.feedkeys(":")
+		setcmdline_delayed(cmdline, #cmdline - 1)
+	end
 end
 
 ---@diagnostic disable-next-line: unused-local
@@ -28,10 +80,14 @@ function _G.zaucy_subst_delete_op(motion_type)
 		end_pos[2] + 1,
 		{}
 	)
-	local content = table.concat(lines, "\n"):gsub("/", "\\/")
-	local cmdline = "%s/\\V" .. content .. "/" .. "/g"
-	vim.fn.feedkeys(":" .. cmdline)
-	vim.schedule_wrap(vim.fn.setcmdline)(cmdline, #cmdline - 1)
+	if #lines > 1 then
+		vim.notify("Cannot subsitute delete multiple lines", vim.log.levels.ERROR)
+	else
+		local content = table.concat(lines, "\n"):gsub("/", "\\/")
+		local cmdline = "%s/\\V" .. content .. "/" .. "/g"
+		vim.fn.feedkeys(":")
+		setcmdline_delayed(cmdline, #cmdline - 1)
+	end
 end
 
 vim.keymap.set({ 'n', 'v' }, 's', function()
@@ -39,7 +95,7 @@ vim.keymap.set({ 'n', 'v' }, 's', function()
 	return 'g@'
 end, { expr = true })
 
-vim.keymap.set({ 'n', 'v' }, 'sd', function()
+vim.keymap.set({ 'n' }, 'sd', function()
 	vim.opt.operatorfunc = 'v:lua.zaucy_subst_delete_op'
 	return 'g@'
 end, { expr = true })
