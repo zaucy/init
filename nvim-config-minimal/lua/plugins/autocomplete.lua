@@ -11,6 +11,9 @@ local slow_completion_prefix = {
 	'termina',
 	'terminal',
 	'terminal ',
+	'g/',
+	'Norm',
+	'Preview',
 }
 
 return {

@@ -1,5 +1,49 @@
-vim.keymap.set({ "v" }, 's', [[:s/\%V]])   -- subsitute in selection
-vim.keymap.set({ "n" }, 'S', [[:%s/]])     -- subsitute in whole file
+---@diagnostic disable-next-line: unused-local
+function _G.zaucy_subst_op(motion_type)
+	local start_pos = vim.api.nvim_buf_get_mark(0, '[')
+	local end_pos = vim.api.nvim_buf_get_mark(0, ']')
+	local lines = vim.api.nvim_buf_get_text(
+		0,
+		start_pos[1] - 1,
+		start_pos[2],
+		end_pos[1] - 1,
+		end_pos[2] + 1,
+		{}
+	)
+	local content = table.concat(lines, "\n"):gsub("/", "\\/")
+	local cmdline = "%s/\\V" .. content .. "/" .. content .. "/g"
+	vim.fn.feedkeys(":" .. cmdline)
+	vim.schedule_wrap(vim.fn.setcmdline)(cmdline, #cmdline - 1)
+end
+
+---@diagnostic disable-next-line: unused-local
+function _G.zaucy_subst_delete_op(motion_type)
+	local start_pos = vim.api.nvim_buf_get_mark(0, '[')
+	local end_pos = vim.api.nvim_buf_get_mark(0, ']')
+	local lines = vim.api.nvim_buf_get_text(
+		0,
+		start_pos[1] - 1,
+		start_pos[2],
+		end_pos[1] - 1,
+		end_pos[2] + 1,
+		{}
+	)
+	local content = table.concat(lines, "\n"):gsub("/", "\\/")
+	local cmdline = "%s/\\V" .. content .. "/" .. "/g"
+	vim.fn.feedkeys(":" .. cmdline)
+	vim.schedule_wrap(vim.fn.setcmdline)(cmdline, #cmdline - 1)
+end
+
+vim.keymap.set({ 'n', 'v' }, 's', function()
+	vim.opt.operatorfunc = 'v:lua.zaucy_subst_op'
+	return 'g@'
+end, { expr = true })
+
+vim.keymap.set({ 'n', 'v' }, 'sd', function()
+	vim.opt.operatorfunc = 'v:lua.zaucy_subst_delete_op'
+	return 'g@'
+end, { expr = true })
+
 vim.keymap.set({ "v" }, '/', '<esc>/\\%V') -- search in selection
 
 local function goto_closest_file(filename)
