@@ -176,7 +176,7 @@ vim.keymap.set({ "n", "v" }, "<leader>qd", "<cmd>BazelDebug<cr>",
 	{ desc = "Build and launch bazel target with nvim-dap" })
 
 for i = 1, 9 do
-	vim.keymap.set({ "n", "v" }, "<C-" ..tostring(i) .. ">", function() require('zaucy.tabline').goto(i) end, { desc = "Goto tab " .. tostring(i) })
+	vim.keymap.set({ "n", "v", "t" }, "<C-" ..tostring(i) .. ">", function() require('zaucy.tabline').goto(i) end, { desc = "Goto tab " .. tostring(i) })
 end
 
 local term_buf_closed = {}
