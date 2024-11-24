@@ -1,3 +1,6 @@
+local homedir = vim.fn.substitute(vim.fn.expand('~'), '\\\\', '/', 'g')
+local initdir = vim.fn.substitute(vim.fn.expand('~/projects/zaucy/init'), '\\\\', '/', 'g')
+
 -- Function to check if a buffer is a blank scratch buffer
 local function is_blank_scratch_buffer(bufnr)
 	local buf_info = vim.fn.getbufinfo(bufnr)[1]
@@ -28,10 +31,10 @@ function M.goto(index)
 	assert(index > 0, "Cannot go to tab < 1")
 	assert(index < 10, "Cannot go to tab > 9")
 
-	local current_tabpage = vim.api.nvim_get_current_tabpage()
-	if is_empty_tabpage(current_tabpage) then
-		vim.cmd('tabclose')
-	end
+	-- local current_tabpage = vim.api.nvim_get_current_tabpage()
+	-- if is_empty_tabpage(current_tabpage) then
+	-- 	vim.cmd('tabclose')
+	-- end
 	vim.cmd('tabnew')
 
 	if M._tabs[index] ~= nil and vim.api.nvim_tabpage_is_valid(M._tabs[index]) then
@@ -48,11 +51,22 @@ function M.draw()
 
 	for index, tabpage in pairs(M._tabs) do
 		if vim.api.nvim_tabpage_is_valid(tabpage) then
+			local tabnumber = vim.api.nvim_tabpage_get_number(tabpage)
+			local tab_name = ""
 			if tabpage == current_tabpage then
-				table.insert(tabs, (M._index_names_active[index] or M._index_names[index] or index))
+				tab_name = "%#TabLineSel#" .. (M._index_names_active[index] or M._index_names[index] or index)
 			else
-				table.insert(tabs, (M._index_names[index] or index))
+				tab_name = "%#TabLine#" .. (M._index_names[index] or index)
 			end
+			local tabcwd = vim.fn.substitute(vim.fn.getcwd(-1, tabnumber), '\\\\', '/', 'g')
+			if tabcwd == homedir then
+				tab_name = tab_name .. ""
+			elseif tabcwd == initdir then
+				tab_name = tab_name .. "󰒔"
+			else
+				tab_name = tab_name .. " " .. vim.fs.basename(tabcwd)
+			end
+			table.insert(tabs, tab_name .. "%*")
 		end
 	end
 

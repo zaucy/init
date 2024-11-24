@@ -13,11 +13,12 @@ vim.opt.shadafile = "NONE" -- shadafiles are annoying and I never find them usef
 
 vim.opt.wrap = false
 vim.opt.cursorline = true
-vim.opt.number = false
-vim.opt.relativenumber = false
+vim.opt.number = true
+vim.opt.relativenumber = true
 vim.opt.list = true
 vim.opt.listchars = { space = ' ', tab = '\u{ebf9} ', trail = '·', lead = '·' }
 
+vim.opt.showtabline = 2
 vim.opt.tabline = "%!v:lua.require'zaucy.tabline'.draw()"
 
 -- Auto reload files when they change
@@ -146,7 +147,7 @@ vim.api.nvim_create_autocmd('InsertLeave', {
 		if vim.bo.buftype == "prompt" then return end
 		if vim.bo.buftype == "acwrite" then return end
 
-		vim.opt.relativenumber = false
+		vim.opt.relativenumber = true
 	end,
 })
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufNew', 'BufWinEnter', 'TermOpen' }, {
@@ -161,8 +162,8 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufNew', 'BufWinEnter', 'TermOpen' },
 			vim.wo.relativenumber = false
 		else
 			vim.wo.signcolumn = "auto:1-9"
-			vim.wo.number = false
-			vim.wo.relativenumber = false
+			vim.wo.number = true
+			vim.wo.relativenumber = true
 		end
 	end,
 })

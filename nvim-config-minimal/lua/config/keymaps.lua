@@ -176,7 +176,7 @@ vim.keymap.set({ "n", "v" }, "<leader>qd", "<cmd>BazelDebug<cr>",
 	{ desc = "Build and launch bazel target with nvim-dap" })
 
 for i = 1, 9 do
-	vim.keymap.set({ "n", "v" }, tostring(i), function() require('zaucy.tabline').goto(i) end, { desc = "Goto tab " .. tostring(i) })
+	vim.keymap.set({ "n", "v" }, "<C-" ..tostring(i) .. ">", function() require('zaucy.tabline').goto(i) end, { desc = "Goto tab " .. tostring(i) })
 end
 
 local term_buf_closed = {}
@@ -309,15 +309,25 @@ local function goto_prev_similar_buffer()
 end
 
 local last_buf_before_terminal = {}
-local last_term_buf = nil
+local last_term_buf = {}
 
-vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
+vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufEnter' }, {
 	callback = function()
 		if vim.bo.buftype == "terminal" then
-			last_term_buf = vim.api.nvim_get_current_buf()
+			last_term_buf[vim.api.nvim_get_current_tabpage()] = vim.api.nvim_get_current_buf()
 		end
 	end,
 })
+
+
+vim.api.nvim_create_autocmd({ 'TermOpen' }, {
+	callback = function()
+		if vim.bo.buftype == "terminal" then
+			last_term_buf[vim.api.nvim_get_current_tabpage()] = vim.api.nvim_get_current_buf()
+		end
+	end,
+})
+
 
 local function close_terminal()
 	if vim.bo.buftype ~= "terminal" then
@@ -358,16 +368,18 @@ local function open_terminal()
 
 	last_buf_before_terminal[vim.api.nvim_get_current_win()] = vim.api.nvim_get_current_buf()
 
-	if is_bufvalid(last_term_buf) then
+	local tabpage = vim.api.nvim_get_current_tabpage()
+
+	if is_bufvalid(last_term_buf[tabpage]) then
 		---@diagnostic disable-next-line: param-type-mismatch
-		vim.api.nvim_set_current_buf(last_term_buf)
+		vim.api.nvim_set_current_buf(last_term_buf[tabpage])
 		return
 	end
 
 	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
 		if vim.bo[buf].buftype == "terminal" and is_bufvalid(buf) then
 			vim.api.nvim_set_current_buf(buf)
-			last_term_buf = buf
+			last_term_buf[tabpage] = buf
 			return
 		end
 	end

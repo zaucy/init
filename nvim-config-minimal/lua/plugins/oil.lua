@@ -69,8 +69,7 @@ vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
 
 return {
 	{
-		"zaucy/oil.nvim",
-		branch = "feat/hidden-highlights",
+		"stevearc/oil.nvim",
 		lazy = false,
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		opts = {
@@ -85,11 +84,30 @@ return {
 					directory = "󰉖",
 					add_padding = false,
 				},
-				"permissions",
 			},
 			view_options = {
 				show_hidden = false,
 				is_hidden_file = is_hidden_file,
+			},
+			cleanup_delay_ms = false,
+			use_default_keymaps = false,
+			keymaps = {
+				["g?"] = "actions.show_help",
+				["<CR>"] = "actions.select",
+				["<C-s>"] = { "actions.select", opts = { vertical = true }, desc = "Open the entry in a vertical split" },
+				["<C-h>"] = { "actions.select", opts = { horizontal = true }, desc = "Open the entry in a horizontal split" },
+				["<C-t>"] = { "actions.select", opts = { tab = true }, desc = "Open the entry in new tab" },
+				["<C-p>"] = "actions.preview",
+				["<C-c>"] = "actions.close",
+				["<C-l>"] = "actions.refresh",
+				["-"] = "actions.parent",
+				["_"] = "actions.open_cwd",
+				["gs"] = "actions.change_sort",
+				["gx"] = "actions.open_external",
+				["g."] = "actions.toggle_hidden",
+				["g\\"] = "actions.toggle_trash",
+				["`"] = { "actions.cd", opts = { silent = true } },
+				["~"] = { "actions.cd", opts = { scope = "tab", silent = true }, desc = ":tcd to the current oil directory", mode = "n" },
 			},
 		},
 		cmd = { "Oil" },
