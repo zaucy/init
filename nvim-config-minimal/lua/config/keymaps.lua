@@ -319,7 +319,6 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufEnter' }, {
 	end,
 })
 
-
 vim.api.nvim_create_autocmd({ 'TermOpen' }, {
 	callback = function()
 		if vim.bo.buftype == "terminal" then
@@ -327,7 +326,6 @@ vim.api.nvim_create_autocmd({ 'TermOpen' }, {
 		end
 	end,
 })
-
 
 local function close_terminal()
 	if vim.bo.buftype ~= "terminal" then

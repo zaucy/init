@@ -1,8 +1,20 @@
+local supress_autoclose = false
+
+vim.api.nvim_create_autocmd({ 'WinLeave' }, {
+	callback = function()
+		if vim.bo.filetype == "OverseerList" and not supress_autoclose then
+			local overseer = require('overseer')
+			if require('overseer.window').is_open() then
+				overseer.close()
+			end
+		end
+	end,
+})
+
 return {
 	{
-		"stevearc/overseer.nvim",
-		-- until https://github.com/stevearc/overseer.nvim/pull/379 is merged
-		commit = "301ceb1df1879d4ea467b3f4a035d7503ce1a857",
+		"zaucy/overseer.nvim",
+		branch = "feat/floating-window",
 		dependencies = {
 			"zaucy/uproject.nvim", -- for uproject.build
 		},
@@ -37,8 +49,26 @@ return {
 					run = function(task)
 						if task then
 							require('overseer').close()
-							task:open_output()
+							local task_bufnr = task:get_bufnr()
+							if not task_bufnr then return end
+							require('overseer').close()
+							vim.api.nvim_win_set_buf(0, task_bufnr)
 						end
+					end,
+				},
+				["show task output"] = {
+					desc = "Close the overseer window and open the task in the current window",
+					--- @param task overseer.Task
+					run = function(task)
+						if not task then return end
+						local task_bufnr = task:get_bufnr()
+						if not task_bufnr then return end
+						local overseer = require('overseer')
+						supress_autoclose = true
+						overseer.close()
+						vim.api.nvim_win_set_buf(0, task_bufnr)
+						overseer.open({ float = true })
+						supress_autoclose = false
 					end,
 				},
 			},
@@ -63,7 +93,7 @@ return {
 					["<C-f>"] = false,
 					["<C-q>"] = false,
 					["p"] = false,
-					["<tab>"] = "TogglePreview",
+					["<tab>"] = "<cmd>OverseerQuickAction show task output<cr>",
 					["["] = "DecreaseWidth",
 					["]"] = "IncreaseWidth",
 					["{"] = "PrevTask",
@@ -100,10 +130,10 @@ return {
 					if require('overseer.window').is_open() then
 						overseer.close()
 					else
-						overseer.open()
+						overseer.open({ float = true })
 						local sidebar = require('overseer.task_list.sidebar').get()
 						if sidebar then
-							sidebar:toggle_preview()
+							sidebar:run_action("show task output")
 						end
 					end
 				end,
@@ -113,20 +143,27 @@ return {
 				"<leader>or",
 				function()
 					local overseer = require('overseer')
+					supress_autoclose = true
+					overseer.open({ float = true })
 					--- @param task overseer.Task
 					overseer.run_template({}, function(task, err)
 						if err then
 							vim.notify(err, vim.log.levels.ERROR)
-						else
-							overseer.open()
-							if task then
-								local sidebar = require('overseer.task_list.sidebar').get()
-								if sidebar then
-									sidebar:focus_task_id(task.id)
-									sidebar:toggle_preview()
-								end
-							end
+							supress_autoclose = false
+							return
 						end
+						if not task then return end
+						local sidebar = require('overseer.task_list.sidebar').get()
+						if not sidebar then return end
+						sidebar:focus_task_id(task.id)
+						if not task then return end
+						local task_bufnr = task:get_bufnr()
+						if not task_bufnr then return end
+
+						overseer.close()
+						vim.api.nvim_win_set_buf(0, task_bufnr)
+						overseer.open({ float = true })
+						supress_autoclose = false
 					end)
 				end,
 				desc = "Run Task"
