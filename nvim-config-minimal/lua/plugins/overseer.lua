@@ -2,6 +2,8 @@ local supress_autoclose = false
 
 vim.api.nvim_create_autocmd({ 'WinLeave' }, {
 	callback = function()
+		if vim.v.exiting ~= nil then return end
+
 		if vim.bo.filetype == "OverseerList" and not supress_autoclose then
 			vim.schedule(function()
 				local overseer = require('overseer')
