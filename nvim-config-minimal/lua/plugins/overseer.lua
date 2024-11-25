@@ -48,10 +48,11 @@ return {
 					--- @param task overseer.Task
 					run = function(task)
 						if task then
+							supress_autoclose = true
 							require('overseer').close()
+							supress_autoclose = false
 							local task_bufnr = task:get_bufnr()
 							if not task_bufnr then return end
-							require('overseer').close()
 							vim.api.nvim_win_set_buf(0, task_bufnr)
 						end
 					end,
@@ -93,6 +94,7 @@ return {
 					["<C-f>"] = false,
 					["<C-q>"] = false,
 					["p"] = false,
+					["R"] = "<cmd>OverseerQuickAction restart<cr>",
 					["<tab>"] = "<cmd>OverseerQuickAction show task output<cr>",
 					["["] = "DecreaseWidth",
 					["]"] = "IncreaseWidth",
@@ -168,6 +170,19 @@ return {
 				end,
 				desc = "Run Task"
 			},
+			{
+				"<leader>oR",
+				function()
+					local overseer = require('overseer')
+					local tasks = overseer.list_tasks({ recent_first = true })
+					if vim.tbl_isempty(tasks) then
+						vim.notify("No tasks found", vim.log.levels.WARN)
+					else
+						overseer.run_action(tasks[1], "restart")
+					end
+				end,
+				desc = "Run Last Task",
+			}
 		},
 	},
 }
