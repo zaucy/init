@@ -198,10 +198,21 @@ local function goto_closest_file(filename)
 	end
 end
 
+local function bazel_override()
+	vim.ui.input({}, function(input)
+		if not input then return end
+		goto_closest_file("MODULE.bazel")()
+		vim.cmd("!bzloverride " ..  input)
+		vim.fn.feedkeys("G", "n")
+	end)
+end
+
 vim.keymap.set({ "n" }, "gbb", goto_closest_file("BUILD.bazel"), { desc = "Bazel Build File" })
 vim.keymap.set({ "n" }, "gbm", goto_closest_file("MODULE.bazel"), { desc = "Bazel Module File" })
 vim.keymap.set({ "n" }, "gbw", goto_closest_file("WORKSPACE.bazel"), { desc = "Bazel Workspace File" })
 vim.keymap.set({ "n" }, "gbz", goto_closest_file(".bazelrc"), { desc = "Bazelrc File" })
+
+vim.keymap.set({ "n" }, "gbo", bazel_override, { desc = "Bazel Override" })
 
 vim.keymap.set({ "n", "v" }, "<leader>qd", "<cmd>BazelDebug<cr>",
 	{ desc = "Build and launch bazel target with nvim-dap" })
@@ -469,6 +480,7 @@ vim.keymap.set(
 	function() require('zaucy.lsp').dynamic_workspace_symbols({ theme = "ivy" }) end,
 	{ desc = "Workspace symbols" }
 )
+
 
 
 -- quickfix
