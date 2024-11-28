@@ -110,12 +110,10 @@ function _G.zaucy_search_norm_op(motion_type)
 		end
 	end
 
-	vim.api.nvim_del_user_command("QG")
 	vim.api.nvim_create_user_command(
 		"QG",
 		function(cmd)
 			vim.cmd(get_command_string(cmd))
-			vim.api.nvim_del_user_command("QG")
 		end,
 		{
 			nargs = "*",
@@ -132,6 +130,7 @@ function _G.zaucy_search_norm_op(motion_type)
 		initial_cmdline_pos = 3,
 		cr_handler = function()
 			if #search_str > 0 then
+				vim.schedule(function() vim.api.nvim_del_user_command("QG") end)
 				return "<cr>"
 			else
 				search_str = vim.fn.getcmdline():sub(3)
