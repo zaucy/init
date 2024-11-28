@@ -3,7 +3,8 @@ local ns_id = vim.api.nvim_create_namespace('ZaucySubstituteNS')
 
 vim.cmd("highlight ZaucySubstituteSelect guibg=#151521")
 
-local function generate_range_pattern(start_pos, end_pos)
+local function generate_range_pattern(start_pos, end_pos, op)
+	op = op or "s"
 	local start_row = start_pos[1]
 	local start_col = start_pos[2] + 1
 	local end_row = end_pos[1]
@@ -30,7 +31,7 @@ local function generate_range_pattern(start_pos, end_pos)
 	return {
 		range = range,
 		col_pattern = col_pattern,
-		full_pattern = range .. "s/" .. col_pattern
+		full_pattern = range .. op .. "/" .. col_pattern
 	}
 end
 
@@ -48,7 +49,7 @@ function _G.zaucy_subst_op(motion_type)
 	)
 
 	if #lines > 1 then
-		local r = generate_range_pattern(start_pos, end_pos)
+		local r = generate_range_pattern(start_pos, end_pos, "s")
 		local cmdline = r.full_pattern .. "\\V"
 		local highlight_id = vim.api.nvim_buf_set_extmark(0, ns_id, start_pos[1] - 1, start_pos[2], {
 			end_line = end_pos[1] - 1,
@@ -78,6 +79,45 @@ function _G.zaucy_subst_op(motion_type)
 		vim.fn.feedkeys(":")
 		util.setcmdline_delayed(cmdline, #cmdline - 1)
 	end
+end
+
+function _G.zaucy_search_norm_op(motion_type)
+	local start_pos = vim.api.nvim_buf_get_mark(0, '[')
+	local end_pos = vim.api.nvim_buf_get_mark(0, ']')
+	local lines = vim.api.nvim_buf_get_text(
+		0,
+		start_pos[1] - 1,
+		start_pos[2],
+		end_pos[1] - 1,
+		end_pos[2] + 1,
+		{}
+	)
+
+	local r = generate_range_pattern(start_pos, end_pos, "g")
+	local new_r = generate_range_pattern(start_pos, end_pos, "QG")
+	local cmdline = r.full_pattern .. "\\V"
+	local highlight_id = vim.api.nvim_buf_set_extmark(0, ns_id, start_pos[1] - 1, start_pos[2], {
+		end_line = end_pos[1] - 1,
+		end_col = end_pos[2],
+		hl_group = "ZaucySubstituteSelect"
+	})
+	util.start_cmdline_with_temp_cr({
+		initial_cmdline = cmdline,
+		initial_cmdline_pos = #cmdline + 1,
+		cr_handler = function()
+			cmdline = vim.fn.getcmdline()
+			if vim.startswith(cmdline, new_r.full_pattern) then
+				return "<cr>"
+			else
+				cmdline = new_r.full_pattern .. "\\V" .. cmdline:sub(#new_r.full_pattern + 2) .. "/norm n"
+				vim.fn.setcmdline(cmdline, #cmdline + 1)
+				return ""
+			end
+		end,
+		cleanup = function()
+			vim.api.nvim_buf_del_extmark(0, ns_id, highlight_id)
+		end
+	})
 end
 
 ---@diagnostic disable-next-line: unused-local
@@ -111,6 +151,12 @@ vim.keymap.set({ 'n' }, 'sd', function()
 	vim.opt.operatorfunc = 'v:lua.zaucy_subst_delete_op'
 	return 'g@'
 end, { expr = true })
+
+vim.keymap.set({ 'n', 'v' }, 'gs', function()
+	vim.opt.operatorfunc = 'v:lua.zaucy_search_norm_op'
+	return 'g@'
+end, { expr = true })
+
 
 vim.keymap.set({ "v" }, '/', '<esc>/\\%V') -- search in selection
 
