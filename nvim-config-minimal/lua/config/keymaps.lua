@@ -3,6 +3,14 @@ local ns_id = vim.api.nvim_create_namespace('ZaucySubstituteNS')
 
 vim.cmd("highlight ZaucySubstituteSelect guibg=#151521")
 
+local refresh_cmd_preview = function()
+	local backspace = vim.api.nvim_replace_termcodes("<bs>", true, false, true)
+	-- Hack to trigger command preview again after new buffer contents have been computed
+	if vim.api.nvim_get_mode().mode == "c" then
+		vim.api.nvim_feedkeys("a" .. backspace, "n", false)
+	end
+end
+
 local function generate_range_pattern(start_pos, end_pos, op)
 	op = op or "s"
 	local start_row = start_pos[1]
@@ -84,33 +92,51 @@ end
 function _G.zaucy_search_norm_op(motion_type)
 	local start_pos = vim.api.nvim_buf_get_mark(0, '[')
 	local end_pos = vim.api.nvim_buf_get_mark(0, ']')
-	local lines = vim.api.nvim_buf_get_text(
-		0,
-		start_pos[1] - 1,
-		start_pos[2],
-		end_pos[1] - 1,
-		end_pos[2] + 1,
-		{}
-	)
-
 	local r = generate_range_pattern(start_pos, end_pos, "g")
-	local new_r = generate_range_pattern(start_pos, end_pos, "QG")
-	local cmdline = r.full_pattern .. "\\V"
 	local highlight_id = vim.api.nvim_buf_set_extmark(0, ns_id, start_pos[1] - 1, start_pos[2], {
 		end_line = end_pos[1] - 1,
 		end_col = end_pos[2],
 		hl_group = "ZaucySubstituteSelect"
 	})
+	local preview_callback = require("live-command").preview_callback
+	local search_str = ""
+
+	local function get_command_string(cmd)
+		if #search_str > 0 then
+			local exec = "execute \"normal\" \"n" .. cmd.args:gsub("\"", "\\\"") .. "\""
+			return  r.full_pattern .. search_str .. "/" .. exec
+		else
+			return ""
+		end
+	end
+
+	vim.api.nvim_del_user_command("QG")
+	vim.api.nvim_create_user_command(
+		"QG",
+		function(cmd)
+			vim.cmd(get_command_string(cmd))
+			vim.api.nvim_del_user_command("QG")
+		end,
+		{
+			nargs = "*",
+			range = true,
+			preview = function(cmd, preview_ns, preview_buf)
+				local cmd_to_preview = get_command_string(cmd)
+				return preview_callback(cmd_to_preview, preview_ns, preview_buf)
+			end
+		}
+	)
+
 	util.start_cmdline_with_temp_cr({
-		initial_cmdline = cmdline,
-		initial_cmdline_pos = #cmdline + 1,
+		initial_cmdline = "g/",
+		initial_cmdline_pos = 3,
 		cr_handler = function()
-			cmdline = vim.fn.getcmdline()
-			if vim.startswith(cmdline, new_r.full_pattern) then
+			if #search_str > 0 then
 				return "<cr>"
 			else
-				cmdline = new_r.full_pattern .. "\\V" .. cmdline:sub(#new_r.full_pattern + 2) .. "/norm n"
-				vim.fn.setcmdline(cmdline, #cmdline + 1)
+				search_str = vim.fn.getcmdline():sub(3)
+				vim.fn.setcmdline("QG ", 4)
+				refresh_cmd_preview()
 				return ""
 			end
 		end,
