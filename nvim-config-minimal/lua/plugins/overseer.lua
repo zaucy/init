@@ -40,10 +40,12 @@ return {
 			},
 			component_aliases = {
 				default = {
-					{ "display_duration", detail_level = 1 },
+					{ "display_duration",      detail_level = 1 },
+					"on_output_parse",
 					"on_output_summarize",
 					"on_exit_set_status",
-					"on_complete_dispose",
+					{ "on_result_diagnostics", remove_on_restart = true },
+					{ "on_complete_notify",    on_change = true,        system = "unfocused" },
 				},
 			},
 			actions = {
@@ -99,6 +101,7 @@ return {
 					["<C-q>"] = false,
 					["p"] = false,
 					["R"] = "<cmd>OverseerQuickAction restart<cr>",
+					["x"] = "<cmd>OverseerQuickAction stop<cr>",
 					["<tab>"] = "<cmd>OverseerQuickAction show task output<cr>",
 					["["] = "DecreaseWidth",
 					["]"] = "IncreaseWidth",
@@ -183,9 +186,23 @@ return {
 						vim.notify("No tasks found", vim.log.levels.WARN)
 					else
 						overseer.run_action(tasks[1], "restart")
+						overseer.run_action(tasks[1], "open")
 					end
 				end,
 				desc = "Run Last Task",
+			},
+			{
+				"<leader>oX",
+				function()
+					local overseer = require('overseer')
+					local tasks = overseer.list_tasks({ recent_first = true })
+					if vim.tbl_isempty(tasks) then
+						vim.notify("No tasks found", vim.log.levels.WARN)
+					else
+						overseer.run_action(tasks[1], "stop")
+					end
+				end,
+				desc = "Stop Last Task",
 			}
 		},
 	},
