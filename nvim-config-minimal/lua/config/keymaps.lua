@@ -502,7 +502,17 @@ vim.keymap.set(
 	{ desc = "Workspace symbols" }
 )
 
-
+vim.keymap.set(
+	{ "n" },
+	"gr/",
+	function()
+		require('telescope.builtin').live_grep({
+			default_text = vim.fn.expand("<cword>"),
+			theme = "ivy",
+		})
+	end,
+	{ desc = "Workspace symbols" }
+)
 
 -- quickfix
 vim.keymap.set({ "n" }, "[q", "<cmd>cprevious<cr>", { desc = "prev qf item" })
