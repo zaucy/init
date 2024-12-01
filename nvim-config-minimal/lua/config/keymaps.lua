@@ -89,62 +89,6 @@ function _G.zaucy_subst_op(motion_type)
 	end
 end
 
-function _G.zaucy_search_norm_op(motion_type)
-	local start_pos = vim.api.nvim_buf_get_mark(0, '[')
-	local end_pos = vim.api.nvim_buf_get_mark(0, ']')
-	local r = generate_range_pattern(start_pos, end_pos, "g")
-	local highlight_id = vim.api.nvim_buf_set_extmark(0, ns_id, start_pos[1] - 1, start_pos[2], {
-		end_line = end_pos[1] - 1,
-		end_col = end_pos[2],
-		hl_group = "ZaucySubstituteSelect"
-	})
-	local preview_callback = require("live-command").preview_callback
-	local search_str = ""
-
-	local function get_command_string(cmd)
-		if #search_str > 0 then
-			local exec = "execute \"normal\" \"n" .. cmd.args:gsub("\"", "\\\"") .. "\""
-			return  r.full_pattern .. search_str .. "/" .. exec
-		else
-			return ""
-		end
-	end
-
-	vim.api.nvim_create_user_command(
-		"QG",
-		function(cmd)
-			vim.cmd(get_command_string(cmd))
-		end,
-		{
-			nargs = "*",
-			range = true,
-			preview = function(cmd, preview_ns, preview_buf)
-				local cmd_to_preview = get_command_string(cmd)
-				return preview_callback(cmd_to_preview, preview_ns, preview_buf)
-			end
-		}
-	)
-
-	util.start_cmdline_with_temp_cr({
-		initial_cmdline = "g/",
-		initial_cmdline_pos = 3,
-		cr_handler = function()
-			if #search_str > 0 then
-				vim.schedule(function() vim.api.nvim_del_user_command("QG") end)
-				return "<cr>"
-			else
-				search_str = vim.fn.getcmdline():sub(3)
-				vim.fn.setcmdline("QG ", 4)
-				refresh_cmd_preview()
-				return ""
-			end
-		end,
-		cleanup = function()
-			vim.api.nvim_buf_del_extmark(0, ns_id, highlight_id)
-		end
-	})
-end
-
 ---@diagnostic disable-next-line: unused-local
 function _G.zaucy_subst_delete_op(motion_type)
 	local start_pos = vim.api.nvim_buf_get_mark(0, '[')
@@ -178,10 +122,9 @@ vim.keymap.set({ 'n' }, 'sd', function()
 end, { expr = true })
 
 vim.keymap.set({ 'n', 'v' }, 'gs', function()
-	vim.opt.operatorfunc = 'v:lua.zaucy_search_norm_op'
+	vim.opt.operatorfunc = 'v:lua.NosOperatorFunc'
 	return 'g@'
 end, { expr = true })
-
 
 vim.keymap.set({ "v" }, '/', '<esc>/\\%V') -- search in selection
 
