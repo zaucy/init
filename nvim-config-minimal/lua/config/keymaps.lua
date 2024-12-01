@@ -121,11 +121,6 @@ vim.keymap.set({ 'n' }, 'sd', function()
 	return 'g@'
 end, { expr = true })
 
-vim.keymap.set({ 'n', 'v' }, 'gs', function()
-	vim.opt.operatorfunc = 'v:lua.NosOperatorFunc'
-	return 'g@'
-end, { expr = true })
-
 vim.keymap.set({ "v" }, '/', '<esc>/\\%V') -- search in selection
 
 local function goto_closest_file(filename)
