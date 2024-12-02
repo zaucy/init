@@ -161,6 +161,8 @@ vim.keymap.set({ "n" }, "gbz", goto_closest_file(".bazelrc"), { desc = "Bazelrc 
 vim.keymap.set({ "n" }, "gbo", bazel_override, { desc = "Bazel Override" })
 vim.keymap.set({ "n" }, "gba", bzlmod_add, { desc = "Bazel Override" })
 
+vim.keymap.set({ "c" }, "<C-c>", "<C-q><C-c>")
+
 vim.keymap.set({ "n", "v" }, "<leader>qd", "<cmd>BazelDebug<cr>",
 	{ desc = "Build and launch bazel target with nvim-dap" })
 
