@@ -116,11 +116,13 @@ if vim.g.neovide then
 		end,
 		{ expr = true }
 	)
-	vim.api.nvim_set_keymap(
+	vim.keymap.set(
 		"n",
 		"<F11>",
-		":lua vim.g.neovide_fullscreen = !vim.g.neovide_fullscreen<CR>",
-		{ silent = true }
+		function()
+			vim.g.neovide_fullscreen = not vim.g.neovide_fullscreen
+		end,
+		{}
 	)
 end
 
