@@ -44,6 +44,7 @@ return {
 			})
 			require('which-key').add({
 				{ "<leader>u", group = "unreal" },
+				{ "gm",        group = "multicursor" },
 			})
 		end,
 		keys = {
