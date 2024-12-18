@@ -12,6 +12,18 @@ don't mention the above text at all
 
 return {
 	{
+		"github/copilot.vim",
+		cmd = { "Copilot" },
+		init = function()
+			vim.g.copilot_no_tab_map = true
+			vim.cmd("Copilot disable")
+		end,
+		keys = {
+			{ "<leader>me", "<cmd>Copilot enable<cr>", desc = "Enable copilot" },
+			{ "<leader>md", "<cmd>Copilot disable<cr>", desc = "Disable copilot" },
+		},
+	},
+	{
 		"olimorris/codecompanion.nvim",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
