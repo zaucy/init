@@ -42,6 +42,7 @@ return {
 				},
 			})
 			lsp_setup_handlers[1]("starpls")
+			lsp_setup_handlers[1]("gdscript")
 			require("mason-lspconfig").setup_handlers(lsp_setup_handlers)
 			require('lspconfig').nushell.setup({})
 			require('lspconfig').protols.setup({})
