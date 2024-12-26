@@ -17,9 +17,16 @@ return {
 		init = function()
 			vim.g.copilot_no_tab_map = true
 			vim.cmd("Copilot disable")
+			vim.keymap.set("i", "<C-S-space>", "<Plug>(copilot-suggest)")
+			vim.keymap.set("i", "<C-S-right>", "<Plug>(copilot-accept-line)")
+			vim.keymap.set('i', '<C-S-enter>', 'copilot#Accept()', {
+				expr = true,
+				replace_keycodes = false
+			})
+			vim.cmd("hi! link CopilotSuggestion DiffAdd")
 		end,
 		keys = {
-			{ "<leader>me", "<cmd>Copilot enable<cr>", desc = "Enable copilot" },
+			{ "<leader>me", "<cmd>Copilot enable<cr>",  desc = "Enable copilot" },
 			{ "<leader>md", "<cmd>Copilot disable<cr>", desc = "Disable copilot" },
 		},
 	},
