@@ -149,6 +149,21 @@ return {
 				desc = "Toggle"
 			},
 			{
+				"<leader>O",
+				function()
+					local overseer = require('overseer')
+					if not require('overseer.window').is_open() then
+						overseer.open({ float = true })
+					end
+					local sidebar = require('overseer.task_list.sidebar').get()
+					if sidebar then
+						sidebar:run_action("show task output")
+					end
+					overseer.close()
+				end,
+				desc = "Open Last Task"
+			},
+			{
 				"<leader>or",
 				function()
 					local overseer = require('overseer')
@@ -171,7 +186,7 @@ return {
 
 						overseer.close()
 						vim.api.nvim_win_set_buf(0, task_bufnr)
-						overseer.open({ float = true })
+						-- overseer.open({ float = true })
 						supress_autoclose = false
 					end)
 				end,

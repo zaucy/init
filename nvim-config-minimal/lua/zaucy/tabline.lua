@@ -35,11 +35,11 @@ function M.goto(index)
 	-- if is_empty_tabpage(current_tabpage) then
 	-- 	vim.cmd('tabclose')
 	-- end
-	vim.cmd('tabnew')
 
 	if M._tabs[index] ~= nil and vim.api.nvim_tabpage_is_valid(M._tabs[index]) then
 		vim.api.nvim_set_current_tabpage(M._tabs[index])
 	else
+		vim.cmd('tabnew')
 		M._tabs[index] = vim.api.nvim_get_current_tabpage()
 	end
 end
