@@ -180,6 +180,7 @@ end
 
 local last_buf_before_terminal = {}
 local last_term_buf = {}
+local tabpage_terms = {}
 
 vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufEnter' }, {
 	callback = function()
@@ -192,7 +193,13 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufEnter' }, {
 vim.api.nvim_create_autocmd({ 'TermOpen' }, {
 	callback = function()
 		if vim.bo.buftype == "terminal" then
-			last_term_buf[vim.api.nvim_get_current_tabpage()] = vim.api.nvim_get_current_buf()
+			local tabpage = vim.api.nvim_get_current_tabpage()
+			local buf = vim.api.nvim_get_current_buf()
+			last_term_buf[tabpage] = buf
+			if not tabpage_terms[tabpage] then
+				tabpage_terms[tabpage] = {}
+			end
+			table.insert(tabpage_terms[tabpage], buf)
 		end
 	end,
 })
@@ -244,11 +251,14 @@ local function open_terminal()
 		return
 	end
 
-	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-		if vim.bo[buf].buftype == "terminal" and is_bufvalid(buf) then
-			vim.api.nvim_set_current_buf(buf)
-			last_term_buf[tabpage] = buf
-			return
+	local term_bufs = tabpage_terms[tabpage]
+	if term_bufs then
+		for _, buf in ipairs(term_bufs) do
+			if vim.bo[buf].buftype == "terminal" and is_bufvalid(buf) then
+				vim.api.nvim_set_current_buf(buf)
+				last_term_buf[tabpage] = buf
+				return
+			end
 		end
 	end
 
