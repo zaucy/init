@@ -1,4 +1,5 @@
-use ~/projects/zaucy/init/nushell-scripts/nu_scripts/modules/prompt/async_git_prompt/async-git-prompt.nu *
+# TODO: This doesn't work anymore
+# use ~/projects/zaucy/init/nushell-scripts/nu_scripts/modules/prompt/async_git_prompt/async-git-prompt.nu *
 
 def get_box_color [] {
 	if ($env.LAST_EXIT_CODE == 0) {

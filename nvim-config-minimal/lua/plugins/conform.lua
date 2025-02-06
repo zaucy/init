@@ -8,7 +8,13 @@ return {
 				timeout_ms = 500,
 			},
 			formatters_by_ft = {
-				cs = { "lsp" },
+				cs = function(bufnr)
+					local root = vim.fs.root(bufnr, ".git")
+					if vim.fs.basename(root) == "ecsact_unity" then
+						return { "clang-format" }
+					end
+					return { "lsp" }
+				end,
 				starlark = { "buildifier" },
 				bzl = { "buildifier" },
 				javascript = { "prettierd", "prettier", stop_after_first = true },

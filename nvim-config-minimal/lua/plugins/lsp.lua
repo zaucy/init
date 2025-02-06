@@ -36,7 +36,9 @@ return {
 		},
 		config = function()
 			require("mason-lspconfig").setup({
-				automatic_installation = true,
+				automatic_installation = {
+					exclude = { "omnisharp" },
+				},
 				ensure_installed = {
 					"lua_ls",
 				},
