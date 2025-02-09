@@ -79,6 +79,7 @@ if vim.g.neovide then
 	vim.g.neovide_fullscreen = false
 	vim.g.experimental_layer_grouping = true
 	vim.g.neovide_floating_corner_radius = 0.5
+	vim.g.neovide_title_background_color = "#171723" -- matches my default theme
 
 	local default_scale_index = 3
 	vim.g.neovide_scale_factor = scale_factors[default_scale_index]
