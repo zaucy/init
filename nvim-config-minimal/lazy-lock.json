@@ -56,6 +56,7 @@
   "vim-bbye": { "branch": "master", "commit": "25ef93ac5a87526111f43e5110675032dbcacf56" },
   "vim-flatbuffers": { "branch": "master", "commit": "95c828bcc7dd83627f732bbb1d78888a3a870d6e" },
   "vim-symlink": { "branch": "master", "commit": "fec2d1a72c6875557109ce6113f26d3140b64374" },
+  "vim-vp4": { "branch": "master", "commit": "7e958ba378b24981b90edd4c56b6d2c3ce20b558" },
   "which-key.nvim": { "branch": "main", "commit": "0e76a87ac51772569aec678dc74baa8e2a86100c" },
   "zen-mode.nvim": { "branch": "main", "commit": "863f150ca321b3dd8aa1a2b69b5f411a220e144f" }
 }
