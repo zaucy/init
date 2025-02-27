@@ -33,6 +33,13 @@ vim.filetype.add({ extension = { bazelrc = "bazelrc" } })
 vim.filetype.add({ extension = { cpp2 = "cpp2" } })
 vim.filetype.add({ extension = { ecsact = "ecsact" } })
 
+-- template engine used by cocogitto
+vim.filetype.add({
+	extension = { tera = "tera" },
+	-- Ecsact SDK uses this file with cocogitto
+	filename = { ["release-notes-template"] = "tera" }
+})
+
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 	vim.lsp.diagnostic.on_publish_diagnostics, {
 		underline = true,

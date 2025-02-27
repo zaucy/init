@@ -5,6 +5,14 @@ local telescope_opts = {
 			"truncate",
 		},
 	},
+	extensions = {
+		fzf = {
+			fuzzy = true,
+			override_generic_sorter = true,
+			override_file_sorter = true,
+			case_mode = "smart_case",
+		},
+	},
 	pickers = {
 		builtins = { theme = "ivy", path_display = { "truncate" } },
 		live_grep = { theme = "ivy", path_display = { "truncate" } },
@@ -31,12 +39,24 @@ local telescope_opts = {
 	}
 }
 
+local function telescope_fzf_build_cmd()
+	if vim.fn.has('win32') == 1 then
+		return
+		'cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && xcopy build\\Release\\libfzf.dll build\\ /Y'
+	else
+		return
+		'cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release'
+	end
+end
+
 return {
 	{
 		"nvim-telescope/telescope.nvim",
-		dependencies = { 'nvim-lua/plenary.nvim' },
+		dependencies = {
+			'nvim-lua/plenary.nvim',
+		},
 		config = function()
-			require("telescope").setup(telescope_opts)
+			require('telescope').setup(telescope_opts)
 		end,
 		cmd = { "Telescope" },
 		keys = {
@@ -47,6 +67,16 @@ return {
 			{ "<leader>b", "<cmd>Telescope buffers<cr>",                             desc = "Find buffers" },
 			{ "<leader>c", "<cmd>Telescope find_files cwd=" .. config_dir .. "<cr>", desc = "Config files" },
 		},
+	},
+	{
+		'nvim-telescope/telescope-fzf-native.nvim',
+		build = telescope_fzf_build_cmd(),
+		dependencies = {
+			"nvim-telescope/telescope.nvim",
+		},
+		config = function()
+			require('telescope').load_extension('fzf')
+		end,
 	},
 	{
 		"jvgrootveld/telescope-zoxide",

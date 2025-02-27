@@ -41,7 +41,6 @@ return {
 			component_aliases = {
 				default = {
 					{ "display_duration",      detail_level = 1 },
-					"on_output_parse",
 					"on_output_summarize",
 					"on_exit_set_status",
 					{ "on_result_diagnostics", remove_on_restart = true },
