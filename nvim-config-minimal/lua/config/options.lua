@@ -15,7 +15,7 @@ vim.opt.wrap = false
 vim.opt.cursorline = true
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.opt.list = true
+vim.opt.list = false
 vim.opt.listchars = { space = ' ', tab = '\u{ebf9} ', trail = '·', lead = '·' }
 
 vim.opt.showtabline = 2
