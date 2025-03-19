@@ -200,4 +200,11 @@ return {
 		},
 		opts = {},
 	},
+	{
+		"leoluz/nvim-dap-go",
+		opts = {},
+		dependencies = {
+			"mfussenegger/nvim-dap",
+		},
+	},
 }

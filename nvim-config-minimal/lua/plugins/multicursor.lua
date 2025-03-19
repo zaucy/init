@@ -18,6 +18,7 @@ return {
 			vim.keymap.set({ "n", "v" }, "gm<A-->", mc.deleteCursor, { desc = "Delete Cursor" })
 			vim.keymap.set({ "n", "v" }, "gm&", mc.alignCursors, { desc = "Align cursors" })
 			vim.keymap.set({ "n", "v" }, "gmm", mc.matchAllAddCursors, { desc = "Match all add cursor" })
+			vim.keymap.set({ "n", "v" }, "gm/", mc.searchAllAddCursors, { desc = "Search all add cursors" })
 			vim.keymap.set("v", "gms", mc.matchCursors, { desc = "Match search add cursor" })
 			vim.keymap.set({ "n", "v" }, "gmn", function() mc.matchAddCursor(1) end, { desc = "Match add cursor next" })
 			vim.keymap.set({ "n", "v" }, "gmN", function() mc.matchAddCursor(-1) end, { desc = "Match add cursor prev" })
@@ -31,6 +32,10 @@ return {
 				{ desc = "Transpose cursor selection next" })
 			vim.keymap.set("v", "gm<A-Down>", function() mc.transposeCursors(-1) end,
 				{ desc = "Transpose cursor selection prev" })
+
+			-- operators
+			vim.keymap.set("n", "gmo", function() mc.operator({ visual = false }) end, { desc = "Mulicursor operator" })
+			vim.keymap.set("v", "gmo", function() mc.operator({ visual = true }) end, { desc = "Mulicursor operator" })
 
 			-- motions
 			vim.keymap.set("n", "gm%", function() mc.addCursor("%") end, { desc = "Add cursor to match" })

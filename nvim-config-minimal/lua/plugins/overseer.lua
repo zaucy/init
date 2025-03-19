@@ -22,7 +22,13 @@ return {
 		dependencies = {
 			"zaucy/uproject.nvim", -- for uproject.build
 		},
+
+		--- @type overseer.Config
 		opts = {
+			strategy = {
+				"jobstart",
+				{ use_terminal = false },
+			},
 			templates = {
 				"vscode",
 				"bazel",
