@@ -15,6 +15,7 @@ return {
 					end
 					return { "lsp" }
 				end,
+				shaderslang = { "clang-format" },
 				starlark = { "buildifier" },
 				bzl = { "buildifier" },
 				javascript = { "prettierd", "prettier", stop_after_first = true },
