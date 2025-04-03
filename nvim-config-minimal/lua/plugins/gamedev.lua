@@ -1,18 +1,38 @@
 return {
 	{
 		"zaucy/uproject.nvim",
-		dir = "~/projects/zaucy/uproject.nvim",
+		dependencies = {
+			'nvim-lua/plenary.nvim',
+			"j-hui/fidget.nvim", -- optional
+		},
 		cmd = { "Uproject" },
-		lazy = false,
 		opts = {},
 		keys = {
+			{ "<leader>uu", "<cmd>Uproject show_output<cr>",                            desc = "Show last output" },
 			{ "<leader>uo", "<cmd>Uproject open<cr>",                                   desc = "Open Unreal Editor" },
 			{ "<leader>uO", "<cmd>Uproject build  type_pattern=Editor wait open<cr>",   desc = "Build and open Unreal Editor" },
 			{ "<leader>ur", "<cmd>Uproject reload show_output<cr>",                     desc = "Reload uproject" },
 			{ "<leader>up", "<cmd>Uproject play log_cmds=Log\\ Log<cr>",                desc = "Play game" },
 			{ "<leader>uP", "<cmd>Uproject play debug log_cmds=Log\\ Log<cr>",          desc = "Play game (debug)" },
-			{ "<leader>uB", "<cmd>Uproject build type_pattern=Editor wait<cr>",         desc = "Build (keep open)" },
+			{ "<leader>uB", "<cmd>Uproject build type_pattern=Editor wait<cr>",         desc = "Build" },
 			{ "<leader>uc", "<cmd>Uproject build_plugins type_pattern=Editor wait<cr>", desc = "Build Plugins" },
+
+			{
+				"<leader>ub",
+				desc = "Build (fast + hide output)",
+				function()
+					require('uproject').uproject_build(vim.fn.getcwd(), {
+						type_pattern = "Editor",
+						wait = true,
+						hide_output = true,
+						env = {
+							-- build systems I use look for this env variable to skip prebuild steps
+							"UBT_SKIP_PREBUILD_STEPS=1",
+						},
+					})
+				end
+			},
+
 			{
 				"<leader>uh",
 				function()

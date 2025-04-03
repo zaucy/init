@@ -54,6 +54,7 @@ local function setup_telescope_backdrop()
 			local backdropBufnr = vim.api.nvim_create_buf(false, true)
 			local winnr = vim.api.nvim_open_win(backdropBufnr, false, {
 				relative = "editor",
+				border = "none",
 				row = 0,
 				col = 0,
 				width = vim.o.columns,
