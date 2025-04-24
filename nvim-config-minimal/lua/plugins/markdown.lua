@@ -1,6 +1,7 @@
 return {
 	{
 		"MeanderingProgrammer/render-markdown.nvim",
+		enabled = false, -- after updating to neovim this stopped working
 		opts = {
 			debounce = 0,
 			sign = { enabled = false },

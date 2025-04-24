@@ -109,11 +109,50 @@ return {
 				["`"] = { "actions.cd", opts = { silent = true } },
 				["~"] = { "actions.cd", opts = { scope = "tab", silent = true }, desc = ":tcd to the current oil directory", mode = "n" },
 			},
+			win_options = {
+				-- for git status
+				signcolumn = "yes:2",
+			},
 		},
 		cmd = { "Oil" },
 		keys = {
 			{ "<leader>e", "<cmd>Oil<cr>",   desc = "Explore Files" },
 			{ "<leader>E", "<cmd>Oil .<cr>", desc = "Explore Files (PWD)" },
+		},
+	},
+	{
+		"refractalize/oil-git-status.nvim",
+		config = {
+			show_ignored = false,
+			symbols = {
+				working_tree = {
+					["!"] = "", -- ignored
+					["?"] = "",
+					["A"] = "",
+					["C"] = "",
+					["D"] = "",
+					["M"] = "",
+					["R"] = "",
+					["T"] = "",
+					["U"] = "U", -- unmerged
+					[" "] = " ", -- unmodified
+				},
+				index = {
+					["!"] = "", -- ignored
+					["?"] = "",
+					["A"] = "",
+					["C"] = "",
+					["D"] = "",
+					["M"] = "",
+					["R"] = "",
+					["T"] = "",
+					["U"] = "U", -- unmerged
+					[" "] = " ", -- unmodified
+				},
+			},
+		},
+		dependencies = {
+			"stevearc/oil.nvim",
 		},
 	}
 }
