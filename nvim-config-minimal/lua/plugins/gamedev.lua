@@ -1,3 +1,13 @@
+local function find_public_dirs(path)
+	return vim.fs.find(function(name, _)
+		return name == "Public"
+	end, {
+		type = "directory",
+		path = path,
+		limit = math.huge,
+	})
+end
+
 return {
 	{
 		"zaucy/uproject.nvim",
@@ -44,40 +54,82 @@ return {
 						local source_dir = vim.fs.joinpath(engine_dir, "Source")
 						local plugins_dir = vim.fs.joinpath(engine_dir, "Plugins")
 						local builtin = require('telescope.builtin')
+						local entry_display = require("telescope.pickers.entry_display")
+						local finders = require("telescope.finders")
+						local make_entry = require("telescope.make_entry")
+						local pickers = require("telescope.pickers")
+						local sorters = require("telescope.sorters")
 
-						local public_dirs = vim.list_extend(
-							vim.fs.find("Public", { type = "dir", path = source_dir, limit = math.huge }),
-							vim.fs.find("Public", { type = "dir", path = plugins_dir, limit = math.huge })
-						)
-						builtin.find_files({
-							cwd = engine_dir,
-							find_command = {
-								"fd",
-								"-t", "f", -- files only
-								"-E", "*.uplugin",
-								"-E", "*.cs",
-								"-E", "*.generated.h",
-								"-E", "*.cpp",
-								"-E", "*.obj",
-								"-E", "*.o",
-								"-E", "*.svg",
-								"-E", "*.uasset",
-								"-E", "*.lib",
-								"-E", "*.dll",
-								"-E", "*.exe",
-								"-E", "*.a",
-								"-E", "*.pdb",
-								"-E", "*.ini",
-								"-E", "*.png",
-								"-E", "*/Thirdparty/*",
-								"-E", "*/ThirdParty/*",
-								"--"
+						local displayer = entry_display.create({
+							separator = " │ ",
+							items = {
+								{ width = 2 }, -- icon
+								{ width = 40 }, -- module name
+								{ remaining = true }, -- header path
 							},
-							search_dirs = public_dirs,
 						})
+
+						local function custom_entry_maker(filepath)
+							local entry = make_entry.gen_from_file({})(filepath)
+							entry.value = filepath
+							entry.filename = filepath
+							entry.display = function(entry_inner)
+								return displayer({
+									"󰦱",
+									"<module-name>",
+									entry_inner.value,
+								})
+							end
+							return entry
+						end
+
+						-- local public_dirs = vim.list_extend(
+						-- 	find_public_dirs(source_dir),
+						-- 	find_public_dirs(plugins_dir)
+						-- )
+
+						local find_command = {
+							"fd",
+							"--glob", "**/*.h",
+							"-t", "f", -- files only
+							"-E", "*.generated.h",
+							"-E", "*/Thirdparty/*",
+							"-E", "*/ThirdParty/*",
+						}
+
+						-- for _, dir in ipairs(public_dirs) do
+						-- 	table.insert(find_command, "--search-path")
+						-- 	table.insert(find_command, dir)
+						-- end
+
+						table.insert(find_command, "--")
+
+						pickers.new({}, {
+							prompt_title = "Unreal Headers",
+							finder = finders.new_oneshot_job(find_command, {
+								entry_maker = custom_entry_maker,
+								cwd = engine_dir,
+							}),
+							-- sorter = sorters.get_fuzzy_file(),
+							sorter = sorters.get_fzy_sorter(),
+						}):find()
+
+						-- builtin.find_files({
+						-- 	cwd = engine_dir,
+						-- 	find_command = {
+						-- 		"fd",
+						-- 		"--glob", "**/*.h",
+						-- 		"-t", "f", -- files only
+						-- 		"-E", "*.generated.h",
+						-- 		"-E", "*/Thirdparty/*",
+						-- 		"-E", "*/ThirdParty/*",
+						-- 		"--"
+						-- 	},
+						-- 	search_dirs = public_dirs,
+						-- })
 					end)
 				end,
-				desc = "List Unreal Modules"
+				desc = "Find unreal headers",
 			},
 		},
 	},
