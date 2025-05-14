@@ -199,6 +199,26 @@ return {
 				function() telescope_unreal_headers() end,
 				desc = "Find unreal headers",
 			},
+
+			{
+				"<leader>ut",
+				function()
+					local util = require('uproject.util')
+					local filepath = vim.api.nvim_buf_get_name(0)
+					if util.is_header_path(filepath) then
+						local source_path = util.get_source_from_header(filepath)
+						if source_path then
+							vim.cmd.edit(source_path)
+						end
+					elseif util.is_source_path(filepath) then
+						local header_path = util.get_header_from_source(filepath)
+						if header_path then
+							vim.cmd.edit(header_path)
+						end
+					end
+				end,
+				desc = "Toggle header/source",
+			},
 		},
 	},
 }
