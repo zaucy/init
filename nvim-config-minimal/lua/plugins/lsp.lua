@@ -22,11 +22,13 @@ return {
 		end,
 	},
 	{
-		"williamboman/mason.nvim",
+		"mason-org/mason.nvim",
+		branch = "v1.x",
 		opts = {},
 	},
 	{
-		"williamboman/mason-lspconfig.nvim",
+		"mason-org/mason-lspconfig.nvim",
+		branch = "v1.x",
 		event = "VeryLazy",
 		dependencies = {
 			"williamboman/mason.nvim",
