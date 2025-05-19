@@ -5,7 +5,7 @@ return {
 		config = function()
 			---@diagnostic disable-next-line: missing-fields
 			require("notify").setup({
-				fps = 120,
+				fps = 20,
 				on_open = function(win)
 					vim.api.nvim_win_set_config(win, { focusable = false })
 				end,

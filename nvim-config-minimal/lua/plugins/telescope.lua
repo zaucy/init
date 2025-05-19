@@ -4,6 +4,43 @@ local telescope_opts = {
 		path_display = {
 			"truncate",
 		},
+		mappings = {
+			i = {
+				["<C-a>"] = function(prompt_bufnr)
+					local actions = require("telescope.actions")
+					local action_state = require("telescope.actions.state")
+					local multibuffer = require("multibuffer")
+					local picker = action_state.get_current_picker(prompt_bufnr)
+					local selections = {}
+					for entry in picker.manager:iter() do
+						local bufnr = entry.bufnr
+						if bufnr == nil then
+							bufnr = vim.fn.bufadd(entry.filename)
+							vim.fn.bufload(bufnr)
+						end
+						table.insert(selections, {
+							filename = entry.filename,
+							bufnr = bufnr,
+							start_row = (entry.lnum or 1) - 1,
+						})
+					end
+					actions.close(prompt_bufnr)
+
+					local multibuf = multibuffer.create_multibuf()
+					--- @type MultibufAddBufOptions[]
+					local add_buf_opts = {}
+					for _, selection in ipairs(selections) do
+						table.insert(add_buf_opts, {
+							buf = selection.bufnr,
+							start_row = selection.start_row - 2,
+							end_row = selection.start_row + 2,
+						})
+					end
+					multibuffer.multibuf_add_bufs(multibuf, add_buf_opts)
+					multibuffer.win_set_multibuf(0, multibuf)
+				end,
+			},
+		},
 	},
 	extensions = {
 		fzf = {

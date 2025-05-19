@@ -277,13 +277,14 @@ end
 vim.keymap.set({ "n" }, "<C-_>", open_terminal, { desc = "Open Terminal" })
 vim.keymap.set({ "n" }, "<C-/>", open_terminal, { desc = "Open Terminal" })
 vim.keymap.set({ "t" }, "<C-w>", "<C-\\><C-n><cmd>WhichKey <C-w><cr>", {})
+vim.keymap.set({ "n", "v" }, "<C-w><cr>", "<cmd>only<cr>", { desc = "Close other windows" })
 vim.keymap.set({ "t" }, "<C-/>", close_terminal, { desc = "Hide Terminal" })
 vim.keymap.set({ "t" }, "<C-_>", close_terminal, { desc = "Hide Terminal" })
 vim.keymap.set({ "n", "v" }, "<C-c>", sigint_terminal, { desc = "Ctrl-C terminal", noremap = true, silent = true })
 vim.keymap.set({ "t" }, "<S-Insert>", "<C-\\><C-n>\"+pi", { desc = "Paste In Terminal" })
 
-vim.keymap.set({ "n" }, "]]", goto_next_similar_buffer, { desc = "Next Similar Buf" })
-vim.keymap.set({ "n" }, "[[", goto_prev_similar_buffer, { desc = "Next Similar Buf" })
+-- vim.keymap.set({ "n" }, "]]", goto_next_similar_buffer, { desc = "Next Similar Buf" })
+-- vim.keymap.set({ "n" }, "[[", goto_prev_similar_buffer, { desc = "Next Similar Buf" })
 
 -- move lines
 vim.keymap.set({ "n" }, "<a-j>", "<cmd>m .+1<cr>==", { desc = "move down" })
