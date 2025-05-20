@@ -1,19 +1,3 @@
-local lsp_setup_handlers = {
-	function(server_name)
-		local capabilities = require('cmp_nvim_lsp').default_capabilities()
-		require("lspconfig")[server_name].setup({
-			capabilities = capabilities,
-		})
-	end,
-	['clangd'] = function()
-		local capabilities = require('cmp_nvim_lsp').default_capabilities()
-		require("lspconfig").clangd.setup({
-			capabilities = capabilities,
-			filetypes = { "c", "cpp", "objc", "objcpp", "cuda" }
-		})
-	end,
-}
-
 return {
 	{
 		"neovim/nvim-lspconfig",
@@ -23,12 +7,10 @@ return {
 	},
 	{
 		"mason-org/mason.nvim",
-		branch = "v1.x",
 		opts = {},
 	},
 	{
 		"mason-org/mason-lspconfig.nvim",
-		branch = "v1.x",
 		event = "VeryLazy",
 		dependencies = {
 			"williamboman/mason.nvim",
@@ -38,6 +20,7 @@ return {
 		},
 		config = function()
 			require("mason-lspconfig").setup({
+				automatic_enable = true,
 				automatic_installation = {
 					exclude = { "omnisharp" },
 				},
@@ -45,11 +28,9 @@ return {
 					"lua_ls",
 				},
 			})
-			lsp_setup_handlers[1]("starpls")
-			lsp_setup_handlers[1]("gdscript")
-			require("mason-lspconfig").setup_handlers(lsp_setup_handlers)
-			require('lspconfig').nushell.setup({})
-			require('lspconfig').protols.setup({})
+			vim.lsp.config('*', {
+				capabilities = require('cmp_nvim_lsp').default_capabilities(),
+			})
 		end,
 	},
 	{
