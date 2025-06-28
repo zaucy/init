@@ -171,7 +171,7 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufNew', 'BufWinEnter', 'TermOpen' },
 			vim.wo.number = false
 			vim.wo.relativenumber = false
 		else
-			vim.wo.signcolumn = "yes:2"
+			vim.wo.signcolumn = "yes:3"
 			vim.wo.number = true
 			vim.wo.relativenumber = true
 		end

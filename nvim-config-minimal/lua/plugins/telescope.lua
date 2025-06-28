@@ -1,4 +1,7 @@
 local config_dir = "~/projects/zaucy/init/nvim-config-minimal"
+
+local telescope_multibuffer_expand = 0
+
 local telescope_opts = {
 	defaults = {
 		path_display = {
@@ -27,14 +30,24 @@ local telescope_opts = {
 					actions.close(prompt_bufnr)
 
 					local multibuf = multibuffer.create_multibuf()
+					--- @type table<number, MultibufAddBufOptions>
+					local add_opts_by_buf = {}
+					for _, selection in ipairs(selections) do
+						if add_opts_by_buf[selection.bufnr] == nil then
+							add_opts_by_buf[selection.bufnr] = {
+								buf = selection.bufnr,
+								regions = {},
+							}
+						end
+						table.insert(add_opts_by_buf[selection.bufnr].regions, {
+							start_row = selection.start_row - telescope_multibuffer_expand,
+							end_row = selection.start_row + telescope_multibuffer_expand,
+						})
+					end
 					--- @type MultibufAddBufOptions[]
 					local add_buf_opts = {}
-					for _, selection in ipairs(selections) do
-						table.insert(add_buf_opts, {
-							buf = selection.bufnr,
-							start_row = selection.start_row - 2,
-							end_row = selection.start_row + 2,
-						})
+					for _, add_opts in pairs(add_opts_by_buf) do
+						table.insert(add_buf_opts, add_opts)
 					end
 					multibuffer.multibuf_add_bufs(multibuf, add_buf_opts)
 					multibuffer.win_set_multibuf(0, multibuf)

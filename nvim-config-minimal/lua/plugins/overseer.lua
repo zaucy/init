@@ -1,24 +1,6 @@
-local supress_autoclose = false
-
-vim.api.nvim_create_autocmd({ 'WinLeave' }, {
-	callback = function()
-		if vim.v.exiting ~= nil then return end
-
-		if vim.bo.filetype == "OverseerList" and not supress_autoclose then
-			vim.schedule(function()
-				local overseer = require('overseer')
-				if require('overseer.window').is_open() then
-					overseer.close()
-				end
-			end)
-		end
-	end,
-})
-
 return {
 	{
-		"zaucy/overseer.nvim",
-		branch = "feat/floating-window",
+		"stevearc/overseer.nvim",
 		dependencies = {
 			"zaucy/uproject.nvim", -- for uproject.build
 		},
@@ -79,21 +61,21 @@ return {
 						supress_autoclose = true
 						overseer.close()
 						vim.api.nvim_win_set_buf(0, task_bufnr)
-						overseer.open({ float = true })
+						overseer.open({ winid = vim.api.nvim_get_current_win() })
 						supress_autoclose = false
 					end,
 				},
 			},
 			task_list = {
-				default_detail = 1,
-				max_width = { 100, 0.2 },
+				default_detail = 2,
+				max_width = 1,
 				min_width = { 40, 0.1 },
 				width = nil,
-				max_height = { 20, 0.1 },
+				max_height = 1,
 				min_height = 8,
 				height = nil,
-				separator = nil,
-				direction = "right",
+				-- separator = nil,
+				direction = "none",
 				bindings = {
 					["?"] = "ShowHelp",
 					["g?"] = "ShowHelp",
@@ -141,15 +123,13 @@ return {
 				"<leader>oo",
 				function()
 					local overseer = require('overseer')
-					if require('overseer.window').is_open() then
-						overseer.close()
-					else
-						overseer.open({ float = true })
-						local sidebar = require('overseer.task_list.sidebar').get()
-						if sidebar then
-							sidebar:run_action("show task output")
-						end
+					local tasks = overseer.list_tasks({ })
+					if #tasks == 0 then
+						vim.notify("No tasks to show")
+						return
 					end
+					local overseer_window = require('overseer.window')
+					overseer_window.open({ winid = vim.api.nvim_get_current_win() })
 				end,
 				desc = "Toggle"
 			},
@@ -157,14 +137,12 @@ return {
 				"<leader>O",
 				function()
 					local overseer = require('overseer')
-					if not require('overseer.window').is_open() then
-						overseer.open({ float = true })
+					local tasks = overseer.list_tasks({ recent_first = true })
+					if vim.tbl_isempty(tasks) then
+						vim.notify("No tasks found", vim.log.levels.WARN)
+					else
+						overseer.run_action(tasks[1], "open")
 					end
-					local sidebar = require('overseer.task_list.sidebar').get()
-					if sidebar then
-						sidebar:run_action("show task output")
-					end
-					overseer.close()
 				end,
 				desc = "Open Last Task"
 			},
@@ -172,30 +150,37 @@ return {
 				"<leader>or",
 				function()
 					local overseer = require('overseer')
-					supress_autoclose = true
-					overseer.open({ float = true })
 					--- @param task overseer.Task
 					overseer.run_template({}, function(task, err)
 						if err then
 							vim.notify(err, vim.log.levels.ERROR)
-							supress_autoclose = false
 							return
 						end
 						if not task then return end
-						local sidebar = require('overseer.task_list.sidebar').get()
-						if not sidebar then return end
-						sidebar:focus_task_id(task.id)
-						if not task then return end
 						local task_bufnr = task:get_bufnr()
 						if not task_bufnr then return end
-
-						overseer.close()
 						vim.api.nvim_win_set_buf(0, task_bufnr)
-						-- overseer.open({ float = true })
-						supress_autoclose = false
 					end)
 				end,
 				desc = "Run Task"
+			},
+			{
+				"<leader>ob",
+				function()
+					local overseer = require('overseer')
+					--- @param task overseer.Task
+					overseer.run_template({ tags = { overseer.TAG.BUILD } }, function(task, err)
+						if err then
+							vim.notify(err, vim.log.levels.ERROR)
+							return
+						end
+						if not task then return end
+						local task_bufnr = task:get_bufnr()
+						if not task_bufnr then return end
+						vim.api.nvim_win_set_buf(0, task_bufnr)
+					end)
+				end,
+				desc = "Run Build Task"
 			},
 			{
 				"<leader>oR",
@@ -210,6 +195,25 @@ return {
 					end
 				end,
 				desc = "Run Last Task",
+			},
+			{
+				"<leader>oB",
+				function()
+					local overseer = require('overseer')
+					local tasks = overseer.list_tasks({
+						recent_first = true,
+						filter = function(task)
+							return string.match(task.name, "build") ~= nil
+						end,
+					})
+					if vim.tbl_isempty(tasks) then
+						vim.notify("No build tasks found", vim.log.levels.WARN)
+					else
+						overseer.run_action(tasks[1], "restart")
+						overseer.run_action(tasks[1], "open")
+					end
+				end,
+				desc = "Run Last Build Task",
 			},
 			{
 				"<leader>oX",

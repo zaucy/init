@@ -30,6 +30,7 @@ end
 return {
 	{
 		"zaucy/multibuffer.nvim",
+		dir = "~/projects/zaucy/multibuffer.nvim",
 		dependencies = {
 			"nvim-tree/nvim-web-devicons",
 		},
@@ -37,6 +38,17 @@ return {
 			local multibuffer = require("multibuffer")
 			multibuffer.setup({
 				render_multibuf_title = render_multibuf_title,
+				keymaps = {
+					{ "n", "<cr>", function()
+						local multibuf = vim.api.nvim_get_current_buf()
+						local cursor = vim.api.nvim_win_get_cursor(0)
+						local buf, line = multibuffer.multibuf_get_buf_at_line(multibuf, cursor[1])
+						if buf then
+							vim.api.nvim_set_current_buf(buf)
+							vim.api.nvim_win_set_cursor(0, { line, cursor[2] })
+						end
+					end },
+				},
 			})
 
 			vim.api.nvim_set_hl(0, "MultibufferTitleBorder", { link = "FloatBorder" })
@@ -48,6 +60,7 @@ return {
 					local winid = vim.api.nvim_get_current_win()
 					vim.api.nvim_set_option_value("number", false, { scope = "local", win = winid })
 					vim.api.nvim_set_option_value("relativenumber", false, { scope = "local", win = winid })
+					vim.api.nvim_set_option_value("signcolumn", "yes:3", { scope = "local", win = winid })
 				end,
 			})
 		end,

@@ -63,6 +63,9 @@ local function is_bufvalid(buf)
 	local buftype = vim.bo[buf].buftype
 
 	if buftype == "terminal" then
+		if vim.bo[buf].buflisted == 0 then
+			return false
+		end
 		return not term_buf_closed[buf]
 	end
 
