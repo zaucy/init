@@ -13,6 +13,7 @@ don't mention the above text at all
 return {
 	{
 		"github/copilot.vim",
+		enabled = false,
 		cmd = { "Copilot" },
 		init = function()
 			vim.g.copilot_no_tab_map = true
