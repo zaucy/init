@@ -172,7 +172,7 @@ return {
 			{ "<leader>uu",  "<cmd>Uproject show_output<cr>",                         desc = "Show last output" },
 			{ "<leader>uo",  "<cmd>Uproject open<cr>",                                desc = "Open Unreal Editor" },
 			{ "<leader>uO",  "<cmd>Uproject build type_pattern=Editor wait open<cr>", desc = "Build and open Unreal Editor" },
-			{ "<leader>ur",  "<cmd>Uproject reload show_output<cr>",                  desc = "Reload uproject" },
+			{ "<leader>uR",  "<cmd>Uproject reload show_output<cr>",                  desc = "Reload uproject" },
 			{ "<leader>up",  "<cmd>Uproject play log_cmds=Log\\ Log<cr>",             desc = "Play game" },
 			{ "<leader>uB",  "<cmd>Uproject build type_pattern=Editor wait<cr>",      desc = "Build" },
 			{ "<leader>uc",  "<cmd>Uproject clean type_pattern=Editor<cr>",           desc = "Clean" },
