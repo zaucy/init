@@ -37,6 +37,7 @@ return {
 			require('lspconfig').nushell.setup({})
 			require('lspconfig').protols.setup({})
 			require('lspconfig').clangd.setup({})
+			require('lspconfig').zls.setup({})
 		end,
 	},
 	{
