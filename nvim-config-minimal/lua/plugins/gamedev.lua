@@ -15,7 +15,6 @@ local function is_private_header(filepath)
 	return idx ~= nil
 end
 
-
 --- @param filepath string
 --- @return string
 local function get_header_module_name(filepath)
@@ -37,7 +36,6 @@ local function get_header_module_name(filepath)
 	return filepath_segments[#filepath_segments - 1]
 end
 
-
 --- @param prefixes string[]
 --- @param filepath string
 --- @return string
@@ -52,83 +50,98 @@ local function get_header_include_string(prefixes, filepath)
 	return filepath
 end
 
+--- @async
 local function telescope_unreal_headers()
-	require('uproject').get_project_engine_info(vim.fn.getcwd(), function(info)
-		if info == nil then
-			vim.notify("cannot find unreal project", vim.log.levels.ERROR)
-			return
-		end
-		local engine_dir = vim.fs.joinpath(info.install_dir, "Engine")
-		local source_dir = vim.fs.joinpath(engine_dir, "Source")
-		local plugins_dir = vim.fs.joinpath(engine_dir, "Plugins")
-		local project_source_dir = vim.fs.joinpath(info.project_dir, "Source")
-		local project_plugins_dir = vim.fs.joinpath(info.project_dir, "Plugins")
-		local entry_display = require("telescope.pickers.entry_display")
-		local finders = require("telescope.finders")
-		local make_entry = require("telescope.make_entry")
-		local pickers = require("telescope.pickers")
-		local sorters = require("telescope.sorters")
-		local previewers = require("telescope.previewers")
-		local themes = require("telescope.themes")
-		local actions = require("telescope.actions")
-		local action_state = require("telescope.actions.state")
+	local info = require("uproject").get_project_engine_info(vim.fn.getcwd())
+	if info == nil then
+		vim.notify("cannot find unreal project", vim.log.levels.ERROR)
+		return
+	end
+	local engine_dir = vim.fs.joinpath(info.install_dir, "Engine")
+	local source_dir = vim.fs.joinpath(engine_dir, "Source")
+	local plugins_dir = vim.fs.joinpath(engine_dir, "Plugins")
+	local project_source_dir = vim.fs.joinpath(info.project_dir, "Source")
+	local project_plugins_dir = vim.fs.joinpath(info.project_dir, "Plugins")
+	local entry_display = require("telescope.pickers.entry_display")
+	local finders = require("telescope.finders")
+	local make_entry = require("telescope.make_entry")
+	local pickers = require("telescope.pickers")
+	local sorters = require("telescope.sorters")
+	local previewers = require("telescope.previewers")
+	local themes = require("telescope.themes")
+	local actions = require("telescope.actions")
+	local action_state = require("telescope.actions.state")
 
-		local displayer = entry_display.create({
-			separator = " │ ",
-			items = {
-				{ width = 32 }, -- module name
-				{ remaining = true }, -- header path
-			},
+	local displayer = entry_display.create({
+		separator = " │ ",
+		items = {
+			{ width = 32 }, -- module name
+			{ remaining = true }, -- header path
+		},
+	})
+
+	--- @param entry {header_info: UnrealHeaderInfo}
+	local function entry_display_fn(entry)
+		return displayer({
+			entry.header_info.module_name,
+			entry.header_info.include_string,
 		})
+	end
 
-		--- @param entry {header_info: UnrealHeaderInfo}
-		local function entry_display_fn(entry)
-			return displayer({
-				entry.header_info.module_name,
-				entry.header_info.include_string,
-			})
-		end
+	local function custom_entry_maker(filepath)
+		filepath = string.gsub(filepath, "\\", "/")
 
-		local function custom_entry_maker(filepath)
-			filepath = string.gsub(filepath, "\\", "/")
-
-			local entry = make_entry.gen_from_file({})(filepath)
-			local private = is_private_header(filepath)
-			local module_name = get_header_module_name(filepath)
-			local include_string = get_header_include_string({ "/Public/", "/Classes/", "/Source/" }, filepath)
-			--- @type UnrealHeaderInfo
-			entry.header_info = {
-				private = private,
-				module_name = module_name,
-				include_string = include_string,
-			}
-			entry.value = filepath
-			entry.filename = filepath
-			entry.ordinal = module_name .. " " .. include_string
-			entry.display = entry_display_fn
-			return entry
-		end
-
-		local find_command = {
-			"fd",
-			"--glob", "**/*.h",
-			"-t", "f", -- files only
-			"-E", "*.generated.h",
-			"-E", "**/Thirdparty/*",
-			"-E", "**/ThirdParty/*",
-			"-E", "**/Binaries/*",
-			"-E", "**/Private/*",
-			"-E", "**/Internal/*",
-			"-E", "**/Intermediate/*",
-			"--search-path", source_dir,
-			"--search-path", plugins_dir,
-			"--search-path", project_source_dir,
-			"--search-path", project_plugins_dir,
+		local entry = make_entry.gen_from_file({})(filepath)
+		local private = is_private_header(filepath)
+		local module_name = get_header_module_name(filepath)
+		local include_string = get_header_include_string({ "/Public/", "/Classes/", "/Source/" }, filepath)
+		--- @type UnrealHeaderInfo
+		entry.header_info = {
+			private = private,
+			module_name = module_name,
+			include_string = include_string,
 		}
+		entry.value = filepath
+		entry.filename = filepath
+		entry.ordinal = module_name .. " " .. include_string
+		entry.display = entry_display_fn
+		return entry
+	end
 
-		table.insert(find_command, "--")
+	local find_command = {
+		"fd",
+		"--glob",
+		"**/*.h",
+		"-t",
+		"f", -- files only
+		"-E",
+		"*.generated.h",
+		"-E",
+		"**/Thirdparty/*",
+		"-E",
+		"**/ThirdParty/*",
+		"-E",
+		"**/Binaries/*",
+		"-E",
+		"**/Private/*",
+		"-E",
+		"**/Internal/*",
+		"-E",
+		"**/Intermediate/*",
+		"--search-path",
+		source_dir,
+		"--search-path",
+		plugins_dir,
+		"--search-path",
+		project_source_dir,
+		"--search-path",
+		project_plugins_dir,
+	}
 
-		pickers.new(themes.get_ivy({}), {
+	table.insert(find_command, "--")
+
+	pickers
+		.new(themes.get_ivy({}), {
 			prompt_title = "Unreal Headers",
 			finder = finders.new_oneshot_job(find_command, {
 				entry_maker = custom_entry_maker,
@@ -137,19 +150,19 @@ local function telescope_unreal_headers()
 			previewer = previewers.vim_buffer_cat.new({}),
 			sorter = sorters.get_fuzzy_file(),
 			attach_mappings = function(prompt_bufnr, map)
-				map('i', '<C-y>', function()
+				map("i", "<C-y>", function()
 					--- @type {filename: string, header_info: UnrealHeaderInfo}
 					local entry = action_state.get_selected_entry()
 					vim.fn.setreg("m", entry.header_info.module_name)
 					vim.fn.setreg("f", entry.filename)
-					vim.fn.setreg("i", "#include \"" .. entry.header_info.include_string .. "\"\n")
+					vim.fn.setreg("i", '#include "' .. entry.header_info.include_string .. '"\n')
 					actions.close(prompt_bufnr)
 				end)
 
 				return true
 			end,
-		}):find()
-	end)
+		})
+		:find()
 end
 
 --- @class UnrealHeaderInfo
@@ -159,52 +172,89 @@ end
 
 return {
 	{
+		"lewis6991/async.nvim",
+		config = function() end,
+	},
+	{
 		"zaucy/uproject.nvim",
-		dir = "~/projects/zaucy/uproject.nvim",
+		-- dir = "~/projects/zaucy/uproject.nvim",
 		dependencies = {
-			'nvim-lua/plenary.nvim',
-			'lewis6991/async.nvim',
+			"nvim-lua/plenary.nvim",
+			"lewis6991/async.nvim",
 			"j-hui/fidget.nvim", -- optional
 		},
 		cmd = { "Uproject" },
 		opts = {},
 		keys = {
-			{ "<leader>uu",  "<cmd>Uproject show_output<cr>",                         desc = "Show last output" },
-			{ "<leader>uo",  "<cmd>Uproject open<cr>",                                desc = "Open Unreal Editor" },
-			{ "<leader>uO",  "<cmd>Uproject build type_pattern=Editor wait open<cr>", desc = "Build and open Unreal Editor" },
-			{ "<leader>uR",  "<cmd>Uproject reload show_output<cr>",                  desc = "Reload uproject" },
-			{ "<leader>up",  "<cmd>Uproject play log_cmds=Log\\ Log<cr>",             desc = "Play game" },
-			{ "<leader>uB",  "<cmd>Uproject build type_pattern=Editor wait<cr>",      desc = "Build" },
-			{ "<leader>uc",  "<cmd>Uproject clean type_pattern=Editor<cr>",           desc = "Clean" },
-			{ "<leader>udo", "<cmd>Uproject open debug<cr>",                          desc = "Open Unreal Editor (debug)" },
-			{ "<leader>udp", "<cmd>Uproject play debug<cr>",                          desc = "Play game (debug)" },
+			{ "<leader>uu", "<cmd>Uproject show_output<cr>", desc = "Show last output" },
+			{ "<leader>uo", "<cmd>Uproject open<cr>", desc = "Open Unreal Editor" },
+			{
+				"<leader>uO",
+				"<cmd>Uproject build wait open<cr>",
+				desc = "Build and open Unreal Editor",
+			},
+			{ "<leader>uR", "<cmd>Uproject reload show_output<cr>", desc = "Reload uproject" },
+			{ "<leader>up", "<cmd>Uproject play log_cmds=Log\\ Log<cr>", desc = "Play game" },
+			{ "<leader>uc", "<cmd>Uproject clean <cr>", desc = "Clean" },
+			{
+				"<leader>udo",
+				"<cmd>Uproject open debug<cr>",
+				desc = "Open Unreal Editor (debug)",
+			},
+			{ "<leader>udp", "<cmd>Uproject play debug<cr>", desc = "Play game (debug)" },
+
+			{
+				"<leader>uB",
+				desc = "Build",
+				function()
+					local async = require("async")
+					async.run(function()
+						require("uproject").uproject_build(vim.fn.getcwd(), {
+							wait = true,
+							hide_output = false,
+							use_last_target = false,
+							unlock = "auto",
+							env = {},
+						})
+					end)
+				end,
+			},
 
 			{
 				"<leader>ub",
-				desc = "Build (fast + hide output)",
+				desc = "Build last (fast)",
 				function()
-					require('uproject').uproject_build(vim.fn.getcwd(), {
-						type_pattern = "Editor",
-						wait = true,
-						hide_output = true,
-						env = {
-							-- build systems I use look for this env variable to skip prebuild steps
-							"UBT_SKIP_PREBUILD_STEPS=1",
-						},
-					})
-				end
+					local async = require("async")
+					async.run(function()
+						require("uproject").uproject_build(vim.fn.getcwd(), {
+							wait = true,
+							hide_output = false,
+							use_last_target = true,
+							unlock = "auto",
+							env = {
+								-- build systems I use look for this env variable to skip prebuild steps
+								"UBT_SKIP_PREBUILD_STEPS=1",
+							},
+						})
+					end)
+				end,
 			},
 
 			{
 				"<leader>uh",
-				function() telescope_unreal_headers() end,
+				function()
+					local async = require("async")
+					async.run(function()
+						telescope_unreal_headers()
+					end)
+				end,
 				desc = "Find unreal headers",
 			},
 
 			{
 				"<leader>ut",
 				function()
-					local util = require('uproject.util')
+					local util = require("uproject.util")
 					local filepath = vim.api.nvim_buf_get_name(0)
 					if util.is_header_path(filepath) then
 						local source_path = util.get_source_from_header(filepath)
