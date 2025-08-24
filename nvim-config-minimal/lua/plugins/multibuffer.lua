@@ -1,9 +1,9 @@
 local function render_multibuf_title(bufnr)
-	local icons = require('nvim-web-devicons')
+	local icons = require("nvim-web-devicons")
 	local buf_name = vim.api.nvim_buf_get_name(bufnr)
 	local icon, icon_hl_group = icons.get_icon(buf_name)
-	local nice_buf_name = vim.fn.fnamemodify(buf_name, ':~:.')
-	nice_buf_name = string.gsub(nice_buf_name, '\\', '/')
+	local nice_buf_name = vim.fn.fnamemodify(buf_name, ":~:.")
+	nice_buf_name = string.gsub(nice_buf_name, "\\", "/")
 
 	icon = icon or ""
 	icon_hl_group = icon_hl_group or "DevIconDefault"
@@ -39,15 +39,19 @@ return {
 			multibuffer.setup({
 				render_multibuf_title = render_multibuf_title,
 				keymaps = {
-					{ "n", "<cr>", function()
-						local multibuf = vim.api.nvim_get_current_buf()
-						local cursor = vim.api.nvim_win_get_cursor(0)
-						local buf, line = multibuffer.multibuf_get_buf_at_line(multibuf, cursor[1])
-						if buf then
-							vim.api.nvim_set_current_buf(buf)
-							vim.api.nvim_win_set_cursor(0, { line, cursor[2] })
-						end
-					end },
+					{
+						"n",
+						"<cr>",
+						function()
+							local multibuf = vim.api.nvim_get_current_buf()
+							local cursor = vim.api.nvim_win_get_cursor(0)
+							local buf, line = multibuffer.multibuf_get_buf_at_line(multibuf, cursor[1])
+							if buf then
+								vim.api.nvim_set_current_buf(buf)
+								vim.api.nvim_win_set_cursor(0, { line, cursor[2] })
+							end
+						end,
+					},
 				},
 			})
 
@@ -64,5 +68,5 @@ return {
 				end,
 			})
 		end,
-	}
+	},
 }

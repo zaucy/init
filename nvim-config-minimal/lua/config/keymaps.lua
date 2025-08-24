@@ -1,5 +1,7 @@
 vim.cmd("highlight ZaucySubstituteSelect guibg=#151521")
 
+local config_dir = vim.fn.expand("~/projects/zaucy/init/nvim-config-minimal")
+
 vim.keymap.set({ "v" }, '/', '<esc>/\\%V') -- search in selection
 
 local function goto_closest_file(filename)
@@ -36,6 +38,7 @@ vim.keymap.set({ "n" }, "gbb", goto_closest_file("BUILD.bazel"), { desc = "Bazel
 vim.keymap.set({ "n" }, "gbm", goto_closest_file("MODULE.bazel"), { desc = "Bazel Module File" })
 vim.keymap.set({ "n" }, "gbw", goto_closest_file("WORKSPACE.bazel"), { desc = "Bazel Workspace File" })
 vim.keymap.set({ "n" }, "gbz", goto_closest_file(".bazelrc"), { desc = "Bazelrc File" })
+vim.keymap.set({ "n" }, "gsh", "<cmd>LspClangdSwitchSourceHeader<cr>", { desc = "clangd switch source header" })
 
 vim.keymap.set({ "n" }, "gbo", bazel_override, { desc = "Bazel Override" })
 vim.keymap.set({ "n" }, "gba", bzlmod_add, { desc = "Bazel Override" })
@@ -45,9 +48,51 @@ vim.keymap.set({ "c" }, "<C-c>", "<C-q><C-c>")
 vim.keymap.set({ "n", "v" }, "<leader>qd", "<cmd>BazelDebug<cr>",
 	{ desc = "Build and launch bazel target with nvim-dap" })
 
+vim.keymap.set({"n", "v" }, "<leader>ypr", function() vim.fn.setreg("+", vim.fn.expand("%")) end,  { desc = "yank current relative file path"})
+vim.keymap.set({"n", "v" }, "<leader>ypa", function() vim.fn.setreg("+", vim.fn.expand("%:p")) end,  { desc = "yank current absolute file path"})
+vim.keymap.set({"n", "v" }, "<leader>ypf", function() vim.fn.setreg("+", vim.fn.expand("%:t")) end, { desc = "yank current file name "})
+vim.keymap.set({"n", "v" }, "<leader>ypd", function() vim.fn.setreg("+", vim.fn.expand("%:h")) end, { desc = "yank current file dirname"})
+
 for i = 1, 9 do
 	vim.keymap.set({ "n", "v", "t" }, "<C-" ..tostring(i) .. ">", function() require('zaucy.tabline').goto(i) end, { desc = "Goto tab " .. tostring(i) })
 end
+
+local function do_fzf(cmd, opts)
+	opts = opts or {}
+	return function()
+	  local buf = vim.api.nvim_create_buf(true, false)
+	  vim.api.nvim_set_current_buf(buf)
+
+	  local channel_id = vim.fn.jobstart({"fzf", "--no-mouse"}, {
+		  term = true,
+		  cwd = opts.cwd,
+		  env = {
+			  FZF_DEFAULT_COMMAND = cmd,
+		  },
+		  on_exit = function(_, code, _)
+			if code == 0 then
+				local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+				local file_path = vim.fn.fnameescape(lines[1])
+				local full_path = file_path
+				if opts.cwd then
+					full_path = vim.fs.joinpath(opts.cwd, file_path)
+				end
+				vim.cmd.edit(full_path)
+				vim.api.nvim_buf_delete(buf, {force = true, unload = true})
+			elseif code == 130 then
+				vim.api.nvim_buf_delete(buf, {force = true, unload = true})
+			end
+		  end,
+	  })
+
+	  if channel_id > 0 then
+		vim.cmd.startinsert()
+	  end
+	end
+end
+
+vim.keymap.set({"n", "v"}, "<C-w>ff", do_fzf("rg --files"), { desc = "open fzf" })
+vim.keymap.set({"n", "v"}, "<C-w>fc", do_fzf("rg --files", {cwd = config_dir}), { desc = "open fzf (config)" })
 
 local term_buf_closed = {}
 
@@ -257,7 +302,7 @@ local function open_terminal()
 	local term_bufs = tabpage_terms[tabpage]
 	if term_bufs then
 		for _, buf in ipairs(term_bufs) do
-			if vim.bo[buf].buftype == "terminal" and is_bufvalid(buf) then
+			if is_bufvalid(buf) and vim.bo[buf].buftype == "terminal" then
 				vim.api.nvim_set_current_buf(buf)
 				last_term_buf[tabpage] = buf
 				return

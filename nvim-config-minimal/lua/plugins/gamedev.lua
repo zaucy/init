@@ -177,7 +177,7 @@ return {
 	},
 	{
 		"zaucy/uproject.nvim",
-		-- dir = "~/projects/zaucy/uproject.nvim",
+		dir = "~/projects/zaucy/uproject.nvim",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"lewis6991/async.nvim",
@@ -210,10 +210,10 @@ return {
 					local async = require("async")
 					async.run(function()
 						require("uproject").uproject_build(vim.fn.getcwd(), {
-							wait = true,
+							wait = false,
 							hide_output = false,
 							use_last_target = false,
-							unlock = "auto",
+							-- unlock = "auto",
 							env = {},
 						})
 					end)
@@ -227,10 +227,10 @@ return {
 					local async = require("async")
 					async.run(function()
 						require("uproject").uproject_build(vim.fn.getcwd(), {
-							wait = true,
+							wait = false,
 							hide_output = false,
 							use_last_target = true,
-							unlock = "auto",
+							-- unlock = "auto",
 							env = {
 								-- build systems I use look for this env variable to skip prebuild steps
 								"UBT_SKIP_PREBUILD_STEPS=1",
@@ -243,10 +243,10 @@ return {
 			{
 				"<leader>uh",
 				function()
-					local async = require("async")
-					async.run(function()
-						telescope_unreal_headers()
-					end)
+					-- local async = require("async")
+					-- async.run(function()
+					telescope_unreal_headers()
+					-- end)
 				end,
 				desc = "Find unreal headers",
 			},
