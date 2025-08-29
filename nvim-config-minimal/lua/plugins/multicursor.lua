@@ -4,8 +4,9 @@ return {
 		event = "VeryLazy",
 		config = function()
 			local mc = require("multicursor-nvim")
-			local active_hydra = { keys = "gm", loop = true }
 			mc.setup()
+
+			vim.api.nvim_set_hl(0, "MultiCursorCursor", { reverse = true, fg = "#73daca" })
 
 			vim.keymap.set({ "n", "v" }, ",", mc.clearCursors)
 			vim.keymap.set({ "n", "v" }, "<A-->", mc.deleteCursor)
