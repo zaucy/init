@@ -2,7 +2,7 @@ return {
 	{
 		"neovim/nvim-lspconfig",
 		init = function()
-			vim.lsp.set_log_level("off")
+			vim.lsp.log.set_level("off")
 		end,
 	},
 	{
@@ -28,16 +28,16 @@ return {
 					"lua_ls",
 				},
 			})
-			vim.lsp.config('*', {
-				capabilities = require('cmp_nvim_lsp').default_capabilities(),
+			vim.lsp.config("*", {
+				capabilities = require("cmp_nvim_lsp").default_capabilities(),
 			})
 
-			require('lspconfig').starpls.setup({})
-			require('lspconfig').gdscript.setup({})
-			require('lspconfig').nushell.setup({})
-			require('lspconfig').protols.setup({})
-			require('lspconfig').clangd.setup({})
-			require('lspconfig').zls.setup({})
+			require("lspconfig").starpls.setup({})
+			require("lspconfig").gdscript.setup({})
+			require("lspconfig").nushell.setup({})
+			require("lspconfig").protols.setup({})
+			require("lspconfig").clangd.setup({})
+			require("lspconfig").zls.setup({})
 		end,
 	},
 	{
@@ -98,14 +98,13 @@ return {
 		},
 		keys = {
 			{ "<leader>s", "<cmd>AerialOpen<cr>", desc = "Goto Symbol" },
-			{ "]s",        "<cmd>AerialNext<cr>", desc = "Next Symbol" },
-			{ "[s",        "<cmd>AerialPrev<cr>", desc = "Previous Symbol" },
+			{ "]s", "<cmd>AerialNext<cr>", desc = "Next Symbol" },
+			{ "[s", "<cmd>AerialPrev<cr>", desc = "Previous Symbol" },
 		},
 	},
 	{
 		"smjonas/inc-rename.nvim",
 		cmd = { "IncRename" },
-		opts = {
-		},
+		opts = {},
 	},
 }

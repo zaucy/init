@@ -195,7 +195,9 @@ return {
 			},
 			{ "<leader>uR", "<cmd>Uproject reload show_output<cr>", desc = "Reload uproject" },
 			{ "<leader>up", "<cmd>Uproject play log_cmds=Log\\ Log<cr>", desc = "Play game" },
-			{ "<leader>uc", "<cmd>Uproject clean <cr>", desc = "Clean" },
+			{ "<leader>uP", "<cmd>Uproject build play log_cmds=Log\\ Log<cr>", desc = "Build and play game" },
+			{ "<leader>uC", "<cmd>Uproject clean <cr>", desc = "Clean" },
+			{ "<leader>uL", "<cmd>Uproject unlock_build_dirs <cr>", desc = "Unlock build dirs" },
 			{
 				"<leader>udo",
 				"<cmd>Uproject open debug<cr>",
@@ -213,8 +215,7 @@ return {
 							wait = false,
 							hide_output = false,
 							use_last_target = false,
-							-- unlock = "auto",
-							env = {},
+							unlock = "auto",
 						})
 					end)
 				end,
@@ -230,11 +231,11 @@ return {
 							wait = false,
 							hide_output = false,
 							use_last_target = true,
-							-- unlock = "auto",
-							env = {
-								-- build systems I use look for this env variable to skip prebuild steps
-								"UBT_SKIP_PREBUILD_STEPS=1",
-							},
+							unlock = "auto",
+							-- env = {
+							-- build systems I use look for this env variable to skip prebuild steps
+							-- "UBT_SKIP_PREBUILD_STEPS=1",
+							-- },
 						})
 					end)
 				end,
@@ -243,10 +244,10 @@ return {
 			{
 				"<leader>uh",
 				function()
-					-- local async = require("async")
-					-- async.run(function()
-					telescope_unreal_headers()
-					-- end)
+					local async = require("async")
+					async.run(function()
+						telescope_unreal_headers()
+					end)
 				end,
 				desc = "Find unreal headers",
 			},
