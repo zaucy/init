@@ -68,6 +68,11 @@ local function perforce_opened()
 
 	async.await(vim.schedule)
 
+	if #opened_result == 0 then
+		vim.notify("no perforce opened files")
+		return
+	end
+
 	local depot_files = vim.tbl_map(function(item)
 		return item.depotFile
 	end, opened_result)
