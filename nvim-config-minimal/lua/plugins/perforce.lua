@@ -50,6 +50,54 @@ local function perforce_opened_all()
 	end)
 end
 
+--- @async
+local function perforce_opened()
+	local async = require("async")
+	local perforce = require("perforce")
+	local pickers = require("telescope.pickers")
+	local finders = require("telescope.finders")
+	local previewers = require("telescope.previewers")
+	local sorters = require("telescope.sorters")
+	local themes = require("telescope.themes")
+
+	local opened_err, opened_result = async.await(2, perforce.opened, {})
+
+	if opened_err then
+		error(opened_err, vim.log.levels.ERROR)
+	end
+
+	async.await(vim.schedule)
+
+	local depot_files = vim.tbl_map(function(item)
+		return item.depotFile
+	end, opened_result)
+	local where_err, where_result = async.await(2, perforce.where, depot_files)
+
+	if where_err then
+		error(where_err, vim.log.levels.ERROR)
+	end
+
+	async.await(vim.schedule)
+
+	local picker_options = themes.get_ivy({
+		previewer = previewers.vim_buffer_cat.new({}),
+		sorter = sorters.get_fuzzy_file(),
+		finder = finders.new_table({
+			results = where_result,
+			entry_maker = function(item)
+				return {
+					value = item,
+					display = item.depotFile,
+					ordinal = item.depotFile,
+					filename = item.path,
+				}
+			end,
+		}),
+	})
+
+	pickers.new({}, picker_options):find()
+end
+
 return {
 	{
 		"ngemily/vim-vp4",
@@ -75,10 +123,8 @@ return {
 				"<leader>vs",
 				desc = "Perforce status",
 				function()
-					local perforce = require("perforce")
-					perforce.changelists({}, function(items)
-						vim.notify(vim.inspect(items))
-					end)
+					local async = require("async")
+					async.run(perforce_opened):raise_on_error()
 				end,
 			},
 			{ "<leader>voa", desc = "Perfoce opened (all)", perforce_opened_all },
