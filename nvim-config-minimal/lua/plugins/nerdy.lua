@@ -1,11 +1,12 @@
 return {
-	'2kabhishek/nerdy.nvim',
+	"2kabhishek/nerdy.nvim",
 	dependencies = {
-		'stevearc/dressing.nvim',
-		'nvim-telescope/telescope.nvim',
+		"folke/snacks.nvim",
 	},
-	cmd = 'Nerdy',
-	config = function()
-		require('telescope').load_extension('nerdy')
-	end,
+	cmd = "Nerdy",
+	opts = {
+		max_recents = 30,
+		add_default_keybindings = true,
+		copy_to_clipboard = false,
+	},
 }

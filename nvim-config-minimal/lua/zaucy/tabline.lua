@@ -48,12 +48,14 @@ function M.draw()
 	local tabs = {}
 	local trailing = {}
 	local current_tabpage = vim.api.nvim_get_current_tabpage()
+	local current_is_numbered_tab = false
 
 	for index, tabpage in pairs(M._tabs) do
 		if vim.api.nvim_tabpage_is_valid(tabpage) then
 			local tabnumber = vim.api.nvim_tabpage_get_number(tabpage)
 			local tab_name = ""
 			if tabpage == current_tabpage then
+				current_is_numbered_tab = true
 				tab_name = "%#TabLineSel#" .. (M._index_names_active[index] or M._index_names[index] or index)
 			else
 				tab_name = "%#TabLine#" .. (M._index_names[index] or index)
@@ -70,7 +72,20 @@ function M.draw()
 		end
 	end
 
-	return table.concat(tabs, ' ')
+	if not current_is_numbered_tab then
+		local winid = vim.api.nvim_tabpage_get_win(current_tabpage)
+		local bufnr = vim.api.nvim_win_get_buf(winid)
+		local buf_name = vim.api.nvim_buf_get_name(bufnr)
+		local display_name = buf_name
+
+		if vim.startswith(buf_name, "health://") then
+			display_name = "%#healthSuccess# %*" .. buf_name:sub(10)
+		end
+
+		table.insert(trailing, "%#TabLineSel#" .. display_name .. "%*")
+	end
+
+	return table.concat(tabs, ' ') .. "%=" .. table.concat(trailing, ' ')
 end
 
 return M

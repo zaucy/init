@@ -31,13 +31,6 @@ return {
 			vim.lsp.config("*", {
 				capabilities = require("cmp_nvim_lsp").default_capabilities(),
 			})
-
-			require("lspconfig").starpls.setup({})
-			require("lspconfig").gdscript.setup({})
-			require("lspconfig").nushell.setup({})
-			require("lspconfig").protols.setup({})
-			require("lspconfig").clangd.setup({})
-			require("lspconfig").zls.setup({})
 		end,
 	},
 	{

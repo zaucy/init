@@ -32,6 +32,17 @@ vim.filetype.add({ extension = { nu = "nu" } })
 vim.filetype.add({ extension = { bazelrc = "bazelrc" } })
 vim.filetype.add({ extension = { cpp2 = "cpp2" } })
 vim.filetype.add({ extension = { ecsact = "ecsact" } })
+vim.filetype.add({
+	filename = {
+		["bgfx_shader.sh"] = "glsl",
+	},
+	pattern = {
+		["vs_.*%.sc"] = "glsl",
+		["vs_.*%.sch"] = "glsl",
+		["fs_.*%.sc"] = "glsl",
+		["fs_.*%.sch"] = "glsl",
+	},
+})
 
 -- template engine used by cocogitto
 vim.filetype.add({

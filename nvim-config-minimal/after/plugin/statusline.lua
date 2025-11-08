@@ -1,17 +1,19 @@
 ---@diagnostic disable: unused-function
 local sysname = vim.uv.os_uname().sysname
-local homedir = vim.fn.substitute(vim.fn.expand('~'), '\\\\', '/', 'g')
+local homedir = vim.fn.substitute(vim.fn.expand("~"), "\\\\", "/", "g")
 local sys_icon = ""
 
 -- show a system icon when using WSL because sometimes its confusing which os I'm on
 if sysname == "Linux" and vim.g.wslenv then
 	local distro_name = ""
 	local file = io.open("/etc/os-release", "r")
-	if not file then return nil end
+	if not file then
+		return nil
+	end
 
 	for line in file:lines() do
 		if line:match("^ID=") then
-			distro_name = line:match("^ID=(.+)"):gsub('"', '')
+			distro_name = line:match("^ID=(.+)"):gsub('"', "")
 			break
 		end
 	end
@@ -26,15 +28,30 @@ if sysname == "Linux" and vim.g.wslenv then
 end
 
 local function colorize_path()
-	local file_path = vim.fn.expand('%:f')
-	local filename = vim.fn.expand('%:t')
+	local winid = vim.g.statusline_winid or 0
+	local tabpage = vim.api.nvim_win_get_tabpage(winid)
+	local has_tabpage_cwd, tabpage_cwd = pcall(vim.fn.getcwd, -1, tabpage)
+	local bufnr = vim.api.nvim_win_get_buf(winid)
 	local scheme = ""
+
+	local file_path = vim.api.nvim_buf_get_name(bufnr)
+	local filename = vim.fs.basename(file_path)
+
+	if has_tabpage_cwd then
+		local rel_file_path = vim.fs.relpath(tabpage_cwd, file_path)
+		if rel_file_path ~= nil then
+			file_path = rel_file_path
+		end
+	end
+
+	file_path = vim.fn.substitute(file_path, "\\\\", "/", "g")
 
 	local dir_color = "%#@punctuation#"
 	local file_color = "%#@include#"
 	local oil_color = "%#@text.note#"
 	local term_color = "%#@attribute.builtin#"
 	local git_color = "%#GitSignsAdd#"
+	local config_color = "%#GitSignsAdd#"
 
 	local dir = ""
 
@@ -44,7 +61,7 @@ local function colorize_path()
 		if sysname == "Windows_NT" then
 			file_path = file_path:sub(8) -- strip out 'oil:///'
 			local drive_letter = file_path:sub(1, 1)
-			file_path = drive_letter .. ':/' .. file_path:sub(3)
+			file_path = drive_letter .. ":/" .. file_path:sub(3)
 			file_path = vim.fs.normalize(vim.fn.fnamemodify(file_path, ":.:h"))
 			dir = file_path .. " "
 		else
@@ -64,19 +81,24 @@ local function colorize_path()
 		scheme = term_color .. "  %*"
 		dir_color = git_color
 		file_path = file_path:sub(11) -- strip out 'diffview://'
-		dir = vim.fs.normalize(vim.fn.fnamemodify(file_path:sub(2, #file_path - #filename), ':.:h')):sub(6) .. '/'
+		dir = vim.fs.normalize(vim.fn.fnamemodify(file_path:sub(2, #file_path - #filename), ":.:h")):sub(6) .. "/"
 	elseif vim.startswith(file_path, "term:") then
 		scheme = term_color .. "  %*"
 		dir_color = term_color
 		file_path = file_path:sub(6) -- strip out 'term:/'
 	else
-		file_path = vim.fn.substitute(file_path, '\\\\', '/', 'g')
 		if vim.startswith(file_path, homedir) then
-			file_path = '~' .. file_path:sub(#homedir + 1)
+			file_path = "~" .. file_path:sub(#homedir + 1)
 		end
 		dir = file_path:sub(1, #file_path - #filename - 1)
 		if #filename > 0 then
 			dir = dir .. "/"
+		end
+
+		local nvim_config_prefix = "~/projects/zaucy/init/nvim-config-minimal/"
+		if vim.startswith(dir, nvim_config_prefix) then
+			dir = dir:sub(#nvim_config_prefix + 1)
+			scheme = config_color .. " 󰒔 %*"
 		end
 	end
 
@@ -88,16 +110,11 @@ function ZaucyStatusline()
 	if package.loaded.dap then
 		local session = require("dap").session()
 		if session ~= nil then
-			status_str = '%#@text.danger#' .. status_str
+			status_str = "%#@text.danger#" .. status_str
 		end
 	end
 	return status_str
 end
 
-vim.cmd([[
-  augroup Statusline
-  au!
-  au WinEnter,BufEnter * setlocal statusline=%!v:lua.ZaucyStatusline()
-  au WinLeave,BufLeave * setlocal statusline=%{substitute(expand('%f'),'\\\\','/','g')}
-  augroup END
-]], false)
+vim.o.laststatus = 2
+vim.o.statusline = "%!v:lua.ZaucyStatusline()"
