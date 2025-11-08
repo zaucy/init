@@ -37,14 +37,8 @@ local function colorize_path()
 	local file_path = vim.api.nvim_buf_get_name(bufnr)
 	local filename = vim.fs.basename(file_path)
 
-	if has_tabpage_cwd then
-		local rel_file_path = vim.fs.relpath(tabpage_cwd, file_path)
-		if rel_file_path ~= nil then
-			file_path = rel_file_path
-		end
-	end
-
-	file_path = vim.fn.substitute(file_path, "\\\\", "/", "g")
+	-- file_path = vim.fn.substitute(file_path, "\\\\", "/", "g")
+	file_path = file_path:gsub("\\", "/")
 
 	local dir_color = "%#@punctuation#"
 	local file_color = "%#@include#"
@@ -87,6 +81,13 @@ local function colorize_path()
 		dir_color = term_color
 		file_path = file_path:sub(6) -- strip out 'term:/'
 	else
+		if has_tabpage_cwd then
+			local rel_file_path = vim.fs.relpath(tabpage_cwd, file_path)
+			if rel_file_path ~= nil then
+				file_path = rel_file_path
+			end
+		end
+
 		if vim.startswith(file_path, homedir) then
 			file_path = "~" .. file_path:sub(#homedir + 1)
 		end
