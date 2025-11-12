@@ -170,6 +170,13 @@ end
 --- @field module_name string
 --- @field include_string string
 
+vim.filetype.add({
+	pattern = {
+		["vs_.*.sc"] = "glsl",
+		["fs_.*.sc"] = "glsl",
+	},
+})
+
 return {
 	{
 		"lewis6991/async.nvim",
@@ -190,12 +197,16 @@ return {
 			{ "<leader>uo", "<cmd>Uproject open<cr>", desc = "Open Unreal Editor" },
 			{
 				"<leader>uO",
-				"<cmd>Uproject build wait open<cr>",
+				"<cmd>Uproject build use_precompiled wait open<cr>",
 				desc = "Build and open Unreal Editor",
 			},
 			{ "<leader>uR", "<cmd>Uproject reload show_output<cr>", desc = "Reload uproject" },
 			{ "<leader>up", "<cmd>Uproject play log_cmds=Log\\ Log<cr>", desc = "Play game" },
-			{ "<leader>uP", "<cmd>Uproject build play log_cmds=Log\\ Log<cr>", desc = "Build and play game" },
+			{
+				"<leader>uP",
+				"<cmd>Uproject build use_precompiled play log_cmds=Log\\ Log<cr>",
+				desc = "Build and play game",
+			},
 			{ "<leader>uC", "<cmd>Uproject clean <cr>", desc = "Clean" },
 			{ "<leader>uL", "<cmd>Uproject unlock_build_dirs <cr>", desc = "Unlock build dirs" },
 			{
@@ -204,6 +215,8 @@ return {
 				desc = "Open Unreal Editor (debug)",
 			},
 			{ "<leader>udp", "<cmd>Uproject play debug<cr>", desc = "Play game (debug)" },
+
+			{ "<leader>uS", "<cmd>Uproject submit<cr>", desc = "Unreal submit tool" },
 
 			{
 				"<leader>uB",
@@ -216,6 +229,7 @@ return {
 							hide_output = false,
 							use_last_target = false,
 							unlock = "auto",
+							use_precompiled = true,
 						})
 					end)
 				end,
@@ -231,6 +245,7 @@ return {
 							wait = false,
 							hide_output = false,
 							use_last_target = true,
+							use_precompiled = true,
 							unlock = "auto",
 							-- env = {
 							-- build systems I use look for this env variable to skip prebuild steps
