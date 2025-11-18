@@ -28,9 +28,18 @@ return {
 					"lua_ls",
 				},
 			})
+
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 			vim.lsp.config("*", {
-				capabilities = require("cmp_nvim_lsp").default_capabilities(),
+				capabilities = capabilities,
 			})
+
+			vim.lsp.config("nushell", {
+				capabilities = capabilities,
+				filetypes = { "nu" },
+			})
+
+			vim.lsp.enable("nushell", true)
 		end,
 	},
 	{
