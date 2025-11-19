@@ -230,6 +230,9 @@ return {
 							use_last_target = false,
 							unlock = "auto",
 							use_precompiled = true,
+							disable_unity = true,
+							no_uba = true,
+							-- static_analyzer = "default",
 						})
 					end)
 				end,
@@ -247,6 +250,9 @@ return {
 							use_last_target = true,
 							use_precompiled = true,
 							unlock = "auto",
+							disable_unity = true,
+							no_uba = true,
+							-- static_analyzer = "default",
 							-- env = {
 							-- build systems I use look for this env variable to skip prebuild steps
 							-- "UBT_SKIP_PREBUILD_STEPS=1",
