@@ -229,9 +229,10 @@ return {
 							hide_output = false,
 							use_last_target = false,
 							unlock = "auto",
-							use_precompiled = true,
-							disable_unity = true,
+							use_precompiled = false,
+							-- disable_unity = true,
 							no_uba = true,
+							no_hot_reload_from_ide = true,
 							-- static_analyzer = "default",
 						})
 					end)
@@ -248,10 +249,11 @@ return {
 							wait = false,
 							hide_output = false,
 							use_last_target = true,
-							use_precompiled = true,
+							use_precompiled = false,
 							unlock = "auto",
-							disable_unity = true,
+							-- disable_unity = true,
 							no_uba = true,
+							no_hot_reload_from_ide = true,
 							-- static_analyzer = "default",
 							-- env = {
 							-- build systems I use look for this env variable to skip prebuild steps
