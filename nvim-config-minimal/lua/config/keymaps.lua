@@ -464,3 +464,6 @@ vim.keymap.set({ "n" }, "]q", "<cmd>cnext<cr>", { desc = "next qf item" })
 
 -- some script runners
 vim.keymap.set({ "n", "v" }, "<C-S-B>", function() end, { desc = "" })
+
+-- similar to alacritty escape
+vim.keymap.set({ "t" }, "<C-S-Space>", "<C-\\><C-n>", { desc = "" })
