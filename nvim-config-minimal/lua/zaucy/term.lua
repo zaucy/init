@@ -130,16 +130,19 @@ local function setup_terminal_toggle(opts)
 	local open_terminal_fn = function()
 		local close_fn = close_terminal(term_args)
 
+		local tabpage = vim.api.nvim_get_current_tabpage()
+		term_buf_by_type[tabpage] = term_buf_by_type[tabpage] or {}
+
 		if vim.bo.buftype == "terminal" then
-			close_fn()
-			return
+			local curr_terminal_buf = vim.api.nvim_get_current_buf()
+			if term_buf_by_type[tabpage][term_args] == curr_terminal_buf then
+				close_fn()
+				return
+			end
 		end
 
 		last_buf_before_terminal_by_type[term_args] = last_buf_before_terminal_by_type[term_args] or {}
 		last_buf_before_terminal_by_type[term_args][vim.api.nvim_get_current_win()] = vim.api.nvim_get_current_buf()
-
-		local tabpage = vim.api.nvim_get_current_tabpage()
-		term_buf_by_type[tabpage] = term_buf_by_type[tabpage] or {}
 
 		if is_bufvalid(term_buf_by_type[tabpage][term_args]) then
 			---@diagnostic disable-next-line: param-type-mismatch
@@ -158,11 +161,11 @@ local function setup_terminal_toggle(opts)
 		term_buf_by_type[tabpage][term_args] = terminal_bufnr
 
 		for _, keymap in ipairs(keymaps) do
-			vim.keymap.set({ "t" }, keymap, close_fn, { desc = "Hide Terminal" })
+			vim.keymap.set({ "t" }, keymap, close_fn, { desc = "Hide Terminal", buffer = terminal_bufnr })
 		end
 
 		for _, key in ipairs(forwarded_keys) do
-			vim.keymap.set({ "t" }, key, "<C-\\><C-n>" .. key, { buffer = terminal_bufnr })
+			vim.keymap.set({ "t" }, key, "<C-\\><C-n>" .. key, { buffer = terminal_bufnr, remap = true })
 		end
 	end
 
@@ -188,7 +191,7 @@ setup_terminal_toggle({
 	keymaps = { "<C-g>" },
 	term_args = "gemini",
 	start_in_terminal_mode = true,
-	forwarded_keys = { "<C-o>", "<C-d>", "<C-u>" },
+	forwarded_keys = { "<C-o>", "<C-d>", "<C-u>", "<C-_>", "<C-/>" },
 })
 
 --- General terminal keys
