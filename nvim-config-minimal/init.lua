@@ -1,4 +1,5 @@
 require("config.options")
 require("config.lazy")
 require("config.keymaps")
+require("zaucy.term")
 require("zaucy.screenshot")
