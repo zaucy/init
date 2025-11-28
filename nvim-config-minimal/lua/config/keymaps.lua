@@ -156,48 +156,6 @@ vim.keymap.set(
 	{ desc = "open search window" }
 )
 
-local term_buf_closed = {}
-
-vim.api.nvim_create_autocmd("TermClose", {
-	callback = function(event)
-		term_buf_closed[event.buf] = true
-	end
-})
-
-local function is_bufvalid(buf)
-	if buf == nil then return false end
-	if not vim.api.nvim_buf_is_valid(buf) then return false end
-	local buftype = vim.bo[buf].buftype
-
-	if buftype == "terminal" then
-		if vim.bo[buf].buflisted == 0 then
-			return false
-		end
-		return not term_buf_closed[buf]
-	end
-
-	if buftype == "prompt" then return false end
-	if buftype == "nofile" then return false end
-	return true
-end
-
-local function find_nearby_valid_buf(bufs, start_index)
-	local offset = 1
-	while true do
-		if start_index + offset > #bufs and start_index - offset < 0 then
-			return nil
-		end
-
-		if is_bufvalid(bufs[start_index + offset]) then
-			return bufs[start_index + offset]
-		elseif is_bufvalid(bufs[start_index - offset]) then
-			return bufs[start_index - offset]
-		end
-
-		offset = offset + 1
-	end
-end
-
 local function is_buf_similar(buf1, buf2)
 	if vim.bo[buf1].buftype ~= vim.bo[buf2].buftype then
 		return false
@@ -288,115 +246,6 @@ local function goto_prev_similar_buffer()
 	vim.api.nvim_set_current_buf(buf)
 end
 
-local last_buf_before_terminal = {}
-local last_term_buf = {}
-local tabpage_terms = {}
-
-vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufEnter' }, {
-	callback = function()
-		if vim.bo.buftype == "terminal" then
-			last_term_buf[vim.api.nvim_get_current_tabpage()] = vim.api.nvim_get_current_buf()
-		end
-	end,
-})
-
-vim.api.nvim_create_autocmd({ 'TermOpen' }, {
-	callback = function()
-		if vim.bo.buftype == "terminal" then
-			local tabpage = vim.api.nvim_get_current_tabpage()
-			local buf = vim.api.nvim_get_current_buf()
-			last_term_buf[tabpage] = buf
-			if not tabpage_terms[tabpage] then
-				tabpage_terms[tabpage] = {}
-			end
-			table.insert(tabpage_terms[tabpage], buf)
-		end
-	end,
-})
-
-local function close_terminal()
-	if vim.bo.buftype ~= "terminal" then
-		return
-	end
-
-	local win = vim.api.nvim_get_current_win()
-	local currbuf = vim.fn.winbufnr(win)
-
-	if is_bufvalid(last_buf_before_terminal[win]) then
-		vim.api.nvim_set_current_buf(last_buf_before_terminal[win])
-		return
-	end
-
-	last_buf_before_terminal[win] = nil
-
-	local allbufs = vim.api.nvim_list_bufs()
-	for i, buf in ipairs(allbufs) do
-		if buf == currbuf then
-			local nearby_buf = find_nearby_valid_buf(allbufs, i)
-			if nearby_buf ~= nil then
-				vim.api.nvim_set_current_buf(nearby_buf)
-			else
-				vim.cmd("enew")
-			end
-			return
-		end
-	end
-
-	vim.cmd("enew")
-end
-
-local function open_terminal()
-	if vim.bo.buftype == "terminal" then
-		close_terminal()
-		return
-	end
-
-	last_buf_before_terminal[vim.api.nvim_get_current_win()] = vim.api.nvim_get_current_buf()
-
-	local tabpage = vim.api.nvim_get_current_tabpage()
-
-	if is_bufvalid(last_term_buf[tabpage]) then
-		---@diagnostic disable-next-line: param-type-mismatch
-		vim.api.nvim_set_current_buf(last_term_buf[tabpage])
-		return
-	end
-
-	local term_bufs = tabpage_terms[tabpage]
-	if term_bufs then
-		for _, buf in ipairs(term_bufs) do
-			if is_bufvalid(buf) and vim.bo[buf].buftype == "terminal" then
-				vim.api.nvim_set_current_buf(buf)
-				last_term_buf[tabpage] = buf
-				return
-			end
-		end
-	end
-
-	vim.cmd("terminal nu")
-end
-
-local function sigint_terminal()
-	if vim.bo.buftype ~= "terminal" then
-		return
-	end
-
-	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-c>', true, false, true), 'n', true)
-	vim.api.nvim_command('startinsert')
-end
-
-vim.keymap.set({ "n" }, "<C-_>", open_terminal, { desc = "Open Terminal" })
-vim.keymap.set({ "n" }, "<C-/>", open_terminal, { desc = "Open Terminal" })
-vim.keymap.set({ "t" }, "<C-w>", "<C-\\><C-n><cmd>WhichKey <C-w><cr>", {})
-vim.keymap.set({ "n", "v" }, "<C-w><cr>", "<cmd>only<cr>", { desc = "Close other windows" })
-vim.keymap.set({ "n", "v" }, "<C-w><C-left>", "<cmd>wincmd H<cr>", { desc = "Move window to the far left" })
-vim.keymap.set({ "n", "v" }, "<C-w><C-down>", "<cmd>wincmd J<cr>", { desc = "Move window to the far bottom" })
-vim.keymap.set({ "n", "v" }, "<C-w><C-up>", "<cmd>wincmd K<cr>", { desc = "Move window to the far top" })
-vim.keymap.set({ "n", "v" }, "<C-w><C-right>", "<cmd>wincmd L<cr>", { desc = "Move window to the far right" })
-vim.keymap.set({ "t" }, "<C-/>", close_terminal, { desc = "Hide Terminal" })
-vim.keymap.set({ "t" }, "<C-_>", close_terminal, { desc = "Hide Terminal" })
-vim.keymap.set({ "n", "v" }, "<C-c>", sigint_terminal, { desc = "Ctrl-C terminal", noremap = true, silent = true })
-vim.keymap.set({ "t" }, "<S-Insert>", "<C-\\><C-n>\"+pi", { desc = "Paste In Terminal" })
-
 -- vim.keymap.set({ "n" }, "]]", goto_next_similar_buffer, { desc = "Next Similar Buf" })
 -- vim.keymap.set({ "n" }, "[[", goto_prev_similar_buffer, { desc = "Next Similar Buf" })
 
@@ -467,3 +316,10 @@ vim.keymap.set({ "n", "v" }, "<C-S-B>", function() end, { desc = "" })
 
 -- similar to alacritty escape
 vim.keymap.set({ "t" }, "<C-S-Space>", "<C-\\><C-n>", { desc = "" })
+
+-- arrow keys for window stuff
+vim.keymap.set({ "n", "v" }, "<C-w><cr>", "<cmd>only<cr>", { desc = "Close other windows" })
+vim.keymap.set({ "n", "v" }, "<C-w><C-left>", "<cmd>wincmd H<cr>", { desc = "Move window to the far left" })
+vim.keymap.set({ "n", "v" }, "<C-w><C-down>", "<cmd>wincmd J<cr>", { desc = "Move window to the far bottom" })
+vim.keymap.set({ "n", "v" }, "<C-w><C-up>", "<cmd>wincmd K<cr>", { desc = "Move window to the far top" })
+vim.keymap.set({ "n", "v" }, "<C-w><C-right>", "<cmd>wincmd L<cr>", { desc = "Move window to the far right" })
