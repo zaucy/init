@@ -5,6 +5,7 @@ local telescope_multibuffer_expand = 0
 local telescope_opts = {
 	defaults = {
 		path_display = {
+			"filename_first",
 			"truncate",
 		},
 		mappings = {
@@ -86,7 +87,7 @@ local telescope_opts = {
 		lsp_type_definitions = { theme = "ivy" },
 		lsp_workspace_symbols = { theme = "ivy" },
 		lsp_dynamic_workspace_symbols = { theme = "ivy" },
-	}
+	},
 }
 
 local function setup_telescope_backdrop()
@@ -124,7 +125,9 @@ local function setup_telescope_backdrop()
 				once = true,
 				buffer = telescopeBufnr,
 				callback = function()
-					if vim.api.nvim_win_is_valid(winnr) then vim.api.nvim_win_close(winnr, true) end
+					if vim.api.nvim_win_is_valid(winnr) then
+						vim.api.nvim_win_close(winnr, true)
+					end
 					if vim.api.nvim_buf_is_valid(backdropBufnr) then
 						vim.api.nvim_buf_delete(backdropBufnr, { force = true })
 					end
@@ -135,12 +138,10 @@ local function setup_telescope_backdrop()
 end
 
 local function telescope_fzf_build_cmd()
-	if vim.fn.has('win32') == 1 then
-		return
-		'cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && xcopy build\\Release\\libfzf.dll build\\ /Y'
+	if vim.fn.has("win32") == 1 then
+		return "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && xcopy build\\Release\\libfzf.dll build\\ /Y"
 	else
-		return
-		'cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release'
+		return "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release"
 	end
 end
 
@@ -148,30 +149,30 @@ return {
 	{
 		"nvim-telescope/telescope.nvim",
 		dependencies = {
-			'nvim-lua/plenary.nvim',
+			"nvim-lua/plenary.nvim",
 		},
 		config = function()
-			require('telescope').setup(telescope_opts)
+			require("telescope").setup(telescope_opts)
 			setup_telescope_backdrop()
 		end,
 		cmd = { "Telescope" },
 		keys = {
-			{ "<leader>?", "<cmd>Telescope keymaps theme=ivy<cr>",                   desc = "Keymaps" },
-			{ "<leader>'", "<cmd>Telescope resume<cr>",                              desc = "Open last picker" },
-			{ "<leader>/", "<cmd>Telescope live_grep<cr>",                           desc = "Global search" },
-			{ "<leader>f", "<cmd>Telescope find_files<cr>",                          desc = "Find files" },
-			{ "<leader>b", "<cmd>Telescope buffers<cr>",                             desc = "Find buffers" },
+			{ "<leader>?", "<cmd>Telescope keymaps theme=ivy<cr>", desc = "Keymaps" },
+			{ "<leader>'", "<cmd>Telescope resume<cr>", desc = "Open last picker" },
+			{ "<leader>/", "<cmd>Telescope live_grep<cr>", desc = "Global search" },
+			{ "<leader>f", "<cmd>Telescope find_files<cr>", desc = "Find files" },
+			{ "<leader>b", "<cmd>Telescope buffers<cr>", desc = "Find buffers" },
 			{ "<leader>c", "<cmd>Telescope find_files cwd=" .. config_dir .. "<cr>", desc = "Config files" },
 		},
 	},
 	{
-		'nvim-telescope/telescope-fzf-native.nvim',
+		"nvim-telescope/telescope-fzf-native.nvim",
 		build = telescope_fzf_build_cmd(),
 		dependencies = {
 			"nvim-telescope/telescope.nvim",
 		},
 		config = function()
-			require('telescope').load_extension('fzf')
+			require("telescope").load_extension("fzf")
 		end,
 	},
 	{
