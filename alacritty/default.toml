@@ -7,7 +7,7 @@ size = 18.0
 [font.normal]
 family = "FiraCode Nerd Font"
 
-[shell]
+[terminal.shell]
 program = "nu"
 
 [keyboard]
@@ -15,3 +15,5 @@ bindings = [{ key = "Slash", mods = "Control", "chars" = "\u001F" }]
 
 [window]
 dynamic_title = false
+
+[terminal]
