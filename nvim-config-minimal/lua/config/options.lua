@@ -17,6 +17,7 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.list = false
 vim.opt.listchars = { space = " ", tab = "\u{ebf9} ", trail = "·", lead = "·" }
+vim.opt.fileformat = "unix"
 
 vim.opt.showtabline = 2
 vim.opt.tabline = "%!v:lua.require'zaucy.tabline'.draw()"
@@ -50,6 +51,8 @@ vim.filetype.add({
 	-- Ecsact SDK uses this file with cocogitto
 	filename = { ["release-notes-template"] = "tera" },
 })
+
+vim.keymap.set("n", "gd", vim.lsp.buf.definition)
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
 	underline = true,
