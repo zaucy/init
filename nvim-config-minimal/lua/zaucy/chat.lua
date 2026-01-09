@@ -87,28 +87,40 @@ function M.set_toggle_key(key)
 	end, { desc = "Show/focus AI chat" })
 
 	vim.keymap.set({ "v" }, key, function()
+		-- ESCAPE visual mode to update the '< and '> marks
+		vim.cmd("noau normal! \27")
+
 		local s = vim.api.nvim_buf_get_mark(0, "<")
 		local e = vim.api.nvim_buf_get_mark(0, ">")
+
+		-- basic validation to ensure marks are set
+		if s[1] == 0 or e[1] == 0 then
+			return
+		end
+
 		local lines = vim.api.nvim_buf_get_text(0, s[1] - 1, s[2], e[1] - 1, e[2] + 1, {})
 		local ft = vim.bo.filetype
 
-		local min_indent = nil
-		for _, line in ipairs(lines) do
+		local min_indent = math.huge
+		for i, line in ipairs(lines) do
+			line = line:gsub("\t", string.rep(" ", vim.bo.tabstop))
+			lines[i] = line
 			if line:match("%S") then
-				local indent = line:match("^%s*") or ""
-				if not min_indent or #indent < min_indent then
-					min_indent = #indent
+				local indent = #line:match("^%s*")
+				if indent < min_indent then
+					min_indent = indent
 				end
 			end
 		end
-		min_indent = min_indent or 0
+		if min_indent == math.huge then
+			min_indent = 0
+		end
 
 		for i, line in ipairs(lines) do
 			lines[i] = line:sub(min_indent + 1)
 		end
 
 		local text = table.concat(lines, "\n")
-		text = text:gsub("\t", "    ")
 		text = "```" .. ft .. "\n" .. text .. "\n```\n"
 
 		vim.schedule(function()
