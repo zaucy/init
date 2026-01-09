@@ -82,9 +82,39 @@ function M.set_toggle_key(key)
 	assert(M._toggle_key == nil, "chat toggle key already set")
 	M._toggle_key = key
 
-	vim.keymap.set({ "n", "v" }, key, function()
+	vim.keymap.set({ "n" }, key, function()
 		M.chat_toggle()
 	end, { desc = "Show/focus AI chat" })
+
+	vim.keymap.set({ "v" }, key, function()
+		local s = vim.api.nvim_buf_get_mark(0, "<")
+		local e = vim.api.nvim_buf_get_mark(0, ">")
+		local lines = vim.api.nvim_buf_get_text(0, s[1] - 1, s[2], e[1] - 1, e[2] + 1, {})
+		local ft = vim.bo.filetype
+
+		local min_indent = nil
+		for _, line in ipairs(lines) do
+			if line:match("%S") then
+				local indent = line:match("^%s*") or ""
+				if not min_indent or #indent < min_indent then
+					min_indent = #indent
+				end
+			end
+		end
+		min_indent = min_indent or 0
+
+		for i, line in ipairs(lines) do
+			lines[i] = line:sub(min_indent + 1)
+		end
+
+		local text = table.concat(lines, "\n")
+		text = text:gsub("\t", "    ")
+		text = "```" .. ft .. "\n" .. text .. "\n```\n"
+
+		vim.schedule(function()
+			M.chat_send(text)
+		end)
+	end, { desc = "Send selected to chat", silent = true })
 end
 
 function M.chat_send(text)
@@ -98,13 +128,39 @@ function M.chat_send(text)
 	end
 end
 
-function M.chat_clear()
-	if not M.chat_valid() then
+--- Send multiple strings to a terminal channel with a delay in between
+--- @param chan number channel number
+--- @param delay_ms number delay in milliseconds between sends
+--- @param messages table<string>
+local function chan_send_with_delay(chan, delay_ms, messages)
+	local i = 1
+	local function send_next()
+		if i <= #messages then
+			vim.api.nvim_chan_send(chan, messages[i])
+			i = i + 1
+			vim.defer_fn(send_next, delay_ms)
+		end
+	end
+
+	send_next()
+end
+
+function M.chat_command(name)
+	local w = M._existing_window
+	if not w or not w:buf_valid() then
 		return
 	end
 
-	M.chat_send("/clear")
-	M.chat_send("\r")
+	local bufnr = w.buf
+	local chan = vim.b[bufnr].terminal_job_id
+
+	if chan > 0 then
+		chan_send_with_delay(chan, 60, { "\27", "\27", "/" .. name, "\r" })
+	end
+end
+
+function M.chat_clear()
+	M.chat_command("clear")
 end
 
 return M

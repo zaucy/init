@@ -208,7 +208,7 @@ setup_terminal_toggle({
 	keymaps = { "<C-g>" },
 	term_args = "gemini",
 	start_in_terminal_mode = true,
-	forwarded_keys = { "<C-o>", "<C-d>", "<C-u>", "<C-_>", "<C-/>" },
+	forwarded_keys = { "<C-o>", "<C-d>", "<C-u>", "<C-_>", "<C-/>", "<C-S-CR>" },
 })
 
 --- General terminal keys
