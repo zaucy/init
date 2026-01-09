@@ -323,3 +323,6 @@ vim.keymap.set({ "n", "v" }, "<C-w><C-left>", "<cmd>wincmd H<cr>", { desc = "Mov
 vim.keymap.set({ "n", "v" }, "<C-w><C-down>", "<cmd>wincmd J<cr>", { desc = "Move window to the far bottom" })
 vim.keymap.set({ "n", "v" }, "<C-w><C-up>", "<cmd>wincmd K<cr>", { desc = "Move window to the far top" })
 vim.keymap.set({ "n", "v" }, "<C-w><C-right>", "<cmd>wincmd L<cr>", { desc = "Move window to the far right" })
+
+-- chat
+require("zaucy.chat").set_toggle_key("<C-S-CR>")

@@ -6,5 +6,10 @@ return {
 	{
 		"j-hui/fidget.nvim",
 		opts = {},
-	}
+	},
+	{
+		"folke/snacks.nvim",
+		lazy = true,
+		opts = {},
+	},
 }
