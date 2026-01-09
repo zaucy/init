@@ -119,6 +119,8 @@ end
 --- @field keymaps string[]
 --- @field term_args string fields passed to :terminal command
 --- @field start_in_terminal_mode ?boolean
+--- @field on_before_open ?fun()
+--- @field on_after_open ?fun()
 --- @field forwarded_keys ?string[] keys that should be automatically executed in normal mode even when in terminal mode
 
 --- @param opts SetupTerminalToggleOptions
@@ -153,10 +155,25 @@ local function setup_terminal_toggle(opts)
 			return
 		end
 
+		if opts.on_before_open then
+			local success, error = pcall(opts.on_before_open)
+			if not success then
+				vim.notify(error, vim.log.levels.ERROR)
+			end
+		end
+
 		vim.cmd("terminal " .. term_args)
 		if start_in_terminal_mode then
 			vim.cmd("startinsert")
 		end
+
+		if opts.on_after_open then
+			local success, error = pcall(opts.on_after_open)
+			if not success then
+				vim.notify(error, vim.log.levels.ERROR)
+			end
+		end
+
 		local terminal_bufnr = vim.api.nvim_get_current_buf()
 		term_buf_by_type[tabpage][term_args] = terminal_bufnr
 

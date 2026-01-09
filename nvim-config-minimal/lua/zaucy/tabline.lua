@@ -26,6 +26,11 @@ M._index_names = { "󰎦", "󰎩", "󰎬", "󰎮", "󰎰", "󰎵", "󰎸", "󰎻
 M._index_names_active = { "󰎤", "󰎧", "󰎪", "󰎭", "󰎱", "󰎳", "󰎶", "󰎹", "󰎼" }
 M._tabs = { vim.api.nvim_get_current_tabpage() }
 
+M._named_tabs = {
+	[homedir] = "",
+	[initdir] = "󰒔",
+}
+
 function M.goto(index)
 	assert(type(index) == "number")
 	assert(index > 0, "Cannot go to tab < 1")
@@ -61,13 +66,13 @@ function M.draw()
 				tab_name = "%#TabLine#" .. (M._index_names[index] or index)
 			end
 			local tabcwd = vim.fn.substitute(vim.fn.getcwd(-1, tabnumber), '\\\\', '/', 'g')
-			if tabcwd == homedir then
-				tab_name = tab_name .. ""
-			elseif tabcwd == initdir then
-				tab_name = tab_name .. "󰒔"
+			local existing_tab_name = M._named_tabs[tabcwd]
+			if existing_tab_name then
+				tab_name = tab_name .. existing_tab_name
 			else
 				tab_name = tab_name .. " " .. vim.fs.basename(tabcwd)
 			end
+
 			table.insert(tabs, tab_name .. "%*")
 		end
 	end
@@ -86,6 +91,14 @@ function M.draw()
 	end
 
 	return table.concat(tabs, ' ') .. "%=" .. table.concat(trailing, ' ')
+end
+
+function M.set_tab_name(dir, name)
+	assert(type(dir) == "string")
+	assert(type(name) == "string")
+
+	dir = vim.fn.substitute(vim.fn.expand(dir), '\\\\', '/', 'g')
+	M._named_tabs[dir] = name
 end
 
 return M
