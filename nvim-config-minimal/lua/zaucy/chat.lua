@@ -89,8 +89,10 @@ local function create_chat_term_buf()
 	})
 end
 
+--- @param tabpage number
 --- @param state chat.ChatTabpageState
-local function ensure_chat_term_buf(state)
+local function ensure_chat_term_buf(tabpage, state)
+	assert(type(tabpage) == "number")
 	if M._active_tab_index == 1 then
 		vim.api.nvim_win_call(state.body.win, function()
 			state.body.opts.fixbuf = false
@@ -106,7 +108,7 @@ local function ensure_chat_term_buf(state)
 		return
 	end
 
-	local cwd = vim.fn.getcwd()
+	local cwd = vim.fn.getcwd(-1, tabpage)
 
 	vim.api.nvim_win_call(state.body.win, function()
 		local term_buf = M._dir_term_bufs[cwd]
@@ -382,7 +384,10 @@ function M.chat_switch_tab(index)
 	assert(index <= #state.tab_wins, "invalid tab index " .. tostring(index))
 	M._active_tab_index = index
 	update_button_state()
-	ensure_chat_term_buf(state)
+
+	for tabpage, other_state in ipairs(M._tabpage_state) do
+		ensure_chat_term_buf(tabpage, other_state)
+	end
 end
 
 function M.chat_switch_tab_next()
