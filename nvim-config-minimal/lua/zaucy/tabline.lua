@@ -85,6 +85,8 @@ function M.draw()
 
 		if vim.startswith(buf_name, "health://") then
 			display_name = "%#healthSuccess# %*" .. buf_name:sub(10)
+		elseif vim.startswith(buf_name, "codediff://") then
+			display_name = "%#GitSignsAdd# %*" .. buf_name:sub(12)
 		end
 
 		table.insert(trailing, "%#TabLineSel#" .. display_name .. "%*")

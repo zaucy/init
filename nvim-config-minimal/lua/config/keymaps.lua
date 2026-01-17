@@ -324,5 +324,38 @@ vim.keymap.set({ "n", "v" }, "<C-w><C-down>", "<cmd>wincmd J<cr>", { desc = "Mov
 vim.keymap.set({ "n", "v" }, "<C-w><C-up>", "<cmd>wincmd K<cr>", { desc = "Move window to the far top" })
 vim.keymap.set({ "n", "v" }, "<C-w><C-right>", "<cmd>wincmd L<cr>", { desc = "Move window to the far right" })
 
+-- tree sitter text object selections
+local function select_textobject(a, b)
+	return function()
+		return require("nvim-treesitter-textobjects.select").select_textobject(a, b)
+	end
+end
+vim.keymap.set({ "x", "o" }, "af",  select_textobject("@function.outer", "textobjects"))
+vim.keymap.set({ "x", "o" }, "if",  select_textobject("@function.inner", "textobjects"))
+vim.keymap.set({ "x", "o" }, "ac",  select_textobject("@class.outer", "textobjects"))
+vim.keymap.set({ "x", "o" }, "ic",  select_textobject("@class.inner", "textobjects"))
+vim.keymap.set({ "x", "o" }, "as",  select_textobject("@local.scope", "locals"))
+
 -- chat
-require("zaucy.chat").set_toggle_key("<C-S-CR>")
+-- require("zaucy.chat").set_toggle_key("<C-S-CR>")
+vim.keymap.set({"n", "v"}, "<C-S-CR>", function() require("zaucy.chat").chat_toggle() end)
+
+vim.api.nvim_create_autocmd("User", {
+	pattern = "ZaucyChatTerminalBufCreated",
+	callback = function(args)
+		vim.keymap.set({ "t" }, "<C-S-CR>", function()
+			vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-\\><C-n>", true, false, true), "n", false)
+			require("zaucy.chat").chat_hide()
+		end, {buffer = args.data.terminal_bufnr})
+
+		local forwarded_keys = {
+			"<C-d>",
+			"<C-u>",
+		}
+
+		for _, key in ipairs(forwarded_keys) do
+			vim.keymap.set({ "t" }, key, "<C-\\><C-n>" .. key, { buffer = args.data.terminal_bufnr, remap = true })
+		end
+
+	end,
+})

@@ -187,7 +187,7 @@ local function setup_terminal_toggle(opts)
 	end
 
 	for _, keymap in ipairs(keymaps) do
-		vim.keymap.set({ "n" }, keymap, open_terminal_fn, { desc = "Open Terminal" })
+		vim.keymap.set({ "n", "v" }, keymap, open_terminal_fn, { desc = "Open Terminal" })
 	end
 end
 
@@ -202,14 +202,6 @@ end
 
 --- Toggle my main (nushell) terminal
 setup_terminal_toggle({ keymaps = { "<C-_>", "<C-/>" }, term_args = "nu" })
-
---- Other misc shells I like to toggle on/off
-setup_terminal_toggle({
-	keymaps = { "<C-g>" },
-	term_args = "gemini",
-	start_in_terminal_mode = true,
-	forwarded_keys = { "<C-o>", "<C-d>", "<C-u>", "<C-_>", "<C-/>", "<C-S-CR>" },
-})
 
 --- General terminal keys
 vim.keymap.set({ "t" }, "<C-w>", "<C-\\><C-n><cmd>WhichKey <C-w><cr>", {})
