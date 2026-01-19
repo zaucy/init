@@ -30,7 +30,7 @@ end
 return {
 	{
 		"zaucy/mcp.nvim",
-		-- dir = "~/projects/zaucy/mcp.nvim",
+		dir = "~/projects/zaucy/mcp.nvim",
 		config = function()
 			local mcp = require("mcp")
 			mcp.setup({})
@@ -70,7 +70,7 @@ return {
 	},
 	{
 		"zaucy/gemini.nvim",
-		-- dir = "~/projects/zaucy/gemini.nvim",
+		dir = "~/projects/zaucy/gemini.nvim",
 		build = "bun install -g @google/gemini-cli@nightly",
 		dependencies = {
 			"zaucy/mcp.nvim",
