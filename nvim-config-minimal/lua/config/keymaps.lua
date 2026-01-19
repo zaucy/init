@@ -348,6 +348,12 @@ vim.api.nvim_create_autocmd("User", {
 			require("zaucy.chat").chat_hide()
 		end, {buffer = args.data.terminal_bufnr})
 
+
+		vim.keymap.set({ "t", "n", "v" }, "<C-g>", function()
+			require("zaucy.chat").chat_hide()
+			require("gemini.diff").focus_next_diff()
+		end, {buffer = args.data.terminal_bufnr})
+
 		local forwarded_keys = {
 			"<C-d>",
 			"<C-u>",
@@ -358,4 +364,34 @@ vim.api.nvim_create_autocmd("User", {
 		end
 
 	end,
+})
+
+local chat_was_focused_when_opening_gemini_diff = false
+
+vim.api.nvim_create_autocmd("User", {
+	pattern = "GeminiOpenDiffPre",
+	callback = function()
+		chat_was_focused_when_opening_gemini_diff = require("zaucy.chat").chat_is_focused()
+		require("zaucy.chat").chat_hide()
+	end,
+})
+
+vim.api.nvim_create_autocmd("User", {
+	pattern = "GeminiOpenDiff",
+	callback = function(args)
+		vim.keymap.set({ "n", "v" }, "<leader>aa", require("gemini.diff").accept_all_diffs, { buffer = args.data.bufnr, desc = "Accept gemini edit" })
+		vim.keymap.set({ "n", "v" }, "<leader>ad", require("gemini.diff").reject_all_diffs, { buffer = args.data.bufnr, desc = "Reject gemini edit" })
+	end
+})
+
+vim.api.nvim_create_autocmd("User", {
+	pattern = "GeminiCloseDiff",
+	callback = function(args)
+		vim.keymap.del({ "n", "v" }, "<leader>aa", { buffer = args.data.bufnr })
+		vim.keymap.del({ "n", "v" }, "<leader>ad", { buffer = args.data.bufnr })
+
+		if chat_was_focused_when_opening_gemini_diff then
+			require("zaucy.chat").chat_show()
+		end
+	end
 })
