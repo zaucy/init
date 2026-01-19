@@ -381,6 +381,7 @@ vim.api.nvim_create_autocmd("User", {
 	callback = function(args)
 		vim.keymap.set({ "n", "v" }, "<leader>aa", require("gemini.diff").accept_all_diffs, { buffer = args.data.bufnr, desc = "Accept gemini edit" })
 		vim.keymap.set({ "n", "v" }, "<leader>ad", require("gemini.diff").reject_all_diffs, { buffer = args.data.bufnr, desc = "Reject gemini edit" })
+		require("zaucy.ui.diff_hint").show_diff_hint()
 	end
 })
 
@@ -389,6 +390,7 @@ vim.api.nvim_create_autocmd("User", {
 	callback = function(args)
 		vim.keymap.del({ "n", "v" }, "<leader>aa", { buffer = args.data.bufnr })
 		vim.keymap.del({ "n", "v" }, "<leader>ad", { buffer = args.data.bufnr })
+		require("zaucy.ui.diff_hint").close_diff_hint()
 
 		if chat_was_focused_when_opening_gemini_diff then
 			require("zaucy.chat").chat_show()
