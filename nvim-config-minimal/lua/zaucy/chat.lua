@@ -7,6 +7,8 @@
 --- @field body snacks.win|nil
 --- @field last_focused_win number|nil
 --- @field tab_wins snacks.win[]
+--- @field loading_win snacks.win|nil
+--- @field loading_timer any|nil
 
 local M = {
 	--- @type chat.SetupOptions
@@ -25,6 +27,12 @@ local M = {
 
 	--- @type table<number, chat.ChatTabpageState>
 	_tabpage_state = {},
+
+	--- @type boolean
+	_chat_loading = false,
+
+	--- @type table<string, boolean>
+	_dir_loading = {},
 }
 
 --- @param state chat.ChatTabpageState
@@ -109,6 +117,7 @@ local function ensure_chat_term_buf(tabpage, state)
 	end
 
 	local cwd = vim.fn.getcwd(-1, tabpage)
+	cwd = cwd:gsub("\\", "/")
 
 	vim.api.nvim_win_call(state.body.win, function()
 		local term_buf = M._dir_term_bufs[cwd]
@@ -172,12 +181,14 @@ local function ensure_layout()
 		on_buf = function(win)
 			bind_chat_keys(win.buf)
 			update_button_state()
+			M._update_loading_overlay()
 		end,
 	})
 
 	state.tab_wins[2] = snacks.win({
 		text = function()
 			local cwd = vim.fn.getcwd()
+			cwd = cwd:gsub("\\", "/")
 			local full_ws = (" "):rep(#cwd)
 			local padding = "  "
 			return {
@@ -192,6 +203,7 @@ local function ensure_layout()
 		on_buf = function(win)
 			bind_chat_keys(win.buf)
 			update_button_state()
+			M._update_loading_overlay()
 		end,
 	})
 
@@ -245,6 +257,7 @@ local function ensure_layout()
 	state.body:update()
 
 	vim.cmd.startinsert()
+	M._update_loading_overlay()
 
 	return state
 end
@@ -261,11 +274,167 @@ local function get_layout_state()
 	return nil
 end
 
+--- @param state chat.ChatTabpageState
+local function _show_loading_overlay(state)
+	if state.loading_win and state.loading_win:valid() then
+		return
+	end
+
+	local snacks = require("snacks")
+	local frames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
+	local frame_idx = 1
+
+	local body_win = state.body.win
+	local config = vim.api.nvim_win_get_config(body_win)
+
+	local function get_spinner_text()
+		local spin = frames[frame_idx]
+		frame_idx = (frame_idx % #frames) + 1
+
+		local h = config.height
+		local w = config.width
+		local lines = {}
+		local mid = math.floor(h / 2)
+
+		for i = 1, h do
+			if i == mid then
+				local padding_len = math.max(0, math.floor((w - #spin) / 2))
+				local padding = string.rep(" ", padding_len)
+				table.insert(lines, padding .. spin .. padding)
+			else
+				table.insert(lines, string.rep(" ", w))
+			end
+		end
+		return lines
+	end
+
+	state.loading_win = snacks.win({
+		relative = config.relative,
+		win = config.win,
+		row = config.row,
+		col = config.col,
+		width = config.width,
+		height = config.height,
+		zindex = (config.zindex or 50) + 10,
+		style = "minimal",
+		border = "none",
+		focusable = false,
+		backdrop = false,
+		text = get_spinner_text,
+	})
+
+	vim.api.nvim_win_set_option(state.loading_win.win, "winblend", 80)
+	vim.api.nvim_win_set_hl_ns(state.loading_win.win, ns)
+
+	local uv = vim.uv or vim.loop
+	state.loading_timer = uv.new_timer()
+	state.loading_timer:start(
+		0,
+		80,
+		vim.schedule_wrap(function()
+			if state.loading_win and state.loading_win:valid() then
+				if vim.api.nvim_win_is_valid(body_win) then
+					local new_config = vim.api.nvim_win_get_config(body_win)
+					if
+						new_config.row ~= config.row
+						or new_config.col ~= config.col
+						or new_config.width ~= config.width
+						or new_config.height ~= config.height
+					then
+						config = new_config
+						vim.api.nvim_win_set_config(state.loading_win.win, {
+							relative = config.relative,
+							win = config.win,
+							row = config.row,
+							col = config.col,
+							width = config.width,
+							height = config.height,
+						})
+					end
+
+					local lines = get_spinner_text()
+					local buf = state.loading_win.buf
+					if buf and vim.api.nvim_buf_is_valid(buf) then
+						vim.api.nvim_set_option_value("modifiable", true, { buf = buf })
+						vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+						vim.api.nvim_set_option_value("modifiable", false, { buf = buf })
+					end
+
+					state.loading_win:update()
+				else
+					M._update_loading_overlay()
+				end
+			else
+				M._update_loading_overlay()
+			end
+		end)
+	)
+end
+
+--- @param state chat.ChatTabpageState
+local function _hide_loading_overlay(state)
+	if state.loading_timer then
+		state.loading_timer:stop()
+		state.loading_timer:close()
+		state.loading_timer = nil
+	end
+
+	if state.loading_win then
+		state.loading_win:close()
+		state.loading_win = nil
+	end
+end
+
+function M._update_loading_overlay()
+	if not M.chat_is_visible() then
+		return
+	end
+
+	local state = get_layout_state()
+	if not state or not state.body or not state.body.win or not vim.api.nvim_win_is_valid(state.body.win) then
+		return
+	end
+
+	local should_show = false
+	if M._active_tab_index == 1 then
+		should_show = M._chat_loading
+	elseif M._active_tab_index == 2 then
+		local cwd = vim.fn.getcwd(-1, vim.api.nvim_get_current_tabpage())
+		cwd = cwd:gsub("\\", "/")
+		should_show = M._dir_loading[cwd]
+	end
+
+	if should_show then
+		_show_loading_overlay(state)
+	else
+		_hide_loading_overlay(state)
+	end
+end
+
+--- @param loading boolean
+function M.set_chat_loading(loading)
+	M._chat_loading = loading
+	M._update_loading_overlay()
+end
+
+--- @param dir string
+--- @param loading boolean
+function M.set_dir_loading(dir, loading)
+	dir = dir:gsub("\\", "/")
+	if dir == M._opts.chat_scratch_dir then
+		M.set_chat_loading(loading)
+	else
+		M._dir_loading[dir] = loading
+		M._update_loading_overlay()
+	end
+end
+
 function M.chat_show()
 	local state = ensure_layout()
 	state.layout:unhide()
 	state.body:focus()
 	vim.cmd.startinsert()
+	M._update_loading_overlay()
 end
 
 function M.chat_hide()
@@ -274,6 +443,7 @@ function M.chat_hide()
 		if state.layout then
 			state.layout:hide()
 			M.chat_defocus()
+			_hide_loading_overlay(state)
 		end
 	end
 end
@@ -388,6 +558,7 @@ function M.chat_switch_tab(index)
 	for tabpage, other_state in ipairs(M._tabpage_state) do
 		ensure_chat_term_buf(tabpage, other_state)
 	end
+	M._update_loading_overlay()
 end
 
 function M.chat_switch_tab_next()
@@ -401,6 +572,9 @@ end
 --- @param opts chat.SetupOptions
 function M.setup(opts)
 	M._opts = vim.tbl_deep_extend("force", M._opts, opts)
+	if M._opts.chat_scratch_dir then
+		M._opts.chat_scratch_dir = M._opts.chat_scratch_dir:gsub("\\", "/")
+	end
 end
 
 return M
