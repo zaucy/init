@@ -247,28 +247,10 @@ local function ensure_layout()
 
 	state.body:focus()
 	state.body.opts.fixbuf = false
-	if M._active_tab_index == 1 then
-		if M._chat_term_buf and vim.api.nvim_buf_is_valid(M._chat_term_buf) then
-			vim.api.nvim_win_set_buf(state.body.win, M._chat_term_buf)
-		else
-			create_chat_term_buf()
-		end
+	if M._chat_term_buf and vim.api.nvim_buf_is_valid(M._chat_term_buf) then
+		vim.api.nvim_win_set_buf(state.body.win, M._chat_term_buf)
 	else
-		local cwd = vim.fn.getcwd(-1, tabpage)
-		cwd = cwd:gsub("\\", "/")
-		local term_buf = M._dir_term_bufs[cwd]
-		if term_buf == nil or not vim.api.nvim_buf_is_valid(term_buf) then
-			vim.cmd.terminal(M._opts.terminal_command)
-			term_buf = vim.api.nvim_get_current_buf()
-			M._dir_term_bufs[cwd] = term_buf
-			bind_chat_keys(term_buf)
-			vim.api.nvim_exec_autocmds("User", {
-				pattern = "ZaucyChatTerminalBufCreated",
-				data = { terminal_bufnr = term_buf },
-			})
-		else
-			vim.api.nvim_win_set_buf(state.body.win, term_buf)
-		end
+		create_chat_term_buf()
 	end
 	state.body.opts.buf = M._chat_term_buf
 	state.body.opts.fixbuf = true
