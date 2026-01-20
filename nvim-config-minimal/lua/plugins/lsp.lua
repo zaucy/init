@@ -10,6 +10,19 @@ return {
 		opts = {},
 	},
 	{
+		"folke/lazydev.nvim",
+		init = function()
+			vim.g.lazydev_enabled = true
+		end,
+		opts = {
+			library = {
+				-- Load luvit types when the `vim.uv` word is found
+				{ path = "luvit-meta/library", words = { "vim%.uv" } },
+			},
+		},
+	},
+	{ "Bilal2453/luvit-meta", lazy = true }, -- optional `vim.uv` typings
+	{
 		"mason-org/mason-lspconfig.nvim",
 		event = "VeryLazy",
 		dependencies = {
@@ -17,10 +30,10 @@ return {
 			"neovim/nvim-lspconfig",
 			"hrsh7th/nvim-cmp",
 			"hrsh7th/cmp-nvim-lsp",
+			"folke/lazydev.nvim",
 		},
 		config = function()
 			require("mason-lspconfig").setup({
-				automatic_enable = true,
 				automatic_installation = {
 					exclude = { "omnisharp" },
 				},
@@ -40,22 +53,9 @@ return {
 			})
 
 			vim.lsp.enable("nushell", true)
+			vim.lsp.enable("lua_ls", true)
 		end,
 	},
-	{
-		"folke/lazydev.nvim",
-		ft = "lua",
-		init = function()
-			vim.g.lazydev_enabled = true
-		end,
-		opts = {
-			library = {
-				-- Load luvit types when the `vim.uv` word is found
-				{ path = "luvit-meta/library", words = { "vim%.uv" } },
-			},
-		},
-	},
-	{ "Bilal2453/luvit-meta", lazy = true }, -- optional `vim.uv` typings
 	{
 		"p00f/clangd_extensions.nvim",
 		ft = { "c", "cpp" },

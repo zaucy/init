@@ -16,7 +16,7 @@ return {
 		opts = {
 			async = true,
 			format_on_save = {
-				lsp_format = "never",
+				lsp_format = "fallback",
 				timeout_ms = 500,
 			},
 			formatters_by_ft = {
@@ -27,7 +27,7 @@ return {
 					if vim.fs.basename(root) == "ecsact_unity" then
 						return { "clang-format" }
 					end
-					return { "lsp" }
+					return nil
 				end,
 				shaderslang = { "clang-format" },
 				starlark = { "buildifier" },
@@ -35,7 +35,6 @@ return {
 				javascript = { "prettierd", "prettier", stop_after_first = true },
 				typescript = { "prettierd", "prettier", stop_after_first = true },
 				typescriptreact = { "prettierd", "prettier", stop_after_first = true },
-				json = { "prettierd", "prettier", stop_after_first = true },
 				lua = { "stylua" },
 			},
 		},
