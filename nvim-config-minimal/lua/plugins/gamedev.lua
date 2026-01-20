@@ -294,6 +294,35 @@ return {
 				end,
 				desc = "Toggle header/source",
 			},
+
+			{
+				"<leader>ui",
+				function()
+					local ext = vim.fn.expand("%:e")
+					local name = vim.fn.expand("%:t:r")
+
+					local lines = {}
+					if ext == "cpp" then
+						lines = {
+							'#include "' .. name .. '.h"',
+							"",
+							"#include UE_INLINE_GENERATED_CPP_BY_NAME(" .. name .. ")",
+							"",
+						}
+					elseif ext == "h" then
+						lines = {
+							"#pragma once",
+							"",
+							'#include "' .. name .. '.generated.h"',
+							"",
+						}
+					else
+						return
+					end
+
+					vim.api.nvim_put(lines, "l", true, true)
+				end,
+			},
 		},
 	},
 }
