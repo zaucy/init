@@ -290,6 +290,8 @@ return {
 						if header_path then
 							vim.cmd.edit(header_path)
 						end
+					else
+						vim.cmd("ClangdSwitchSourceHeader")
 					end
 				end,
 				desc = "Toggle header/source",

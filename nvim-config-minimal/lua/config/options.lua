@@ -11,6 +11,13 @@ vim.opt.colorcolumn = {}
 vim.opt.swapfile = false
 vim.opt.shadafile = "NONE" -- shadafiles are annoying and I never find them useful
 
+vim.opt.breakindent = true
+-- vim.opt.breakindentopt = "shift:4,min:20"
+vim.opt.showbreak = " ↳  "
+vim.opt.linebreak = true
+
+vim.opt.includeexpr = "v:lua.require('zaucy.expr').include(v:fname)"
+
 vim.opt.wrap = false
 vim.opt.cursorline = true
 vim.opt.number = true

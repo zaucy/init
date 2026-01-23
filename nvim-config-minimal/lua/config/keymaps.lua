@@ -1,6 +1,7 @@
 vim.cmd("highlight ZaucySubstituteSelect guibg=#151521")
 
 local config_dir = vim.fn.expand("~/projects/zaucy/init/nvim-config-minimal")
+local restart_session_file = vim.fn.stdpath("state") .. "/RestartSession.vim"
 
 vim.keymap.set({ "v" }, '/', '<esc>/\\%V') -- search in selection
 
@@ -335,6 +336,17 @@ vim.keymap.set({ "x", "o" }, "if",  select_textobject("@function.inner", "textob
 vim.keymap.set({ "x", "o" }, "ac",  select_textobject("@class.outer", "textobjects"))
 vim.keymap.set({ "x", "o" }, "ic",  select_textobject("@class.inner", "textobjects"))
 vim.keymap.set({ "x", "o" }, "as",  select_textobject("@local.scope", "locals"))
+
+vim.keymap.set({"n", "v"}, "<C-S-r>", "<cmd>mksession! ".. restart_session_file .. " | restart source " .. restart_session_file .. "<cr>")
+vim.api.nvim_create_autocmd("SessionLoadPost", {
+	callback = function(args)
+		if vim.v.this_session == restart_session_file then
+			vim.fn.delete(vim.v.this_session)
+		else
+			vim.notify("not session restart session file")
+		end
+	end,
+})
 
 -- chat
 -- require("zaucy.chat").set_toggle_key("<C-S-CR>")
