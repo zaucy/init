@@ -1,0 +1,610 @@
+{
+	"macros": [
+		{
+			"name": "Individual Chat",
+			"group": false,
+			"pauseSaveBehavior": 0,
+			"pause": false,
+			"parallel": false,
+			"checkConditionsInParallel": false,
+			"onChange": true,
+			"skipExecOnStart": false,
+			"stopActionsIfNotDone": false,
+			"useShortCircuitEvaluation": false,
+			"useCustomConditionCheckInterval": false,
+			"customConditionCheckInterval": {
+				"value": {
+					"value": 0.3,
+					"type": 0
+				},
+				"unit": 0,
+				"version": 1
+			},
+			"dockSettings": {
+				"register": false,
+				"standaloneDock": true,
+				"dockWindow": "Dock",
+				"hasRunButton": true,
+				"hasPauseButton": true,
+				"hasStatusLabel": false,
+				"highlightIfConditionsTrue": false,
+				"runButtonText": "Run",
+				"pauseButtonText": "Pause",
+				"unpauseButtonText": "Unpause",
+				"conditionsTrueStatusText": "Conditions are true.",
+				"conditionsFalseStatusText": "Conditions are false.",
+				"dockId": "advss-macro-dock-268c9b7f-4188-4f34-8eaf-4bd8484ba2ab",
+				"version": 1
+			},
+			"macroActionConditionSplitterPosition": [
+				{
+					"pos": 678
+				},
+				{
+					"pos": 0
+				}
+			],
+			"macroElseActionSplitterPosition": [
+				{
+					"pos": 560
+				},
+				{
+					"pos": 0
+				}
+			],
+			"registerHotkeys": false,
+			"pauseHotkey": [],
+			"unpauseHotkey": [],
+			"togglePauseHotkey": [],
+			"conditions": [
+				{
+					"segmentSettings": {
+						"collapsed": false,
+						"useCustomLabel": false,
+						"customLabel": "My label",
+						"enabled": true,
+						"version": 1
+					},
+					"id": "window",
+					"logic": 0,
+					"durationModifier": {
+						"time_constraint": 0,
+						"seconds": {
+							"value": {
+								"value": 0.0,
+								"type": 0
+							},
+							"unit": 0,
+							"version": 1
+						}
+					},
+					"checkTitle": true,
+					"window": ".+Usercard\\s+.+",
+					"windowRegexConfig": {
+						"enable": true,
+						"partial": false,
+						"options": 0
+					},
+					"fullscreen": false,
+					"maximized": false,
+					"focus": true,
+					"windowFocusChanged": true,
+					"checkWindowText": false,
+					"text": "",
+					"textRegexConfig": {
+						"enable": false,
+						"partial": true,
+						"options": 0
+					},
+					"version": 1
+				}
+			],
+			"actions": [
+				{
+					"segmentSettings": {
+						"collapsed": false,
+						"useCustomLabel": false,
+						"customLabel": "My label",
+						"enabled": true,
+						"version": 1
+					},
+					"id": "variable",
+					"variableName": "Window title",
+					"variable2Name": "Invalid variable selection",
+					"strValue": "",
+					"numValue": {
+						"value": 0.0,
+						"type": 0
+					},
+					"condition": 16,
+					"segmentIdx": -1,
+					"subStringStart": {
+						"value": 1,
+						"type": 0
+					},
+					"subStringSize": {
+						"value": 0,
+						"type": 0
+					},
+					"regexPattern": ".*",
+					"regexMatchIdx": {
+						"value": 1,
+						"type": 0
+					},
+					"findRegex": {
+						"enable": false,
+						"partial": false,
+						"options": 0
+					},
+					"findStr": "Text to find",
+					"replaceStr": "Text to replace with",
+					"regexConfig": {
+						"enable": false,
+						"partial": true,
+						"options": 0
+					},
+					"mathExpression": "( 1 + 2 * 3 ) / 4",
+					"useCustomPrompt": false,
+					"inputPrompt": "Assign value to variable:",
+					"useInputPlaceholder": false,
+					"inputPlaceholder": "--enter text--",
+					"environmentVariableName": "USERPROFILE",
+					"sceneSelection": {
+						"type": 0,
+						"name": "",
+						"canvasSelection": "Main"
+					},
+					"tempVar": {
+						"type": 1,
+						"idx": 0,
+						"id": "window",
+						"depth": 0,
+						"version": 1
+					},
+					"sceneItemIndex": {
+						"value": 1,
+						"type": 0
+					},
+					"direction": 0,
+					"stringLength": {
+						"value": 0,
+						"type": 0
+					},
+					"paddingChar": 32,
+					"caseType": 0,
+					"randomNumberStart": {
+						"value": 0.0,
+						"type": 0
+					},
+					"randomNumberEnd": {
+						"value": 0.0,
+						"type": 0
+					},
+					"generateInteger": false,
+					"jsonQuery": "",
+					"jsonIndex": {
+						"value": 0,
+						"type": 0
+					},
+					"version": 1
+				},
+				{
+					"segmentSettings": {
+						"collapsed": false,
+						"useCustomLabel": false,
+						"customLabel": "My label",
+						"enabled": true,
+						"version": 1
+					},
+					"id": "variable",
+					"variableName": "Window class",
+					"variable2Name": "Invalid variable selection",
+					"strValue": "",
+					"numValue": {
+						"value": 0.0,
+						"type": 0
+					},
+					"condition": 16,
+					"segmentIdx": -1,
+					"subStringStart": {
+						"value": 1,
+						"type": 0
+					},
+					"subStringSize": {
+						"value": 0,
+						"type": 0
+					},
+					"regexPattern": ".*",
+					"regexMatchIdx": {
+						"value": 1,
+						"type": 0
+					},
+					"findRegex": {
+						"enable": false,
+						"partial": false,
+						"options": 0
+					},
+					"findStr": "Text to find",
+					"replaceStr": "Text to replace with",
+					"regexConfig": {
+						"enable": false,
+						"partial": true,
+						"options": 0
+					},
+					"mathExpression": "( 1 + 2 * 3 ) / 4",
+					"useCustomPrompt": false,
+					"inputPrompt": "Assign value to variable:",
+					"useInputPlaceholder": false,
+					"inputPlaceholder": "--enter text--",
+					"environmentVariableName": "USERPROFILE",
+					"sceneSelection": {
+						"type": 0,
+						"name": "",
+						"canvasSelection": "Main"
+					},
+					"tempVar": {
+						"type": 1,
+						"idx": 0,
+						"id": "windowClass",
+						"depth": 0,
+						"version": 1
+					},
+					"sceneItemIndex": {
+						"value": 1,
+						"type": 0
+					},
+					"direction": 0,
+					"stringLength": {
+						"value": 0,
+						"type": 0
+					},
+					"paddingChar": 32,
+					"caseType": 0,
+					"randomNumberStart": {
+						"value": 0.0,
+						"type": 0
+					},
+					"randomNumberEnd": {
+						"value": 0.0,
+						"type": 0
+					},
+					"generateInteger": false,
+					"jsonQuery": "",
+					"jsonIndex": {
+						"value": 0,
+						"type": 0
+					},
+					"version": 1
+				},
+				{
+					"segmentSettings": {
+						"collapsed": false,
+						"useCustomLabel": true,
+						"customLabel": "Search and replace \"#\" for OBS internal encoding",
+						"enabled": true,
+						"version": 1
+					},
+					"id": "variable",
+					"variableName": "Window title",
+					"variable2Name": "Invalid variable selection",
+					"strValue": "${Window title}:${Window class}:${Process name}",
+					"numValue": {
+						"value": 0.0,
+						"type": 0
+					},
+					"condition": 9,
+					"segmentIdx": -1,
+					"subStringStart": {
+						"value": 1,
+						"type": 0
+					},
+					"subStringSize": {
+						"value": 0,
+						"type": 0
+					},
+					"regexPattern": ".*",
+					"regexMatchIdx": {
+						"value": 1,
+						"type": 0
+					},
+					"findRegex": {
+						"enable": false,
+						"partial": false,
+						"options": 0
+					},
+					"findStr": "#",
+					"replaceStr": "#22",
+					"regexConfig": {
+						"enable": false,
+						"partial": true,
+						"options": 0
+					},
+					"mathExpression": "( 1 + 2 * 3 ) / 4",
+					"useCustomPrompt": false,
+					"inputPrompt": "Assign value to variable:",
+					"useInputPlaceholder": false,
+					"inputPlaceholder": "--enter text--",
+					"environmentVariableName": "USERPROFILE",
+					"sceneSelection": {
+						"type": 0,
+						"name": "",
+						"canvasSelection": "Main"
+					},
+					"tempVar": {
+						"type": 0,
+						"idx": -1,
+						"id": "",
+						"version": 1
+					},
+					"sceneItemIndex": {
+						"value": 1,
+						"type": 0
+					},
+					"direction": 0,
+					"stringLength": {
+						"value": 0,
+						"type": 0
+					},
+					"paddingChar": 32,
+					"caseType": 0,
+					"randomNumberStart": {
+						"value": 0.0,
+						"type": 0
+					},
+					"randomNumberEnd": {
+						"value": 0.0,
+						"type": 0
+					},
+					"generateInteger": false,
+					"jsonQuery": "",
+					"jsonIndex": {
+						"value": 0,
+						"type": 0
+					},
+					"version": 1
+				},
+				{
+					"segmentSettings": {
+						"collapsed": false,
+						"useCustomLabel": true,
+						"customLabel": "Search and replace \":\" for OBS internal encoding",
+						"enabled": true,
+						"version": 1
+					},
+					"id": "variable",
+					"variableName": "Window title",
+					"variable2Name": "Invalid variable selection",
+					"strValue": "${Window title}:${Window class}:${Process name}",
+					"numValue": {
+						"value": 0.0,
+						"type": 0
+					},
+					"condition": 9,
+					"segmentIdx": -1,
+					"subStringStart": {
+						"value": 1,
+						"type": 0
+					},
+					"subStringSize": {
+						"value": 0,
+						"type": 0
+					},
+					"regexPattern": ".*",
+					"regexMatchIdx": {
+						"value": 1,
+						"type": 0
+					},
+					"findRegex": {
+						"enable": false,
+						"partial": false,
+						"options": 0
+					},
+					"findStr": ":",
+					"replaceStr": "#3A",
+					"regexConfig": {
+						"enable": false,
+						"partial": true,
+						"options": 0
+					},
+					"mathExpression": "( 1 + 2 * 3 ) / 4",
+					"useCustomPrompt": false,
+					"inputPrompt": "Assign value to variable:",
+					"useInputPlaceholder": false,
+					"inputPlaceholder": "--enter text--",
+					"environmentVariableName": "USERPROFILE",
+					"sceneSelection": {
+						"type": 0,
+						"name": "",
+						"canvasSelection": "Main"
+					},
+					"tempVar": {
+						"type": 0,
+						"idx": -1,
+						"id": "",
+						"version": 1
+					},
+					"sceneItemIndex": {
+						"value": 1,
+						"type": 0
+					},
+					"direction": 0,
+					"stringLength": {
+						"value": 0,
+						"type": 0
+					},
+					"paddingChar": 32,
+					"caseType": 0,
+					"randomNumberStart": {
+						"value": 0.0,
+						"type": 0
+					},
+					"randomNumberEnd": {
+						"value": 0.0,
+						"type": 0
+					},
+					"generateInteger": false,
+					"jsonQuery": "",
+					"jsonIndex": {
+						"value": 0,
+						"type": 0
+					},
+					"version": 1
+				},
+				{
+					"segmentSettings": {
+						"collapsed": false,
+						"useCustomLabel": false,
+						"customLabel": "My label",
+						"enabled": true,
+						"version": 1
+					},
+					"id": "variable",
+					"variableName": "Window Capture setting",
+					"variable2Name": "Invalid variable selection",
+					"strValue": "${Window title}:${Window class}:chatterino.exe",
+					"numValue": {
+						"value": 0.0,
+						"type": 0
+					},
+					"condition": 0,
+					"segmentIdx": -1,
+					"subStringStart": {
+						"value": 1,
+						"type": 0
+					},
+					"subStringSize": {
+						"value": 0,
+						"type": 0
+					},
+					"regexPattern": ".*",
+					"regexMatchIdx": {
+						"value": 1,
+						"type": 0
+					},
+					"findRegex": {
+						"enable": false,
+						"partial": false,
+						"options": 0
+					},
+					"findStr": "Text to find",
+					"replaceStr": "Text to replace with",
+					"regexConfig": {
+						"enable": false,
+						"partial": true,
+						"options": 0
+					},
+					"mathExpression": "( 1 + 2 * 3 ) / 4",
+					"useCustomPrompt": false,
+					"inputPrompt": "Assign value to variable:",
+					"useInputPlaceholder": false,
+					"inputPlaceholder": "--enter text--",
+					"environmentVariableName": "USERPROFILE",
+					"sceneSelection": {
+						"type": 0,
+						"name": "",
+						"canvasSelection": "Main"
+					},
+					"tempVar": {
+						"type": 0,
+						"idx": -1,
+						"id": "",
+						"version": 1
+					},
+					"sceneItemIndex": {
+						"value": 1,
+						"type": 0
+					},
+					"direction": 0,
+					"stringLength": {
+						"value": 0,
+						"type": 0
+					},
+					"paddingChar": 32,
+					"caseType": 0,
+					"randomNumberStart": {
+						"value": 0.0,
+						"type": 0
+					},
+					"randomNumberEnd": {
+						"value": 0.0,
+						"type": 0
+					},
+					"generateInteger": false,
+					"jsonQuery": "",
+					"jsonIndex": {
+						"value": 0,
+						"type": 0
+					},
+					"version": 1
+				},
+				{
+					"segmentSettings": {
+						"collapsed": false,
+						"useCustomLabel": false,
+						"customLabel": "My label",
+						"enabled": true,
+						"version": 1
+					},
+					"id": "source",
+					"source": {
+						"type": 0,
+						"name": "Individual Chat"
+					},
+					"action": 2,
+					"sourceSettingButton": {
+						"id": "",
+						"description": ""
+					},
+					"inputMethod": 0,
+					"sourceSetting": {
+						"id": "window",
+						"type": 6,
+						"description": "Window (List)"
+					},
+					"manualSettingValue": "${Window Capture setting}",
+					"tempVar": {
+						"type": 0,
+						"idx": -1,
+						"id": "",
+						"version": 1
+					},
+					"settings": "",
+					"deinterlaceMode": 0,
+					"deinterlaceOrder": 0,
+					"acceptDialog": false
+				}
+			],
+			"elseActions": [],
+			"inputVariables": []
+		}
+	],
+	"variables": [
+		{
+			"name": "ChatWindowTitle",
+			"saveAction": 0,
+			"defaultValue": ""
+		},
+		{
+			"name": "Window title",
+			"saveAction": 0,
+			"defaultValue": ""
+		},
+		{
+			"name": "Process name",
+			"saveAction": 0,
+			"defaultValue": ""
+		},
+		{
+			"name": "Window Capture setting",
+			"saveAction": 0,
+			"defaultValue": ""
+		},
+		{
+			"name": "Window class",
+			"saveAction": 0,
+			"defaultValue": ""
+		}
+	],
+	"actionQueues": [],
+	"version": "1.32.6"
+}
