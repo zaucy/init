@@ -317,6 +317,17 @@ function Layout:mount()
 			end
 		end,
 	})
+
+	-- Cleanup Autocmd (if any window is closed via :q etc)
+	vim.api.nvim_create_autocmd("WinClosed", {
+		group = self.augroup,
+		pattern = { tostring(self.wins.body), tostring(self.wins.chat_btn), tostring(self.wins.cwd_btn) },
+		callback = function()
+			vim.schedule(function()
+				self:unmount()
+			end)
+		end,
+	})
 end
 
 function Layout:resize()
@@ -358,10 +369,14 @@ function Layout:resize()
 end
 
 function Layout:unmount()
-	for _, win in pairs(self.wins) do
-		if win and vim.api.nvim_win_is_valid(win) then
-			vim.api.nvim_win_close(win, true)
-		end
+	if self.wins.body and vim.api.nvim_win_is_valid(self.wins.body) then
+		vim.api.nvim_win_close(self.wins.body, true)
+	end
+	if self.wins.chat_btn and vim.api.nvim_win_is_valid(self.wins.chat_btn) then
+		vim.api.nvim_win_close(self.wins.chat_btn, true)
+	end
+	if self.wins.cwd_btn and vim.api.nvim_win_is_valid(self.wins.cwd_btn) then
+		vim.api.nvim_win_close(self.wins.cwd_btn, true)
 	end
 	self.wins = { body = nil, chat_btn = nil, cwd_btn = nil }
 	vim.api.nvim_clear_autocmds({ group = self.augroup })
