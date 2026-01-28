@@ -113,12 +113,14 @@ local function ensure_chat_term_buf(tabpage, state)
 	if M._active_tab_index == 1 then
 		vim.api.nvim_win_call(body_win, function()
 			-- Disable fixbuf equivalent if needed, though we manipulate buf directly
+			vim.wo[body_win].winfixbuf = false
 			if M._chat_term_buf and vim.api.nvim_buf_is_valid(M._chat_term_buf) then
 				vim.api.nvim_win_set_buf(body_win, M._chat_term_buf)
 			else
 				create_chat_term_buf()
 				vim.api.nvim_win_set_buf(body_win, M._chat_term_buf)
 			end
+			vim.wo[body_win].winfixbuf = true
 		end)
 		return
 	end
@@ -128,6 +130,7 @@ local function ensure_chat_term_buf(tabpage, state)
 
 	vim.api.nvim_win_call(body_win, function()
 		local term_buf = M._dir_term_bufs[cwd]
+		vim.wo[body_win].winfixbuf = false
 		if term_buf == nil or not vim.api.nvim_buf_is_valid(term_buf) then
 			vim.cmd.terminal(M._opts.terminal_command)
 			term_buf = vim.api.nvim_get_current_buf()
@@ -140,6 +143,7 @@ local function ensure_chat_term_buf(tabpage, state)
 		else
 			vim.api.nvim_win_set_buf(body_win, term_buf)
 		end
+		vim.wo[body_win].winfixbuf = true
 	end)
 end
 
@@ -273,6 +277,7 @@ function Layout:mount()
 	})
 	setup_window_props(self.wins.chat_btn)
 	vim.wo[self.wins.chat_btn].wrap = false
+	vim.wo[self.wins.chat_btn].winfixbuf = true
 
 	-- CWD Button Window
 	-- Shifted by btn1_width + 1 (border)
@@ -289,6 +294,7 @@ function Layout:mount()
 	})
 	setup_window_props(self.wins.cwd_btn)
 	vim.wo[self.wins.cwd_btn].wrap = false
+	vim.wo[self.wins.cwd_btn].winfixbuf = true
 
 	-- Body Window (we don't open with a specific buffer yet, will be set later)
 	-- Use a temp buffer initially
@@ -307,6 +313,7 @@ function Layout:mount()
 	setup_window_props(self.wins.body)
 	vim.api.nvim_set_option_value("winhighlight", "NormalFloat:Normal", { win = self.wins.body })
 	vim.wo[self.wins.body].wrap = false
+	vim.wo[self.wins.body].winfixbuf = true
 
 	-- Resize Autocmd
 	vim.api.nvim_create_autocmd("VimResized", {
