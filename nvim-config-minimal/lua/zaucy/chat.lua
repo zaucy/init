@@ -3,11 +3,9 @@
 --- @field terminal_command string
 
 --- @class chat.ChatTabpageState
---- @field layout snacks.layout|nil
---- @field body snacks.win|nil
+--- @field layout chat.Layout|nil
 --- @field last_focused_win number|nil
---- @field tab_wins snacks.win[]
---- @field loading_win snacks.win|nil
+--- @field loading_win number|nil
 --- @field loading_timer any|nil
 
 local M = {
@@ -35,38 +33,38 @@ local M = {
 	_dir_loading = {},
 }
 
+local ns = vim.api.nvim_create_namespace("ZaucyChatTabs")
+vim.api.nvim_set_hl(ns, "Cursor", { blend = 100 })
+
 --- @param state chat.ChatTabpageState
 local function store_last_focused_win(state)
 	local current_win = vim.api.nvim_get_current_win()
-	if state.layout then
-		for _, win in pairs(state.layout.wins) do
-			if current_win == win then
-				return false
-			end
-		end
+	if state.layout and state.layout:contains_win(current_win) then
+		return false
 	end
 	state.last_focused_win = current_win
 	return true
 end
 
-local ns = vim.api.nvim_create_namespace("ZaucyChatTabs")
-vim.api.nvim_set_hl(ns, "Cursor", { blend = 100 })
-
---- @param win snacks.win
+--- @param win number
 local function setup_window_props(win)
-	assert(win:win_valid())
-	vim.api.nvim_win_set_hl_ns(win.win, ns)
+	if vim.api.nvim_win_is_valid(win) then
+		vim.api.nvim_win_set_hl_ns(win, ns)
+	end
 end
 
 local function update_button_state()
 	for state_index in pairs(M._tabpage_state) do
 		local state = M._tabpage_state[state_index]
-		for i, tab_win in ipairs(state.tab_wins) do
-			if tab_win.buf then
-				vim.api.nvim_buf_clear_namespace(tab_win.buf, ns, 0, -1)
-				if M._active_tab_index == i then
-					for line = 0, vim.api.nvim_buf_line_count(tab_win.buf) - 1 do
-						vim.api.nvim_buf_add_highlight(tab_win.buf, ns, "Visual", line, 0, -1)
+		if state.layout then
+			local tab_bufs = { state.layout.bufs.chat_btn, state.layout.bufs.cwd_btn }
+			for i, buf in ipairs(tab_bufs) do
+				if buf and vim.api.nvim_buf_is_valid(buf) then
+					vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
+					if M._active_tab_index == i then
+						for line = 0, vim.api.nvim_buf_line_count(buf) - 1 do
+							vim.api.nvim_buf_add_highlight(buf, ns, "Visual", line, 0, -1)
+						end
 					end
 				end
 			end
@@ -75,6 +73,9 @@ local function update_button_state()
 end
 
 local function bind_chat_keys(buf)
+	if not buf or not vim.api.nvim_buf_is_valid(buf) then
+		return
+	end
 	vim.keymap.set({ "t", "v", "n" }, "<Tab>", function()
 		M.chat_switch_tab_next()
 	end, { buffer = buf })
@@ -85,7 +86,9 @@ end
 
 local function create_chat_term_buf()
 	local orig_cwd = vim.fn.getcwd(0, 0)
-	vim.cmd.lcd(M._opts.chat_scratch_dir)
+	if M._opts.chat_scratch_dir then
+		vim.cmd.lcd(M._opts.chat_scratch_dir)
+	end
 	vim.cmd.terminal(M._opts.terminal_command)
 	vim.cmd.lcd(orig_cwd)
 
@@ -101,17 +104,21 @@ end
 --- @param state chat.ChatTabpageState
 local function ensure_chat_term_buf(tabpage, state)
 	assert(type(tabpage) == "number")
+	if not state.layout or not state.layout.wins.body or not vim.api.nvim_win_is_valid(state.layout.wins.body) then
+		return
+	end
+
+	local body_win = state.layout.wins.body
+
 	if M._active_tab_index == 1 then
-		vim.api.nvim_win_call(state.body.win, function()
-			state.body.opts.fixbuf = false
+		vim.api.nvim_win_call(body_win, function()
+			-- Disable fixbuf equivalent if needed, though we manipulate buf directly
 			if M._chat_term_buf and vim.api.nvim_buf_is_valid(M._chat_term_buf) then
-				vim.api.nvim_win_set_buf(state.body.win, M._chat_term_buf)
+				vim.api.nvim_win_set_buf(body_win, M._chat_term_buf)
 			else
 				create_chat_term_buf()
+				vim.api.nvim_win_set_buf(body_win, M._chat_term_buf)
 			end
-			state.body.opts.buf = M._chat_term_buf
-			state.body.opts.fixbuf = true
-			state.body:update()
 		end)
 		return
 	end
@@ -119,9 +126,8 @@ local function ensure_chat_term_buf(tabpage, state)
 	local cwd = vim.fn.getcwd(-1, tabpage)
 	cwd = cwd:gsub("\\", "/")
 
-	vim.api.nvim_win_call(state.body.win, function()
+	vim.api.nvim_win_call(body_win, function()
 		local term_buf = M._dir_term_bufs[cwd]
-		state.body.opts.fixbuf = false
 		if term_buf == nil or not vim.api.nvim_buf_is_valid(term_buf) then
 			vim.cmd.terminal(M._opts.terminal_command)
 			term_buf = vim.api.nvim_get_current_buf()
@@ -132,14 +138,243 @@ local function ensure_chat_term_buf(tabpage, state)
 				data = { terminal_bufnr = term_buf },
 			})
 		else
-			vim.api.nvim_win_set_buf(state.body.win, term_buf)
+			vim.api.nvim_win_set_buf(body_win, term_buf)
 		end
-
-		state.body.opts.buf = term_buf
-		state.body.opts.fixbuf = true
-		state.body:update()
 	end)
 end
+
+-- #region Layout Implementation
+
+--- @class chat.Layout
+--- @field wins { body: number|nil, chat_btn: number|nil, cwd_btn: number|nil }
+--- @field bufs { chat_btn: number|nil, cwd_btn: number|nil }
+--- @field opts table
+local Layout = {}
+Layout.__index = Layout
+
+function Layout.new()
+	local self = setmetatable({}, Layout)
+	self.wins = {
+		body = nil,
+		chat_btn = nil,
+		cwd_btn = nil,
+	}
+	self.bufs = {
+		chat_btn = nil,
+		cwd_btn = nil,
+	}
+	self.augroup = vim.api.nvim_create_augroup("ZaucyChatLayout", { clear = true })
+	return self
+end
+
+function Layout:get_geometry()
+	local editor_width = vim.o.columns
+	local editor_height = vim.o.lines
+	local width = math.floor(editor_width * 0.4)
+	if width < 90 then
+		width = 90
+	end
+	if width > editor_width then
+		width = editor_width
+	end
+
+	local col = editor_width - width
+	-- Full height usually implies avoiding cmdline, but let's try to match full editor
+	-- Snacks used 0.999999 height, essentially full screen.
+	local height = editor_height
+
+	return {
+		col = col,
+		row = 0,
+		width = width,
+		height = height,
+	}
+end
+
+function Layout:update_text()
+	if self.bufs.chat_btn and vim.api.nvim_buf_is_valid(self.bufs.chat_btn) then
+		local lines = {
+			"            ",
+			"  󰚩 󰭹 chat  ",
+			"            ",
+		}
+		vim.api.nvim_set_option_value("modifiable", true, { buf = self.bufs.chat_btn })
+		vim.api.nvim_buf_set_lines(self.bufs.chat_btn, 0, -1, false, lines)
+		vim.api.nvim_set_option_value("modifiable", false, { buf = self.bufs.chat_btn })
+	end
+
+	if self.bufs.cwd_btn and vim.api.nvim_buf_is_valid(self.bufs.cwd_btn) then
+		local cwd = vim.fn.getcwd()
+		cwd = cwd:gsub("\\", "/")
+		local full_ws = (" "):rep(#cwd)
+		local padding = "  "
+		local lines = {
+			padding .. full_ws .. padding,
+			padding .. cwd .. padding,
+			padding .. full_ws .. padding,
+		}
+		vim.api.nvim_set_option_value("modifiable", true, { buf = self.bufs.cwd_btn })
+		vim.api.nvim_buf_set_lines(self.bufs.cwd_btn, 0, -1, false, lines)
+		vim.api.nvim_set_option_value("modifiable", false, { buf = self.bufs.cwd_btn })
+	end
+end
+
+function Layout:mount()
+	if self:valid() then
+		return
+	end
+
+	local geo = self:get_geometry()
+	local header_height = 3
+	local btn1_width = 14
+
+	-- Create Buffers if needed
+	if not self.bufs.chat_btn or not vim.api.nvim_buf_is_valid(self.bufs.chat_btn) then
+		self.bufs.chat_btn = vim.api.nvim_create_buf(false, true)
+		bind_chat_keys(self.bufs.chat_btn)
+	end
+	if not self.bufs.cwd_btn or not vim.api.nvim_buf_is_valid(self.bufs.cwd_btn) then
+		self.bufs.cwd_btn = vim.api.nvim_create_buf(false, true)
+		bind_chat_keys(self.bufs.cwd_btn)
+	end
+
+	-- Update Text
+	self:update_text()
+	update_button_state()
+
+	-- Chat Button Window
+	self.wins.chat_btn = vim.api.nvim_open_win(self.bufs.chat_btn, false, {
+		relative = "editor",
+		row = geo.row,
+		col = geo.col,
+		width = btn1_width,
+		height = header_height,
+		style = "minimal",
+		border = "none",
+		focusable = false,
+		zindex = 50,
+	})
+	setup_window_props(self.wins.chat_btn)
+
+	-- CWD Button Window
+	self.wins.cwd_btn = vim.api.nvim_open_win(self.bufs.cwd_btn, false, {
+		relative = "editor",
+		row = geo.row,
+		col = geo.col + btn1_width, -- Simply adjacent
+		width = math.max(1, geo.width - btn1_width),
+		height = header_height,
+		style = "minimal",
+		border = "none",
+		focusable = false,
+		zindex = 50,
+	})
+	setup_window_props(self.wins.cwd_btn)
+
+	-- Body Window (we don't open with a specific buffer yet, will be set later)
+	-- Use a temp buffer initially
+	local body_buf = vim.api.nvim_create_buf(false, true)
+	self.wins.body = vim.api.nvim_open_win(body_buf, true, {
+		relative = "editor",
+		row = geo.row + header_height,
+		col = geo.col,
+		width = geo.width,
+		height = math.max(1, geo.height - header_height),
+		style = "minimal",
+		border = "none", -- Snacks had "left" border on layout, but individual windows were none?
+		-- We can add a border window if strict fidelity is needed, but 'none' is safe.
+		-- To simulate the 'left' border of the layout, we might need a container or just border the windows.
+		-- For now, let's stick to minimal.
+		focusable = true,
+		zindex = 50,
+	})
+	setup_window_props(self.wins.body)
+	vim.api.nvim_set_option_value("winhighlight", "NormalFloat:Normal", { win = self.wins.body })
+
+	-- Resize Autocmd
+	vim.api.nvim_create_autocmd("VimResized", {
+		group = self.augroup,
+		callback = function()
+			if self:valid() then
+				self:resize()
+			end
+		end,
+	})
+end
+
+function Layout:resize()
+	local geo = self:get_geometry()
+	local header_height = 3
+	local btn1_width = 14
+
+	if self.wins.chat_btn and vim.api.nvim_win_is_valid(self.wins.chat_btn) then
+		vim.api.nvim_win_set_config(self.wins.chat_btn, {
+			relative = "editor",
+			row = geo.row,
+			col = geo.col,
+			width = btn1_width,
+			height = header_height,
+		})
+	end
+
+	if self.wins.cwd_btn and vim.api.nvim_win_is_valid(self.wins.cwd_btn) then
+		vim.api.nvim_win_set_config(self.wins.cwd_btn, {
+			relative = "editor",
+			row = geo.row,
+			col = geo.col + btn1_width,
+			width = math.max(1, geo.width - btn1_width),
+			height = header_height,
+		})
+	end
+
+	if self.wins.body and vim.api.nvim_win_is_valid(self.wins.body) then
+		vim.api.nvim_win_set_config(self.wins.body, {
+			relative = "editor",
+			row = geo.row + header_height,
+			col = geo.col,
+			width = geo.width,
+			height = math.max(1, geo.height - header_height),
+		})
+	end
+end
+
+function Layout:unmount()
+	for _, win in pairs(self.wins) do
+		if win and vim.api.nvim_win_is_valid(win) then
+			vim.api.nvim_win_close(win, true)
+		end
+	end
+	self.wins = { body = nil, chat_btn = nil, cwd_btn = nil }
+	vim.api.nvim_clear_autocmds({ group = self.augroup })
+end
+
+function Layout:valid()
+	return self.wins.body and vim.api.nvim_win_is_valid(self.wins.body)
+end
+
+function Layout:contains_win(win)
+	for _, w in pairs(self.wins) do
+		if w == win then
+			return true
+		end
+	end
+	return false
+end
+
+function Layout:get_wins()
+	local wins = {}
+	if self.wins.body then
+		table.insert(wins, self.wins.body)
+	end
+	if self.wins.chat_btn then
+		table.insert(wins, self.wins.chat_btn)
+	end
+	if self.wins.cwd_btn then
+		table.insert(wins, self.wins.cwd_btn)
+	end
+	return wins
+end
+
+-- #endregion
 
 --- @return chat.ChatTabpageState
 local function ensure_layout()
@@ -152,109 +387,18 @@ local function ensure_layout()
 
 	state = {
 		layout = nil,
-		body = nil,
 		last_focused_win = nil,
-		tab_wins = {},
+		loading_win = nil,
 	}
 	M._tabpage_state[tabpage] = state
 
 	store_last_focused_win(state)
 
-	local snacks = require("snacks")
+	state.layout = Layout.new()
+	state.layout:mount()
 
-	state.body = snacks.win({
-		fixbuf = true,
-		backdrop = false,
-		on_win = setup_window_props,
-	})
-
-	state.tab_wins[1] = snacks.win({
-		text = {
-			"            ",
-			"  󰚩 󰭹 chat  ",
-			"            ",
-		},
-		width = 14,
-		backdrop = false,
-		border = "none",
-		on_win = setup_window_props,
-		on_buf = function(win)
-			bind_chat_keys(win.buf)
-			update_button_state()
-			M._update_loading_overlay()
-		end,
-	})
-
-	state.tab_wins[2] = snacks.win({
-		text = function()
-			local cwd = vim.fn.getcwd()
-			cwd = cwd:gsub("\\", "/")
-			local full_ws = (" "):rep(#cwd)
-			local padding = "  "
-			return {
-				padding .. full_ws .. padding,
-				padding .. cwd .. padding,
-				padding .. full_ws .. padding,
-			}
-		end,
-		backdrop = false,
-		border = "none",
-		on_win = setup_window_props,
-		on_buf = function(win)
-			bind_chat_keys(win.buf)
-			update_button_state()
-			M._update_loading_overlay()
-		end,
-	})
-
-	state.layout = snacks.layout.new({
-		layout = {
-			position = "float",
-			col = 0.99999,
-			box = "vertical",
-			min_width = 90,
-			width = 0.4,
-			height = 0.999999,
-			backdrop = false,
-			border = "left",
-			resize = true,
-			wo = {
-				signcolumn = "no",
-				wrap = false,
-			},
-			{
-				box = "horizontal",
-				min_height = 3,
-				max_height = 3,
-				height = 3,
-				fixed = true,
-				{
-					win = "chat_btn",
-					width = 14,
-				},
-				{
-					win = "cwd_btn",
-				},
-			},
-			{ win = "body" },
-		},
-		wins = {
-			body = state.body,
-			chat_btn = state.tab_wins[1],
-			cwd_btn = state.tab_wins[2],
-		},
-	})
-
-	state.body:focus()
-	state.body.opts.fixbuf = false
-	if M._chat_term_buf and vim.api.nvim_buf_is_valid(M._chat_term_buf) then
-		vim.api.nvim_win_set_buf(state.body.win, M._chat_term_buf)
-	else
-		create_chat_term_buf()
-	end
-	state.body.opts.buf = M._chat_term_buf
-	state.body.opts.fixbuf = true
-	state.body:update()
+	-- Initialize content
+	ensure_chat_term_buf(tabpage, state)
 
 	vim.cmd.startinsert()
 	M._update_loading_overlay()
@@ -276,15 +420,18 @@ end
 
 --- @param state chat.ChatTabpageState
 local function _show_loading_overlay(state)
-	if state.loading_win and state.loading_win:valid() then
+	if state.loading_win and vim.api.nvim_win_is_valid(state.loading_win) then
 		return
 	end
 
-	local snacks = require("snacks")
+	if not state.layout or not state.layout.wins.body or not vim.api.nvim_win_is_valid(state.layout.wins.body) then
+		return
+	end
+
+	local body_win = state.layout.wins.body
 	local frames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
 	local frame_idx = 1
 
-	local body_win = state.body.win
 	local config = vim.api.nvim_win_get_config(body_win)
 
 	local function get_spinner_text()
@@ -308,23 +455,23 @@ local function _show_loading_overlay(state)
 		return lines
 	end
 
-	state.loading_win = snacks.win({
-		relative = config.relative,
-		win = config.win,
-		row = config.row,
-		col = config.col,
+	local buf = vim.api.nvim_create_buf(false, true)
+	local win = vim.api.nvim_open_win(buf, false, {
+		relative = "win",
+		win = body_win,
+		row = 0,
+		col = 0,
 		width = config.width,
 		height = config.height,
 		zindex = (config.zindex or 50) + 10,
 		style = "minimal",
 		border = "none",
 		focusable = false,
-		backdrop = false,
-		text = get_spinner_text,
 	})
+	state.loading_win = win
 
-	vim.api.nvim_win_set_option(state.loading_win.win, "winblend", 80)
-	vim.api.nvim_win_set_hl_ns(state.loading_win.win, ns)
+	vim.api.nvim_win_set_option(win, "winblend", 80)
+	setup_window_props(win)
 
 	local uv = vim.uv or vim.loop
 	state.loading_timer = uv.new_timer()
@@ -332,35 +479,26 @@ local function _show_loading_overlay(state)
 		0,
 		80,
 		vim.schedule_wrap(function()
-			if state.loading_win and state.loading_win:valid() then
+			if state.loading_win and vim.api.nvim_win_is_valid(state.loading_win) then
 				if vim.api.nvim_win_is_valid(body_win) then
 					local new_config = vim.api.nvim_win_get_config(body_win)
-					if
-						new_config.row ~= config.row
-						or new_config.col ~= config.col
-						or new_config.width ~= config.width
-						or new_config.height ~= config.height
-					then
+					local my_config = vim.api.nvim_win_get_config(state.loading_win)
+
+					-- Update size if body changed
+					if new_config.width ~= my_config.width or new_config.height ~= my_config.height then
 						config = new_config
-						vim.api.nvim_win_set_config(state.loading_win.win, {
-							relative = config.relative,
-							win = config.win,
-							row = config.row,
-							col = config.col,
-							width = config.width,
-							height = config.height,
+						vim.api.nvim_win_set_config(state.loading_win, {
+							width = new_config.width,
+							height = new_config.height,
 						})
 					end
 
 					local lines = get_spinner_text()
-					local buf = state.loading_win.buf
 					if buf and vim.api.nvim_buf_is_valid(buf) then
 						vim.api.nvim_set_option_value("modifiable", true, { buf = buf })
 						vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 						vim.api.nvim_set_option_value("modifiable", false, { buf = buf })
 					end
-
-					state.loading_win:update()
 				else
 					M._update_loading_overlay()
 				end
@@ -380,7 +518,9 @@ local function _hide_loading_overlay(state)
 	end
 
 	if state.loading_win then
-		state.loading_win:close()
+		if vim.api.nvim_win_is_valid(state.loading_win) then
+			vim.api.nvim_win_close(state.loading_win, true)
+		end
 		state.loading_win = nil
 	end
 end
@@ -391,7 +531,7 @@ function M._update_loading_overlay()
 	end
 
 	local state = get_layout_state()
-	if not state or not state.body or not state.body.win or not vim.api.nvim_win_is_valid(state.body.win) then
+	if not state or not state.layout then
 		return
 	end
 
@@ -431,17 +571,19 @@ end
 
 function M.chat_show()
 	local state = ensure_layout()
-	state.layout:unhide()
-	state.body:focus()
-	vim.cmd.startinsert()
-	M._update_loading_overlay()
+	-- ensure_layout mounts the layout, which effectively "unhides" it
+	if state.layout and state.layout.wins.body and vim.api.nvim_win_is_valid(state.layout.wins.body) then
+		vim.api.nvim_set_current_win(state.layout.wins.body)
+		vim.cmd.startinsert()
+		M._update_loading_overlay()
+	end
 end
 
 function M.chat_hide()
 	local state = get_layout_state()
 	if state then
 		if state.layout then
-			state.layout:hide()
+			state.layout:unmount()
 			M.chat_defocus()
 			_hide_loading_overlay(state)
 		end
@@ -450,42 +592,20 @@ end
 
 function M.chat_is_visible()
 	local state = get_layout_state()
-	if not state then
+	if not state or not state.layout then
 		return false
 	end
-
-	---@diagnostic disable-next-line: invisible
-	for _, win in ipairs(state.layout:get_wins()) do
-		if win:valid() then
-			local win_config = vim.api.nvim_win_get_config(win.win)
-			-- there doesn't seem to be a "is visible" check on snacks layouts. we assume if any of the layout windows are not hidden then the layout is not hidden
-			if not win_config.hide then
-				return true
-			end
-		end
-	end
-
-	return false
+	return state.layout:valid()
 end
 
 function M.chat_is_focused()
 	local state = get_layout_state()
-	if not state then
+	if not state or not state.layout then
 		return false
 	end
 
 	local cursor_win = vim.api.nvim_get_current_win()
-
-	---@diagnostic disable-next-line: invisible
-	for _, win in ipairs(state.layout:get_wins()) do
-		if win:valid() then
-			if win.win == cursor_win then
-				return true
-			end
-		end
-	end
-
-	return false
+	return state.layout:contains_win(cursor_win)
 end
 
 function M.chat_toggle()
@@ -511,8 +631,10 @@ function M.chat_focus()
 			store_last_focused_win(state)
 		end
 
-		state.body:focus()
-		vim.cmd.startinsert()
+		if state.layout and state.layout.wins.body then
+			vim.api.nvim_set_current_win(state.layout.wins.body)
+			vim.cmd.startinsert()
+		end
 	end
 end
 
@@ -522,6 +644,7 @@ function M.chat_defocus()
 		return
 	end
 
+	-- Only refocus if we are currently in the chat
 	if not M.chat_is_focused() then
 		return
 	end
@@ -529,16 +652,13 @@ function M.chat_defocus()
 	if state.last_focused_win ~= nil and vim.api.nvim_win_is_valid(state.last_focused_win) then
 		vim.api.nvim_set_current_win(state.last_focused_win)
 	else
+		-- Fallback: find any non-chat window
 		local all_wins = vim.api.nvim_tabpage_list_wins(0)
 		for _, win in ipairs(all_wins) do
-			if state.layout then
-				for _, layout_win in pairs(state.layout.wins) do
-					if layout_win ~= win then
-						state.last_focused_win = win
-						vim.api.nvim_set_current_win(state.last_focused_win)
-						return
-					end
-				end
+			if state.layout and not state.layout:contains_win(win) then
+				state.last_focused_win = win
+				vim.api.nvim_set_current_win(win)
+				return
 			end
 		end
 	end
@@ -547,15 +667,18 @@ end
 --- @param index number
 function M.chat_switch_tab(index)
 	assert(type(index) == "number")
+	-- Ensure layout exists and is valid
 	local state = ensure_layout()
+
+	-- We have 2 "tabs" in the UI (buttons)
+	local num_tabs = 2
+
 	index = math.floor(index)
-	index = ((index - 1) % #state.tab_wins) + 1
-	assert(index > 0, "invalid tab index " .. tostring(index))
-	assert(index <= #state.tab_wins, "invalid tab index " .. tostring(index))
+	index = ((index - 1) % num_tabs) + 1
 	M._active_tab_index = index
 	update_button_state()
 
-	for tabpage, other_state in ipairs(M._tabpage_state) do
+	for tabpage, other_state in pairs(M._tabpage_state) do
 		ensure_chat_term_buf(tabpage, other_state)
 	end
 	M._update_loading_overlay()
