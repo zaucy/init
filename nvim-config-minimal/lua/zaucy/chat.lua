@@ -192,11 +192,20 @@ function Layout:get_geometry()
 end
 
 function Layout:update_text()
+	local geo = self:get_geometry()
+	local btn1_width = 13
+	local cwd_btn_width = math.max(1, geo.width - (btn1_width + 1))
+
 	if self.bufs.chat_btn and vim.api.nvim_buf_is_valid(self.bufs.chat_btn) then
+		-- Width 14.
+		-- Center line: "  󰚩 󰭹 chat  "
+		-- We assume this fits visually. To ensure background fill, we rely on the highlight covering the text.
+		-- If the window is 14 wide and text is shorter, we need padding.
+		-- Let's explicitly use a fixed width string if possible, or just ample spaces.
 		local lines = {
-			"            ",
-			"  󰚩 󰭹 chat  ",
-			"            ",
+			string.rep(" ", btn1_width),
+			"  󰚩 󰭹 chat   ",
+			string.rep(" ", btn1_width),
 		}
 		vim.api.nvim_set_option_value("modifiable", true, { buf = self.bufs.chat_btn })
 		vim.api.nvim_buf_set_lines(self.bufs.chat_btn, 0, -1, false, lines)
@@ -206,12 +215,20 @@ function Layout:update_text()
 	if self.bufs.cwd_btn and vim.api.nvim_buf_is_valid(self.bufs.cwd_btn) then
 		local cwd = vim.fn.getcwd()
 		cwd = cwd:gsub("\\", "/")
-		local full_ws = (" "):rep(#cwd)
-		local padding = "  "
+
+		-- Center cwd in cwd_btn_width
+		local text_len = #cwd
+		local padding_total = math.max(0, cwd_btn_width - text_len)
+		local pad_left = math.floor(padding_total / 2)
+		local pad_right = padding_total - pad_left
+
+		local line_text = string.rep(" ", pad_left) .. cwd .. string.rep(" ", pad_right)
+		local empty_line = string.rep(" ", cwd_btn_width)
+
 		local lines = {
-			padding .. full_ws .. padding,
-			padding .. cwd .. padding,
-			padding .. full_ws .. padding,
+			empty_line,
+			line_text,
+			empty_line,
 		}
 		vim.api.nvim_set_option_value("modifiable", true, { buf = self.bufs.cwd_btn })
 		vim.api.nvim_buf_set_lines(self.bufs.cwd_btn, 0, -1, false, lines)
@@ -226,7 +243,7 @@ function Layout:mount()
 
 	local geo = self:get_geometry()
 	local header_height = 3
-	local btn1_width = 14
+	local btn1_width = 13
 
 	-- Create Buffers if needed
 	if not self.bufs.chat_btn or not vim.api.nvim_buf_is_valid(self.bufs.chat_btn) then
@@ -250,18 +267,20 @@ function Layout:mount()
 		width = btn1_width,
 		height = header_height,
 		style = "minimal",
-		border = "none",
+		border = { "", "", "", "", "", "", "", "│" },
 		focusable = false,
 		zindex = 50,
 	})
 	setup_window_props(self.wins.chat_btn)
+	vim.wo[self.wins.chat_btn].wrap = false
 
 	-- CWD Button Window
+	-- Shifted by btn1_width + 1 (border)
 	self.wins.cwd_btn = vim.api.nvim_open_win(self.bufs.cwd_btn, false, {
 		relative = "editor",
 		row = geo.row,
-		col = geo.col + btn1_width, -- Simply adjacent
-		width = math.max(1, geo.width - btn1_width),
+		col = geo.col + btn1_width + 1,
+		width = math.max(1, geo.width - (btn1_width + 1)),
 		height = header_height,
 		style = "minimal",
 		border = "none",
@@ -269,26 +288,25 @@ function Layout:mount()
 		zindex = 50,
 	})
 	setup_window_props(self.wins.cwd_btn)
+	vim.wo[self.wins.cwd_btn].wrap = false
 
 	-- Body Window (we don't open with a specific buffer yet, will be set later)
 	-- Use a temp buffer initially
 	local body_buf = vim.api.nvim_create_buf(false, true)
 	self.wins.body = vim.api.nvim_open_win(body_buf, true, {
 		relative = "editor",
-		row = geo.row + header_height,
+		row = geo.row + header_height + 1,
 		col = geo.col,
-		width = geo.width,
-		height = math.max(1, geo.height - header_height),
+		width = math.max(1, geo.width - 1),
+		height = math.max(1, geo.height - header_height - 1),
 		style = "minimal",
-		border = "none", -- Snacks had "left" border on layout, but individual windows were none?
-		-- We can add a border window if strict fidelity is needed, but 'none' is safe.
-		-- To simulate the 'left' border of the layout, we might need a container or just border the windows.
-		-- For now, let's stick to minimal.
+		border = { "", "", "", "", "", "", "", "│" },
 		focusable = true,
 		zindex = 50,
 	})
 	setup_window_props(self.wins.body)
 	vim.api.nvim_set_option_value("winhighlight", "NormalFloat:Normal", { win = self.wins.body })
+	vim.wo[self.wins.body].wrap = false
 
 	-- Resize Autocmd
 	vim.api.nvim_create_autocmd("VimResized", {
@@ -304,7 +322,7 @@ end
 function Layout:resize()
 	local geo = self:get_geometry()
 	local header_height = 3
-	local btn1_width = 14
+	local btn1_width = 13
 
 	if self.wins.chat_btn and vim.api.nvim_win_is_valid(self.wins.chat_btn) then
 		vim.api.nvim_win_set_config(self.wins.chat_btn, {
@@ -320,8 +338,8 @@ function Layout:resize()
 		vim.api.nvim_win_set_config(self.wins.cwd_btn, {
 			relative = "editor",
 			row = geo.row,
-			col = geo.col + btn1_width,
-			width = math.max(1, geo.width - btn1_width),
+			col = geo.col + btn1_width + 1,
+			width = math.max(1, geo.width - (btn1_width + 1)),
 			height = header_height,
 		})
 	end
@@ -329,12 +347,14 @@ function Layout:resize()
 	if self.wins.body and vim.api.nvim_win_is_valid(self.wins.body) then
 		vim.api.nvim_win_set_config(self.wins.body, {
 			relative = "editor",
-			row = geo.row + header_height,
+			row = geo.row + header_height + 1,
 			col = geo.col,
-			width = geo.width,
-			height = math.max(1, geo.height - header_height),
+			width = math.max(1, geo.width - 1),
+			height = math.max(1, geo.height - header_height - 1),
 		})
 	end
+
+	self:update_text()
 end
 
 function Layout:unmount()
