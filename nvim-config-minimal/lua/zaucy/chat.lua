@@ -59,7 +59,7 @@ local function setup_window_props(win)
 end
 
 local function update_button_state()
-	for state_index in ipairs(M._tabpage_state) do
+	for state_index in pairs(M._tabpage_state) do
 		local state = M._tabpage_state[state_index]
 		for i, tab_win in ipairs(state.tab_wins) do
 			if tab_win.buf then

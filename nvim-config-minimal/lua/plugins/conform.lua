@@ -27,7 +27,7 @@ return {
 					if vim.fs.basename(root) == "ecsact_unity" then
 						return { "clang-format" }
 					end
-					return nil
+					return {}
 				end,
 				shaderslang = { "clang-format" },
 				starlark = { "buildifier" },
