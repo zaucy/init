@@ -288,10 +288,9 @@ vim.keymap.set(
 	{ "n" },
 	"grs",
 	function()
-		require('zaucy.lsp').dynamic_workspace_symbols({
-			default_text = vim.fn.expand("<cword>"),
-			theme = "ivy",
-		})
+		local word =  vim.fn.expand("<cword>")
+		require('zaucy.lsp').dynamic_workspace_symbols({ theme = "ivy", })
+		vim.api.nvim_feedkeys(word, "n", false)
 	end,
 	{ desc = "Workspace symbols" }
 )
@@ -300,10 +299,9 @@ vim.keymap.set(
 	{ "n" },
 	"gr/",
 	function()
-		require('telescope.builtin').live_grep({
-			default_text = vim.fn.expand("<cword>"),
-			theme = "ivy",
-		})
+		local word =  vim.fn.expand("<cword>")
+		require('telescope.builtin').live_grep({theme = "ivy"})
+		vim.api.nvim_feedkeys(word, "n", false)
 	end,
 	{ desc = "Workspace symbols" }
 )

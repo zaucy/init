@@ -1,13 +1,13 @@
-local utils = require('telescope.utils')
-local protocol = require('vim.lsp.protocol')
-local entry_display = require('telescope.pickers.entry_display')
-local pickers = require('telescope.pickers')
-local finders = require('telescope.finders')
+local utils = require("telescope.utils")
+local protocol = require("vim.lsp.protocol")
+local entry_display = require("telescope.pickers.entry_display")
+local pickers = require("telescope.pickers")
+local finders = require("telescope.finders")
 local channel = require("plenary.async.control").channel
 local sorters = require("telescope.sorters")
 local conf = require("telescope.config").values
-local actions = require('telescope.actions')
-local themes = require('telescope.themes')
+local actions = require("telescope.actions")
+local themes = require("telescope.themes")
 
 local get_filename_fn = function()
 	local bufnr_name_cache = {}
@@ -45,9 +45,9 @@ local symbol_table = {
 	["namespace"] = { "", "@namespace" },
 	["null"] = "󰟢",
 	["number"] = { "", "@number" },
-	["object"] = { "", },
+	["object"] = { "" },
 	["operator"] = { "", "@lsp.type.operator" },
-	["package"] = { "", "@namespace", },
+	["package"] = { "", "@namespace" },
 	["property"] = { "", "@property" },
 	["string"] = { "", "@string" },
 	["struct"] = { "", "@lsp.type.struct" },
@@ -75,7 +75,7 @@ local function workspace_symbols_to_items(symbols, bufnr)
 		end
 
 		if filename and pos then
-			local kind = protocol.SymbolKind[symbol.kind] or 'Unknown'
+			local kind = protocol.SymbolKind[symbol.kind] or "Unknown"
 			local full_symbol_name = symbol.name
 			if symbol.containerName and #symbol.containerName > 0 then
 				full_symbol_name = symbol.containerName .. "::" .. full_symbol_name
@@ -85,7 +85,7 @@ local function workspace_symbols_to_items(symbols, bufnr)
 				lnum = pos.line + 1,
 				col = pos.character + 1,
 				kind = kind,
-				text = '[' .. kind .. '] ' .. full_symbol_name,
+				text = "[" .. kind .. "] " .. full_symbol_name,
 			}
 		end
 
@@ -168,24 +168,24 @@ function M.make_entry_symbols(opts)
 		{ remaining = true },
 	}
 
-	local displayer = entry_display.create {
+	local displayer = entry_display.create({
 		separator = " ",
 		hl_chars = { ["["] = "TelescopeBorder", ["]"] = "TelescopeBorder" },
 		items = display_items,
-	}
+	})
 
 	local make_display = function(entry)
-		return displayer {
+		return displayer({
 			symbol_table[entry.symbol_type:lower()] or "󱔁",
 			entry.symbol_name,
-		}
+		})
 	end
 
 	local get_filename = get_filename_fn()
 	return function(entry)
 		local filename = vim.F.if_nil(entry.filename, get_filename(entry.bufnr))
 		local symbol_msg = entry.text
-		local symbol_type, symbol_name = symbol_msg:match "%[(.+)%]%s+(.*)"
+		local symbol_type, symbol_name = symbol_msg:match("%[(.+)%]%s+(.*)")
 		symbol_type = symbol_type:lower() or "unknown"
 		local ordinal = symbol_name .. " " .. symbol_type
 		return {
@@ -204,21 +204,24 @@ end
 
 function M.dynamic_workspace_symbols(opts)
 	local bufnr = opts.bufnr or vim.api.nvim_get_current_buf()
-	pickers
-		.new(opts, themes.get_ivy({
+	local picker = pickers.new(
+		opts,
+		themes.get_ivy({
 			prompt_title = "Workspace Symbols",
-			finder = finders.new_dynamic {
+			finder = finders.new_dynamic({
 				entry_maker = M.make_entry_symbols(opts),
 				fn = get_workspace_symbols_requester(bufnr, opts),
-			},
+			}),
 			previewer = conf.qflist_previewer(opts),
 			sorter = sorters.highlighter_only(opts),
 			attach_mappings = function(_, map)
 				map("i", "<c-space>", actions.to_fuzzy_refine)
 				return true
 			end,
-		}))
-		:find()
+		})
+	)
+
+	picker:find()
 end
 
 return M
