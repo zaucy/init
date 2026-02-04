@@ -177,6 +177,15 @@ vim.filetype.add({
 	},
 })
 
+vim.api.nvim_create_autocmd("User", {
+	pattern = "UprojectBufferCreated",
+	callback = function(ev)
+		local bufnr = ev.data.bufnr
+		local type = ev.data.type
+		vim.keymap.set("n", "<C-c>", "<cmd>Uproject cancel<cr>", { buffer = bufnr })
+	end,
+})
+
 return {
 	{
 		"lewis6991/async.nvim",
