@@ -186,6 +186,25 @@ vim.api.nvim_create_autocmd("User", {
 	end,
 })
 
+local last_exec_cmds = ""
+
+local function uproject_play_with_last_exec_cmds()
+	local async = require("async")
+	async.run(function()
+		require("uproject").uproject_play(vim.fn.getcwd(), {
+			log_cmds = "Log Log",
+			exec_cmds = last_exec_cmds,
+		})
+	end)
+end
+
+local function uproject_play_with_exec_cmds_prompt()
+	vim.ui.input({ prompt = "ExecCmds", default = last_exec_cmds }, function(exec_cmds)
+		last_exec_cmds = exec_cmds
+		uproject_play_with_last_exec_cmds()
+	end)
+end
+
 return {
 	{
 		"lewis6991/async.nvim",
@@ -210,12 +229,6 @@ return {
 				desc = "Build and open Unreal Editor",
 			},
 			{ "<leader>uR", "<cmd>Uproject reload show_output<cr>", desc = "Reload uproject" },
-			{ "<leader>up", "<cmd>Uproject play log_cmds=Log\\ Log<cr>", desc = "Play game" },
-			{
-				"<leader>uP",
-				"<cmd>Uproject build use_precompiled play log_cmds=Log\\ Log<cr>",
-				desc = "Build and play game",
-			},
 			{ "<leader>uC", "<cmd>Uproject clean <cr>", desc = "Clean" },
 			{ "<leader>uL", "<cmd>Uproject unlock_build_dirs <cr>", desc = "Unlock build dirs" },
 			{
@@ -226,6 +239,9 @@ return {
 			{ "<leader>udp", "<cmd>Uproject play debug<cr>", desc = "Play game (debug)" },
 
 			{ "<leader>uS", "<cmd>Uproject submit<cr>", desc = "Unreal submit tool" },
+
+			{ "<leader>uP", desc = "Play", uproject_play_with_exec_cmds_prompt },
+			{ "<leader>up", desc = "Play (with last exec cmds)", uproject_play_with_last_exec_cmds },
 
 			{
 				"<leader>uB",
