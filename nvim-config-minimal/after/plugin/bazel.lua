@@ -94,6 +94,7 @@ vim.api.nvim_create_user_command("BazelDebugAttachWait", bazel_debug_attach, {})
 
 local bazel_group = vim.api.nvim_create_augroup("BazelRefresh", { clear = true })
 local refresh_timer
+local bazel_refresh_handle
 
 vim.api.nvim_create_autocmd("BufWritePre", {
 	group = bazel_group,
@@ -158,9 +159,11 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 				local stdout = vim.uv.new_pipe(false)
 				assert(stdout)
 
-				local handle
+				if bazel_refresh_handle and not bazel_refresh_handle:is_closing() then
+					bazel_refresh_handle:kill("sigterm")
+				end
 
-				handle = vim.uv.spawn("bazel", {
+				bazel_refresh_handle = vim.uv.spawn("bazel", {
 					args = { "run", "//bazel/dev:refresh_compile_commands" },
 					cwd = vim.uv.cwd(),
 					stdio = { nil, stdout, nil },
@@ -169,8 +172,8 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 
 					stdout:close()
 
-					if handle then
-						handle:close()
+					if bazel_refresh_handle then
+						bazel_refresh_handle:close()
 					end
 
 					vim.schedule(function()
