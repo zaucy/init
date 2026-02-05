@@ -10,6 +10,15 @@ vim.opt.guifont = "FiraCode Nerd Font"
 vim.opt.colorcolumn = {}
 vim.opt.swapfile = false
 vim.opt.shadafile = "NONE" -- shadafiles are annoying and I never find them useful
+vim.opt.undofile = true
+vim.opt.undodir = vim.fn.stdpath("data") .. "/undo//"
+vim.opt.backup = true
+vim.opt.backupdir = vim.fn.stdpath("data") .. "/backup//"
+
+vim.schedule(function()
+	vim.cmd("packadd nvim.undotree")
+	vim.cmd("packadd nvim.difftool")
+end)
 
 vim.opt.sessionoptions:append("globals")
 
