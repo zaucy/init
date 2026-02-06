@@ -16,6 +16,9 @@ local telescope_opts = {
 					local multibuffer = require("multibuffer")
 					local picker = action_state.get_current_picker(prompt_bufnr)
 					local selections = {}
+					local prompt_text = action_state.get_current_line()
+					local selected_entry = action_state.get_selected_entry()
+
 					for entry in picker.manager:iter() do
 						local bufnr = entry.bufnr
 						if bufnr == nil then
@@ -30,7 +33,10 @@ local telescope_opts = {
 					end
 					actions.close(prompt_bufnr)
 
-					local multibuf = multibuffer.create_multibuf()
+					local header = { " " .. picker.prompt_title .. ": " .. prompt_text .. " " }
+					table.insert(header, string.rep("-", #header[1]))
+
+					local multibuf = multibuffer.create_multibuf({ header = header })
 					--- @type table<number, MultibufAddBufOptions>
 					local add_opts_by_buf = {}
 					for _, selection in ipairs(selections) do
