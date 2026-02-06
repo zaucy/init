@@ -77,6 +77,21 @@ local telescope_opts = {
 					end
 					multibuffer.multibuf_add_bufs(multibuf, add_buf_opts)
 					multibuffer.win_set_multibuf(0, multibuf)
+
+					local selected_filename = selected_entry.filename
+					if selected_filename then
+						local selected_bufnr = vim.fn.bufnr(selected_filename)
+						if selected_bufnr ~= -1 then
+							local selected_line_num = selected_entry.lnum
+							local selected_col = selected_entry.col
+
+							local multibuf_line =
+								multibuffer.multibuf_buf_get_line(multibuf, selected_bufnr, selected_line_num)
+							if multibuf_line then
+								vim.api.nvim_win_set_cursor(0, { multibuf_line, selected_col })
+							end
+						end
+					end
 				end,
 			},
 		},
