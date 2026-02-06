@@ -36,6 +36,107 @@ local M = {
 local ns = vim.api.nvim_create_namespace("ZaucyChatTabs")
 vim.api.nvim_set_hl(ns, "Cursor", { blend = 100 })
 
+-- Create a "ghost" highlight that is nearly invisible
+local function setup_ghost_hl()
+	local ghost_props = { fg = "bg", bg = "bg", blend = 100 }
+	local groups = {
+		"Normal",
+		"NormalFloat",
+		"FloatBorder",
+		"EndOfBuffer",
+		"TermCursor",
+		"Visual",
+		"Search",
+		"IncSearch",
+		"Identifier",
+		"Statement",
+		"PreProc",
+		"Type",
+		"Special",
+		"Underlined",
+		"Ignore",
+		"Error",
+		"Todo",
+		"String",
+		"Character",
+		"Number",
+		"Boolean",
+		"Float",
+		"Function",
+		"Conditional",
+		"Repeat",
+		"Label",
+		"Operator",
+		"Keyword",
+		"Exception",
+		"Include",
+		"Define",
+		"Macro",
+		"PreCondit",
+		"StorageClass",
+		"Structure",
+		"Typedef",
+		"Tag",
+		"Delimiter",
+		"SpecialChar",
+		"Debug",
+		"Directory",
+		"ModeMsg",
+		"MoreMsg",
+		"Question",
+		"StatusLine",
+		"StatusLineNC",
+		"VertSplit",
+		"Title",
+		"NonText",
+		"Comment",
+		"Constant",
+		"SpecialKey",
+		"WarningMsg",
+		"ErrorMsg",
+	}
+	for _, group in ipairs(groups) do
+		vim.api.nvim_set_hl(ns, group, ghost_props)
+	end
+end
+setup_ghost_hl()
+
+local global_augroup = vim.api.nvim_create_augroup("ZaucyChatGlobal", { clear = true })
+
+function M._ensure_global_autocmds()
+	vim.api.nvim_clear_autocmds({ group = global_augroup })
+	vim.api.nvim_create_autocmd("VimResized", {
+		group = global_augroup,
+		callback = function()
+			for _, state in pairs(M._tabpage_state) do
+				if state.layout and state.layout:valid() then
+					state.layout:resize()
+				end
+			end
+			M._update_transparency()
+		end,
+	})
+	vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI", "WinEnter" }, {
+		group = global_augroup,
+		callback = function()
+			M._update_transparency()
+		end,
+	})
+end
+
+function M._cleanup_global_autocmds()
+	local any_valid = false
+	for _, state in pairs(M._tabpage_state) do
+		if state.layout and state.layout:valid() then
+			any_valid = true
+			break
+		end
+	end
+	if not any_valid then
+		vim.api.nvim_clear_autocmds({ group = global_augroup })
+	end
+end
+
 --- @param state chat.ChatTabpageState
 local function store_last_focused_win(state)
 	local current_win = vim.api.nvim_get_current_win()
@@ -167,7 +268,6 @@ function Layout.new()
 		chat_btn = nil,
 		cwd_btn = nil,
 	}
-	self.augroup = vim.api.nvim_create_augroup("ZaucyChatLayout", { clear = true })
 	return self
 end
 
@@ -310,20 +410,11 @@ function Layout:mount()
 		focusable = true,
 		zindex = 50,
 	})
-	setup_window_props(self.wins.body)
 	vim.api.nvim_set_option_value("winhighlight", "NormalFloat:Normal", { win = self.wins.body })
 	vim.wo[self.wins.body].wrap = false
 	vim.wo[self.wins.body].winfixbuf = true
 
-	-- Resize Autocmd
-	vim.api.nvim_create_autocmd("VimResized", {
-		group = self.augroup,
-		callback = function()
-			if self:valid() then
-				self:resize()
-			end
-		end,
-	})
+	self.augroup = vim.api.nvim_create_augroup("ZaucyChatLayout_" .. self.wins.body, { clear = true })
 
 	-- Cleanup Autocmd (if any window is closed via :q etc)
 	vim.api.nvim_create_autocmd("WinClosed", {
@@ -335,6 +426,8 @@ function Layout:mount()
 			end)
 		end,
 	})
+
+	M._ensure_global_autocmds()
 end
 
 function Layout:resize()
@@ -385,8 +478,12 @@ function Layout:unmount()
 	if self.wins.cwd_btn and vim.api.nvim_win_is_valid(self.wins.cwd_btn) then
 		vim.api.nvim_win_close(self.wins.cwd_btn, true)
 	end
+	if self.augroup then
+		vim.api.nvim_clear_autocmds({ group = self.augroup })
+		self.augroup = nil
+	end
 	self.wins = { body = nil, chat_btn = nil, cwd_btn = nil }
-	vim.api.nvim_clear_autocmds({ group = self.augroup })
+	M._cleanup_global_autocmds()
 end
 
 function Layout:valid()
@@ -590,6 +687,97 @@ function M._update_loading_overlay()
 		_show_loading_overlay(state)
 	else
 		_hide_loading_overlay(state)
+	end
+
+	M._update_transparency()
+end
+
+function M._update_transparency()
+	local state = get_layout_state()
+	if not state or not state.layout then
+		return
+	end
+
+	local is_underneath = false
+	if not M.chat_is_focused() then
+		local cursor_pos = vim.fn.screenpos(0, vim.fn.line("."), vim.fn.col("."))
+		local r = cursor_pos.row
+		local c = cursor_pos.col
+
+		if r > 0 and c > 0 then
+			local check_wins = state.layout:get_wins()
+			if state.loading_win and vim.api.nvim_win_is_valid(state.loading_win) then
+				table.insert(check_wins, state.loading_win)
+			end
+
+			for _, win in ipairs(check_wins) do
+				if vim.api.nvim_win_is_valid(win) then
+					local pos = vim.fn.win_screenpos(win)
+					local win_r = pos[1]
+					local win_c = pos[2]
+					local win_w = vim.api.nvim_win_get_width(win)
+					local win_h = vim.api.nvim_win_get_height(win)
+
+					local config = vim.api.nvim_win_get_config(win)
+					if config.border then
+						if type(config.border) == "string" and config.border ~= "none" then
+							win_w = win_w + 2
+							win_h = win_h + 2
+						elseif type(config.border) == "table" then
+							local b = config.border
+							if #b >= 8 then
+								if b[1] ~= "" then
+									win_h = win_h + 1
+								end -- top
+								if b[5] ~= "" then
+									win_h = win_h + 1
+								end -- bottom
+								if b[7] ~= "" then
+									win_w = win_w + 1
+								end -- left
+								if b[3] ~= "" then
+									win_w = win_w + 1
+								end -- right
+							end
+						end
+					end
+
+					if r >= win_r and r < win_r + win_h and c >= win_c and c < win_c + win_w then
+						is_underneath = true
+						break
+					end
+				end
+			end
+		end
+	end
+
+	local blend = is_underneath and 90 or 0
+	local wins = state.layout:get_wins()
+	if state.loading_win and vim.api.nvim_win_is_valid(state.loading_win) then
+		table.insert(wins, state.loading_win)
+	end
+
+	for _, win in ipairs(wins) do
+		if vim.api.nvim_win_is_valid(win) then
+			if state.loading_win == win and not is_underneath then
+				vim.api.nvim_set_option_value("winblend", 80, { win = win })
+				vim.api.nvim_win_set_hl_ns(win, 0)
+				vim.api.nvim_set_option_value("winhighlight", "", { win = win })
+			else
+				vim.api.nvim_set_option_value("winblend", blend, { win = win })
+				if is_underneath then
+					vim.api.nvim_win_set_hl_ns(win, ns)
+					vim.api.nvim_set_option_value("winhighlight", "Normal:Normal,FloatBorder:FloatBorder,NormalFloat:NormalFloat", { win = win })
+				else
+					vim.api.nvim_win_set_hl_ns(win, 0)
+					if win == state.layout.wins.body then
+						vim.api.nvim_set_option_value("winhighlight", "NormalFloat:Normal", { win = win })
+					else
+						vim.api.nvim_set_option_value("winhighlight", "", { win = win })
+					end
+				end
+			end
+		end
 	end
 end
 
