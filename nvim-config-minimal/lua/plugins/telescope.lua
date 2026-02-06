@@ -1,6 +1,6 @@
 local config_dir = "~/projects/zaucy/init/nvim-config-minimal"
 
-local telescope_multibuffer_expand = 0
+local telescope_multibuffer_expand = 2
 
 local telescope_opts = {
 	defaults = {
@@ -48,6 +48,25 @@ local telescope_opts = {
 					--- @type MultibufAddBufOptions[]
 					local add_buf_opts = {}
 					for _, add_opts in pairs(add_opts_by_buf) do
+						table.sort(add_opts.regions, function(a, b)
+							return a.start_row < b.start_row
+						end)
+
+						local merged_regions = {}
+						for _, region in ipairs(add_opts.regions) do
+							if #merged_regions == 0 then
+								table.insert(merged_regions, region)
+							else
+								local last = merged_regions[#merged_regions]
+								if region.start_row <= last.end_row then
+									last.end_row = math.max(last.end_row, region.end_row)
+								else
+									table.insert(merged_regions, region)
+								end
+							end
+						end
+
+						add_opts.regions = merged_regions
 						table.insert(add_buf_opts, add_opts)
 					end
 					multibuffer.multibuf_add_bufs(multibuf, add_buf_opts)
