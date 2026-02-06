@@ -38,25 +38,24 @@ return {
 			local multibuffer = require("multibuffer")
 			multibuffer.setup({
 				render_multibuf_title = render_multibuf_title,
-				keymaps = {
-					{
-						"n",
-						"<cr>",
-						function()
-							local multibuf = vim.api.nvim_get_current_buf()
-							local cursor = vim.api.nvim_win_get_cursor(0)
-							local buf, line = multibuffer.multibuf_get_buf_at_line(multibuf, cursor[1])
-							if buf then
-								vim.api.nvim_set_current_buf(buf)
-								vim.api.nvim_win_set_cursor(0, { line, cursor[2] })
-							end
-						end,
-					},
-				},
 			})
 
 			vim.api.nvim_set_hl(0, "MultibufferTitleBorder", { link = "FloatBorder" })
 			vim.api.nvim_set_hl(0, "MultibufferTitleName", { link = "FloatTitle" })
+
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = "multibuffer",
+				callback = function(args)
+					vim.keymap.set("n", "<cr>", function()
+						local cursor = vim.api.nvim_win_get_cursor(0)
+						local buf, line = multibuffer.multibuf_get_buf_at_line(args.buf, cursor[1])
+						if buf then
+							vim.api.nvim_set_current_buf(buf)
+							vim.api.nvim_win_set_cursor(0, { line, cursor[2] })
+						end
+					end, { buffer = args.buf, desc = "Jump to source" })
+				end,
+			})
 
 			vim.api.nvim_create_autocmd("BufWinEnter", {
 				pattern = "multibuffer://*",
