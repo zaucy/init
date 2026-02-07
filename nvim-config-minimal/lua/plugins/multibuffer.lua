@@ -70,7 +70,7 @@ return {
 			})
 
 			vim.keymap.set({ "n", "v" }, "<C-w>/", function()
-				local word = vim.fn.expand("<cword>")
+				local cword = vim.fn.expand("<cword>")
 				local mbuf = require("multibuffer")
 
 				local search_mbuf = mbuf.create_multibuf()
@@ -392,6 +392,10 @@ return {
 				})
 
 				vim.cmd("startinsert")
+				if cword ~= "" then
+					vim.api.nvim_feedkeys(cword, "n", true)
+					vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>vT <C-g>", true, false, true), "n", true)
+				end
 			end, { desc = "open search window" })
 		end,
 	},
