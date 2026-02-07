@@ -1,3 +1,5 @@
+local multibuffer_expand = 1
+
 local function render_multibuf_title(bufnr)
 	local icons = require("nvim-web-devicons")
 	local buf_name = vim.api.nvim_buf_get_name(bufnr)
@@ -181,14 +183,34 @@ return {
 
 						for _, path in ipairs(done_searching_paths) do
 							local path_bufnr = vim.fn.bufadd(path)
+							local regions = regions_by_filename[path]
+
+							table.sort(regions, function(a, b)
+								return a.start_row < b.start_row
+							end)
+
+							local merged_regions = {}
+							for _, region in ipairs(regions) do
+								if #merged_regions == 0 then
+									table.insert(merged_regions, region)
+								else
+									local last = merged_regions[#merged_regions]
+									if region.start_row <= last.end_row then
+										last.end_row = math.max(last.end_row, region.end_row)
+									else
+										table.insert(merged_regions, region)
+									end
+								end
+							end
+
 							table.insert(add_opts, {
 								buf = path_bufnr,
-								regions = regions_by_filename[path],
+								regions = merged_regions,
 							})
 						end
 
 						total_searched_paths = total_searched_paths + #done_searching_paths
-						vim.fn.prompt_setprompt(prompt_bufnr, "[" .. total_searched_paths .. "]  ")
+						-- vim.fn.prompt_setprompt(prompt_bufnr, "[" .. total_searched_paths .. "]  ")
 
 						multibuffer.multibuf_add_bufs(search_mbuf, add_opts)
 
@@ -275,7 +297,10 @@ return {
 									local path = msg.data.path.text
 									local match_lnum = msg.data.line_number
 									--- @type MultibufRegion
-									local region = { start_row = match_lnum + 1, end_row = match_lnum + 1 }
+									local region = {
+										start_row = match_lnum - 1 - multibuffer_expand,
+										end_row = match_lnum - 1 + multibuffer_expand,
+									}
 									assert(regions_by_filename[path])
 									table.insert(regions_by_filename[path], region)
 								end
