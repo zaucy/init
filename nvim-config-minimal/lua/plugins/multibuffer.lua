@@ -362,6 +362,7 @@ return {
 					"<C-u>",
 					"<C-f>",
 					"<C-b>",
+					"<C-o>",
 					"<PageDown>",
 					"<PageUp>",
 					"G",
@@ -370,7 +371,7 @@ return {
 
 				for _, key in ipairs(motion_keys) do
 					-- only map printable keys in normal mode to avoid blocking typing in insert mode
-					local modes = (string.len(key) > 1 or key:match("%W")) and { "n", "i" } or { "n" }
+					local modes = (string.len(key) > 1 or key:match("%W")) and { "n", "i", "s" } or { "n", "s" }
 					vim.keymap.set(modes, key, move_to_mbuf(key), { buffer = prompt_bufnr })
 				end
 
