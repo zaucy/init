@@ -339,6 +339,56 @@ return {
 					end,
 				})
 
+				local move_to_mbuf = function(key)
+					return function()
+						vim.api.nvim_set_current_win(win)
+						local line_count = vim.api.nvim_buf_line_count(search_mbuf)
+						local cursor = vim.api.nvim_win_get_cursor(win)
+						if cursor[1] <= 3 then
+							vim.api.nvim_win_set_cursor(win, { math.min(4, line_count), 0 })
+						end
+						if key then
+							vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, false, true), "n", true)
+						end
+					end
+				end
+
+				local motion_keys = {
+					"j",
+					"k",
+					"<Down>",
+					"<Up>",
+					"<C-d>",
+					"<C-u>",
+					"<C-f>",
+					"<C-b>",
+					"<PageDown>",
+					"<PageUp>",
+					"G",
+					"gg",
+				}
+
+				for _, key in ipairs(motion_keys) do
+					-- only map printable keys in normal mode to avoid blocking typing in insert mode
+					local modes = (string.len(key) > 1 or key:match("%W")) and { "n", "i" } or { "n" }
+					vim.keymap.set(modes, key, move_to_mbuf(key), { buffer = prompt_bufnr })
+				end
+
+				vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+					buffer = search_mbuf,
+					callback = function()
+						if vim.api.nvim_get_current_win() ~= win then
+							return
+						end
+						local cursor = vim.api.nvim_win_get_cursor(win)
+						if cursor[1] <= 3 then
+							ensure_prompt_win()
+							vim.api.nvim_set_current_win(prompt_win)
+							vim.cmd("startinsert")
+						end
+					end,
+				})
+
 				vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
 					callback = function()
 						local current_win = vim.api.nvim_get_current_win()
