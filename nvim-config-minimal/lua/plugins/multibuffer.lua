@@ -122,8 +122,14 @@ return {
 				local last_proc = nil
 				--- @type uv.uv_pipe_t|nil
 				local last_proc_stdout = nil
+				--- @type uv.uv_pipe_t|nil
+				local last_proc_stderr = nil
 
-				local spawn_proc = function(query)
+				local function spawn_proc(query)
+					if last_proc_stderr and not last_proc_stderr:is_closing() then
+						last_proc_stderr:close(function() end)
+						last_proc_stderr = nil
+					end
 					if last_proc_stdout and not last_proc_stdout:is_closing() then
 						last_proc_stdout:close(function() end)
 						last_proc_stdout = nil
@@ -133,24 +139,46 @@ return {
 						last_proc = nil
 					end
 
+					local new_proc_stdin, new_proc_stdin_err = vim.uv.new_pipe(false)
+					assert(new_proc_stdin, new_proc_stdin_err)
+					-- last_proc_stdin = new_proc_stdin
+
 					local new_proc_stdout, new_proc_stdout_err = vim.uv.new_pipe(false)
 					assert(new_proc_stdout, new_proc_stdout_err)
 					last_proc_stdout = new_proc_stdout
 
+					local new_proc_stderr, new_proc_stderr_err = vim.uv.new_pipe(false)
+					assert(new_proc_stderr, new_proc_stderr_err)
+					last_proc_stderr = new_proc_stderr
+
 					local new_proc, new_proc_err = vim.uv.spawn("rg", {
-						stdio = { nil, new_proc_stdout, nil },
-						hide = false,
+						stdio = { new_proc_stdin, new_proc_stdout, new_proc_stderr },
+						hide = true,
 						cwd = vim.uv.cwd(),
 						args = {
 							"--json",
 							-- "--vimgrep",
 							query,
 						},
-					})
+					}, function(code, signal)
+						vim.schedule(function()
+							vim.notify("rg exited: " .. vim.inspect({ code = code, signal = signal }))
+						end)
+					end)
 					assert(new_proc, new_proc_err)
 
 					--- @type table<string, MultibufRegion[]>
 					local regions_by_filename = {}
+
+					vim.uv.read_start(new_proc_stderr, function(err, data)
+						if err or not data then
+							return
+						end
+
+						vim.schedule(function()
+							vim.notify(data, vim.log.levels.ERROR)
+						end)
+					end)
 
 					local stdout_leftovers = ""
 					vim.uv.read_start(new_proc_stdout, function(err, data)
@@ -168,8 +196,8 @@ return {
 							return
 						end
 
-						lines[1] = stdout_leftovers .. lines[1]
-						stdout_leftovers = ""
+						-- lines[1] = stdout_leftovers .. lines[1]
+						-- stdout_leftovers = ""
 
 						for _, line in ipairs(lines) do
 							local success, msg = pcall(vim.json.decode, line, {})
@@ -203,12 +231,16 @@ return {
 								vim.notify(vim.inspect(region))
 								table.insert(regions_by_filename[path], region)
 							else
-								-- vim.schedule(function()
-								-- 	vim.notify(vim.inspect(msg))
-								-- end)
 							end
+
+							vim.schedule(function()
+								vim.notify(vim.inspect(msg.type))
+							end)
 						end
 					end)
+
+					vim.uv.write(new_proc_stdin, "\r\n")
+					vim.uv.shutdown(new_proc_stdin, function() end)
 				end
 
 				local input = ""
