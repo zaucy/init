@@ -88,7 +88,7 @@ local telescope_opts = {
 							local multibuf_line =
 								multibuffer.multibuf_buf_get_line(multibuf, selected_bufnr, selected_line_num)
 							if multibuf_line then
-								vim.api.nvim_win_set_cursor(0, { multibuf_line, selected_col })
+								vim.api.nvim_win_set_cursor(0, { multibuf_line, selected_col or 0 })
 							end
 						end
 					end

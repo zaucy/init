@@ -142,21 +142,6 @@ vim.keymap.set(
 	{ desc = "open fzf (config)" }
 )
 
-vim.keymap.set(
-	{"n", "v"},
-	"<C-w>/",
-	do_fzf("rg --column", {
-		fzf_args = {
-			"--preview", "bat --style=numbers --color=always --highlight-line {2} {1}",
-			"--preview-window", "~4,+{2}+4/3,up:75%",
-			"--bind", "change:reload:rg --column {q}",
-			"--bind", "enter:become(echo {\"filename\": {+1}, \"line\": {+2}, \"col\": {+3}})",
-			"--delimiter", ":",
-		},
-	}),
-	{ desc = "open search window" }
-)
-
 local function is_buf_similar(buf1, buf2)
 	if vim.bo[buf1].buftype ~= vim.bo[buf2].buftype then
 		return false
