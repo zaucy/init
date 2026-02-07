@@ -67,15 +67,6 @@ return {
 				end,
 			})
 
-			-- do_fzf("rg --column", {
-			-- 	fzf_args = {
-			-- 		"--preview", "bat --style=numbers --color=always --highlight-line {2} {1}",
-			-- 		"--preview-window", "~4,+{2}+4/3,up:75%",
-			-- 		"--bind", "change:reload:rg --column {q}",
-			-- 		"--bind", "enter:become(echo {\"filename\": {+1}, \"line\": {+2}, \"col\": {+3}})",
-			-- 		"--delimiter", ":",
-			-- 	},
-			-- }),
 			vim.keymap.set({ "n", "v" }, "<C-w>/", function()
 				local word = vim.fn.expand("<cword>")
 				local mbuf = require("multibuffer")
@@ -125,6 +116,7 @@ return {
 				--- @type uv.uv_pipe_t|nil
 				local last_proc_stderr = nil
 
+				--- @param query string
 				local function spawn_proc(query)
 					if last_proc_stderr and not last_proc_stderr:is_closing() then
 						last_proc_stderr:close(function() end)
@@ -135,13 +127,14 @@ return {
 						last_proc_stdout = nil
 					end
 					if last_proc and not last_proc:is_closing() then
-						last_proc:close(function() end)
+						-- last_proc:close(function() end)
+						last_proc:kill("sigint")
 						last_proc = nil
 					end
 
-					local new_proc_stdin, new_proc_stdin_err = vim.uv.new_pipe(false)
-					assert(new_proc_stdin, new_proc_stdin_err)
-					-- last_proc_stdin = new_proc_stdin
+					if not query then
+						return
+					end
 
 					local new_proc_stdout, new_proc_stdout_err = vim.uv.new_pipe(false)
 					assert(new_proc_stdout, new_proc_stdout_err)
@@ -151,24 +144,81 @@ return {
 					assert(new_proc_stderr, new_proc_stderr_err)
 					last_proc_stderr = new_proc_stderr
 
+					local spawn_args = {
+						"--json",
+						-- "--vimgrep",
+						query,
+					}
+
 					local new_proc, new_proc_err = vim.uv.spawn("rg", {
-						stdio = { new_proc_stdin, new_proc_stdout, new_proc_stderr },
+						stdio = { nil, new_proc_stdout, new_proc_stderr },
 						hide = true,
 						cwd = vim.uv.cwd(),
-						args = {
-							"--json",
-							-- "--vimgrep",
-							query,
-						},
+						verbatim = false,
+						args = spawn_args,
 					}, function(code, signal)
-						vim.schedule(function()
-							vim.notify("rg exited: " .. vim.inspect({ code = code, signal = signal }))
-						end)
+						if code ~= 0 then
+							vim.schedule(function()
+								vim.notify(
+									"rg exited: " .. vim.inspect({ code = code, signal = signal }),
+									vim.log.levels.ERROR
+								)
+							end)
+						end
 					end)
 					assert(new_proc, new_proc_err)
 
 					--- @type table<string, MultibufRegion[]>
 					local regions_by_filename = {}
+					--- @type string[]
+					local done_searching_paths = {}
+					local done_schedule_active = false
+					local total_searched_paths = 0
+					local stats = nil
+
+					local process_done_searching_paths = vim.schedule_wrap(function()
+						local add_opts = {}
+
+						for _, path in ipairs(done_searching_paths) do
+							local path_bufnr = vim.fn.bufadd(path)
+							table.insert(add_opts, {
+								buf = path_bufnr,
+								regions = regions_by_filename[path],
+							})
+						end
+
+						total_searched_paths = total_searched_paths + #done_searching_paths
+						vim.fn.prompt_setprompt(prompt_bufnr, "[" .. total_searched_paths .. "]  ")
+
+						multibuffer.multibuf_add_bufs(search_mbuf, add_opts)
+
+						done_searching_paths = {}
+						done_schedule_active = false
+
+						-- stats: {
+						--   bytes_printed = 26203636,
+						--   bytes_searched = 6602263,
+						--   elapsed = {
+						--     human = "0.109379s",
+						--     nanos = 109378500,
+						--     secs = 0
+						--   },
+						--   matched_lines = 77874,
+						--   matches = 157317,
+						--   searches = 2121,
+						--   searches_with_match = 1556
+						-- }
+
+						-- vim.notify("stats: " .. vim.inspect(stats))
+					end)
+
+					local try_schedule_done_searching_paths = function()
+						if done_schedule_active then
+							return
+						end
+						done_schedule_active = true
+						process_done_searching_paths()
+					end
 
 					vim.uv.read_start(new_proc_stderr, function(err, data)
 						if err or not data then
@@ -182,80 +232,70 @@ return {
 
 					local stdout_leftovers = ""
 					vim.uv.read_start(new_proc_stdout, function(err, data)
+						-- should have been closed, but ignore just incase
+						if last_proc_stdout ~= new_proc_stdout then
+							return
+						end
+
 						if err or not data then
 							if err then
 								vim.schedule(function()
-									vim.notify(vim.inspect(err), vim.log.levels.ERROR)
+									vim.notify(err, vim.log.levels.ERROR)
 								end)
 							end
 							return
 						end
 
-						local lines = vim.split(data, "\n", { trimempty = true, plain = true })
-						if #lines == 0 then
-							return
-						end
-
-						-- lines[1] = stdout_leftovers .. lines[1]
-						-- stdout_leftovers = ""
+						local lines = vim.split(stdout_leftovers .. data, "\n", { plain = true })
+						stdout_leftovers = table.remove(lines)
 
 						for _, line in ipairs(lines) do
-							local success, msg = pcall(vim.json.decode, line, {})
+							if line ~= "" then
+								local success, msg = pcall(vim.json.decode, line)
 
-							if not success then
-								vim.schedule(function()
-									vim.notify("json decode fail: " .. vim.inspect(msg), vim.log.levels.ERROR)
-								end)
-								return
+								if not success then
+									vim.schedule(function()
+										vim.notify("json decode fail: " .. vim.inspect(msg), vim.log.levels.ERROR)
+									end)
+									return
+								end
+
+								if msg.data.stats then
+									stats = msg.data.stats
+								end
+
+								if msg.type == "begin" then
+									local path = msg.data.path.text
+									regions_by_filename[path] = {}
+								elseif msg.type == "end" then
+									local path = msg.data.path.text
+									table.insert(done_searching_paths, path)
+									try_schedule_done_searching_paths()
+								elseif msg.type == "match" then
+									local path = msg.data.path.text
+									local match_lnum = msg.data.line_number
+									--- @type MultibufRegion
+									local region = { start_row = match_lnum + 1, end_row = match_lnum + 1 }
+									assert(regions_by_filename[path])
+									table.insert(regions_by_filename[path], region)
+								end
 							end
-
-							if msg.type == "begin" then
-								local path = msg.data.path.text
-								regions_by_filename[path] = {}
-							elseif msg.type == "end" then
-								local path = msg.data.path.text
-								vim.schedule(function()
-									local path_bufnr = vim.fn.bufadd(path)
-									vim.fn.bufload(path_bufnr)
-									multibuffer.multibuf_add_buf(search_mbuf, {
-										buf = path_bufnr,
-										regions = regions_by_filename[path],
-									})
-								end)
-							elseif msg.type == "match" then
-								local path = msg.data.path.text
-								local match_lnum = msg.data.line_number
-								--- @type MultibufRegion
-								local region = { start_row = match_lnum + 1, end_row = match_lnum + 1 }
-								assert(regions_by_filename[path])
-								vim.notify(vim.inspect(region))
-								table.insert(regions_by_filename[path], region)
-							else
-							end
-
-							vim.schedule(function()
-								vim.notify(vim.inspect(msg.type))
-							end)
 						end
 					end)
-
-					vim.uv.write(new_proc_stdin, "\r\n")
-					vim.uv.shutdown(new_proc_stdin, function() end)
 				end
 
 				local input = ""
 
-				local function input_changed()
-					vim.schedule(function()
-						spawn_proc(input)
-					end)
-				end
+				local input_changed = vim.schedule_wrap(function()
+					multibuffer.multibuf_clear_bufs(search_mbuf)
+					spawn_proc(input)
+				end)
 
 				local function submit() end
 
-				local function update_input()
+				local update_input = function()
 					vim.api.nvim_set_option_value("modified", false, { buf = prompt_bufnr })
-					local new_input = vim.api.nvim_buf_get_lines(prompt_bufnr, 0, -1, true)[1]
+					local new_input = vim.trim(vim.fn.prompt_getinput(prompt_bufnr))
 					if new_input ~= input then
 						input = new_input
 						input_changed()
