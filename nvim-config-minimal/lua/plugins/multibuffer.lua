@@ -36,6 +36,9 @@ return {
 		dependencies = {
 			"nvim-tree/nvim-web-devicons",
 		},
+		init = function()
+			vim.g.multibuffer_expander_max_lines = 3
+		end,
 		config = function()
 			local multibuffer = require("multibuffer")
 			multibuffer.setup({
@@ -48,14 +51,39 @@ return {
 			vim.api.nvim_create_autocmd("FileType", {
 				pattern = "multibuffer",
 				callback = function(args)
+					vim.bo[args.buf].tabstop = 4
+					vim.bo[args.buf].shiftwidth = 4
+					vim.bo[args.buf].softtabstop = 4
+					vim.bo[args.buf].expandtab = false
+
 					vim.keymap.set("n", "<cr>", function()
-						local cursor = vim.api.nvim_win_get_cursor(0)
+						local winid = vim.api.nvim_get_current_win()
+						local cursor = vim.api.nvim_win_get_cursor(winid)
+						local winline = vim.fn.winline()
+
 						local buf, line = multibuffer.multibuf_get_buf_at_line(args.buf, cursor[1])
 						if buf then
 							vim.api.nvim_set_current_buf(buf)
 							vim.api.nvim_win_set_cursor(0, { line, cursor[2] })
+							vim.fn.winrestview({ topline = line - winline + 1 })
 						end
 					end, { buffer = args.buf, desc = "Jump to source" })
+
+					vim.keymap.set("n", "<C-up>", function()
+						multibuffer.multibuf_slice_expand_top(args.buf, 1)
+					end)
+
+					vim.keymap.set("n", "<C-S-up>", function()
+						multibuffer.multibuf_slice_expand_bottom(args.buf, -1)
+					end)
+
+					vim.keymap.set("n", "<C-down>", function()
+						multibuffer.multibuf_slice_expand_bottom(args.buf, 1)
+					end)
+
+					vim.keymap.set("n", "<C-S-down>", function()
+						multibuffer.multibuf_slice_expand_top(args.buf, -1)
+					end)
 				end,
 			})
 
