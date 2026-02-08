@@ -218,30 +218,52 @@ return {
 						query,
 					}
 
+					local err_from_stderr = ""
+					local new_proc
+					local new_proc_err
+
+					local on_proc_exit_safe = vim.schedule_wrap(function(code, signal)
+						if last_proc_stdout ~= new_proc_stdout then
+							return
+						end
+
+						if code ~= 0 then
+							local search_stats_text = string.format("ripgrep exited with code %i", code)
+							if code == 1 then
+								local pretty_cwd = cwd:gsub("\\", "/")
+								local homedir = vim.fn.substitute(vim.fn.expand("~"), "\\\\", "/", "g")
+								if vim.startswith(pretty_cwd, homedir) then
+									pretty_cwd = "~" .. pretty_cwd:sub(#homedir + 1)
+								end
+								search_stats_text = string.format("ripgrep found 0 matches in %s", pretty_cwd)
+							end
+							local header = { "", "", "", search_stats_text }
+							local error_lines = vim.split(err_from_stderr, "\n", {})
+							for _, error_line in ipairs(error_lines) do
+								table.insert(header, error_line)
+							end
+							mbuf.multibuf_set_header(search_mbuf, header)
+						end
+					end)
+
+					local function on_proc_exit(code, signal)
+						if last_proc_stdout ~= new_proc_stdout then
+							return
+						end
+
+						on_proc_exit_safe(code, signal)
+					end
+
 					local cwd = vim.uv.cwd()
 					assert(cwd)
-					local new_proc, new_proc_err = vim.uv.spawn("rg", {
+					new_proc, new_proc_err = vim.uv.spawn("rg", {
 						stdio = { nil, new_proc_stdout, new_proc_stderr },
 						hide = true,
 						cwd = cwd,
 						verbatim = false,
 						args = spawn_args,
-					}, function(code, signal)
-						if code ~= 0 then
-							vim.schedule(function()
-								local search_stats_text = string.format("ripgrep exited with code %i", code)
-								if code == 1 then
-									local pretty_cwd = cwd:gsub("\\", "/")
-									local homedir = vim.fn.substitute(vim.fn.expand("~"), "\\\\", "/", "g")
-									if vim.startswith(pretty_cwd, homedir) then
-										pretty_cwd = "~" .. pretty_cwd:sub(#homedir + 1)
-									end
-									search_stats_text = string.format("ripgrep found 0 matches in %s", pretty_cwd)
-								end
-								mbuf.multibuf_set_header(search_mbuf, { "", "", "", search_stats_text })
-							end)
-						end
-					end)
+					}, on_proc_exit)
+
 					assert(new_proc, new_proc_err)
 
 					--- @type table<string, MultibufRegion[]>
@@ -313,13 +335,15 @@ return {
 					end
 
 					vim.uv.read_start(new_proc_stderr, function(err, data)
-						if err or not data then
+						-- should have been closed, but ignore just incase
+						if last_proc_stdout ~= new_proc_stdout then
 							return
 						end
 
-						vim.schedule(function()
-							vim.notify(data, vim.log.levels.ERROR)
-						end)
+						if err or not data then
+							return
+						end
+						err_from_stderr = err_from_stderr .. data
 					end)
 
 					local stdout_leftovers = ""
