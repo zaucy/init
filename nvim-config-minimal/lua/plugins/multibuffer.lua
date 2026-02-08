@@ -48,6 +48,19 @@ return {
 			vim.api.nvim_set_hl(0, "MultibufferTitleBorder", { link = "FloatBorder" })
 			vim.api.nvim_set_hl(0, "MultibufferTitleName", { link = "FloatTitle" })
 
+			local function open_source_buf(mbuf)
+				local winid = vim.api.nvim_get_current_win()
+				local cursor = vim.api.nvim_win_get_cursor(winid)
+				local winline = vim.fn.winline()
+
+				local buf, line = multibuffer.multibuf_get_buf_at_line(mbuf, cursor[1])
+				if buf then
+					vim.api.nvim_set_current_buf(buf)
+					vim.api.nvim_win_set_cursor(0, { line, cursor[2] })
+					vim.fn.winrestview({ topline = line - winline + 1 })
+				end
+			end
+
 			vim.api.nvim_create_autocmd("FileType", {
 				pattern = "multibuffer",
 				callback = function(args)
@@ -57,16 +70,7 @@ return {
 					vim.bo[args.buf].expandtab = false
 
 					vim.keymap.set("n", "<cr>", function()
-						local winid = vim.api.nvim_get_current_win()
-						local cursor = vim.api.nvim_win_get_cursor(winid)
-						local winline = vim.fn.winline()
-
-						local buf, line = multibuffer.multibuf_get_buf_at_line(args.buf, cursor[1])
-						if buf then
-							vim.api.nvim_set_current_buf(buf)
-							vim.api.nvim_win_set_cursor(0, { line, cursor[2] })
-							vim.fn.winrestview({ topline = line - winline + 1 })
-						end
+						open_source_buf(args.buf)
 					end, { buffer = args.buf, desc = "Jump to source" })
 
 					vim.keymap.set("n", "<C-up>", function()
@@ -398,7 +402,15 @@ return {
 					end
 				end)
 
-				local function submit() end
+				local function submit()
+					local line_count = vim.api.nvim_buf_line_count(search_mbuf)
+					local cursor = vim.api.nvim_win_get_cursor(win)
+					if cursor[1] <= 3 then
+						vim.api.nvim_win_set_cursor(win, { math.min(5 + multibuffer_expand, line_count), 0 })
+					end
+					vim.api.nvim_set_current_win(win)
+					open_source_buf(search_mbuf)
+				end
 
 				local update_input = function()
 					vim.api.nvim_set_option_value("modified", false, { buf = prompt_bufnr })
@@ -409,10 +421,12 @@ return {
 					end
 				end
 
-				vim.fn.prompt_setcallback(prompt_bufnr, function()
+				-- we intentionally don't use prompt_setcallback
+				vim.keymap.set({ "i", "s", "n", "v" }, "<cr>", function()
 					update_input()
+					vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-\\><C-n>", true, false, true), "n", true)
 					submit()
-				end)
+				end, { noremap = true, buffer = prompt_bufnr })
 
 				vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "TextChangedP" }, {
 					buffer = prompt_bufnr,
