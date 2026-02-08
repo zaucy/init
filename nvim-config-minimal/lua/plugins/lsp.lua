@@ -16,17 +16,15 @@ return {
 		end,
 		opts = {
 			library = {
-				-- Load luvit types when the `vim` word is found
-				{ path = "luvit-meta/library", words = { "vim" } },
+				{ path = "luvit-meta/library" },
 			},
 		},
 	},
 	{ "Bilal2453/luvit-meta", lazy = true }, -- optional `vim.uv` typings
 	{
 		"mason-org/mason-lspconfig.nvim",
-		event = "VeryLazy",
 		dependencies = {
-			"williamboman/mason.nvim",
+			"mason-org/mason.nvim",
 			"neovim/nvim-lspconfig",
 			"hrsh7th/nvim-cmp",
 			"hrsh7th/cmp-nvim-lsp",
