@@ -131,7 +131,31 @@ return {
 						win = win,
 					})
 
-					vim.wo[prompt_win].winfixbuf = true
+					vim.api.nvim_create_autocmd({ "BufEnter" }, {
+						callback = function()
+							if not vim.api.nvim_win_is_valid(prompt_win) then
+								return true
+							end
+
+							if vim.api.nvim_get_current_win() ~= prompt_win then
+								return
+							end
+
+							local bufnr = vim.api.nvim_get_current_buf()
+							if bufnr == prompt_bufnr then
+								return
+							end
+
+							local config = vim.api.nvim_win_get_config(prompt_win)
+							local attached_win = config.win
+							if attached_win and vim.api.nvim_win_is_valid(attached_win) then
+								vim.api.nvim_win_set_buf(attached_win, bufnr)
+								vim.api.nvim_set_current_win(attached_win)
+							end
+							vim.api.nvim_win_set_buf(prompt_win, prompt_bufnr)
+						end,
+					})
+
 					vim.wo[prompt_win].signcolumn = "no"
 					vim.wo[prompt_win].number = false
 					vim.wo[prompt_win].relativenumber = false
