@@ -88,12 +88,13 @@ return {
 			})
 
 			vim.api.nvim_create_autocmd("BufWinEnter", {
-				pattern = "multibuffer://*",
 				callback = function(args)
-					local winid = vim.api.nvim_get_current_win()
-					vim.api.nvim_set_option_value("number", false, { scope = "local", win = winid })
-					vim.api.nvim_set_option_value("relativenumber", false, { scope = "local", win = winid })
-					vim.api.nvim_set_option_value("signcolumn", "yes:3", { scope = "local", win = winid })
+					if vim.bo[args.buf].filetype == "multibuffer" then
+						local winid = vim.api.nvim_get_current_win()
+						vim.api.nvim_set_option_value("number", false, { scope = "local", win = winid })
+						vim.api.nvim_set_option_value("relativenumber", false, { scope = "local", win = winid })
+						vim.api.nvim_set_option_value("signcolumn", "yes:3", { scope = "local", win = winid })
+					end
 				end,
 			})
 
@@ -106,7 +107,7 @@ return {
 				local win_opts = vim.api.nvim_win_get_config(win)
 				vim.api.nvim_win_set_buf(win, search_mbuf)
 
-				mbuf.multibuf_set_header(search_mbuf, { "", "", "" })
+				mbuf.multibuf_set_header(search_mbuf, { "", "", "", "" })
 
 				local prompt_bufnr = vim.api.nvim_create_buf(false, false)
 				vim.bo[prompt_bufnr].buftype = "prompt"
@@ -146,8 +147,7 @@ return {
 				--- @type uv.uv_pipe_t|nil
 				local last_proc_stderr = nil
 
-				--- @param query string
-				local function spawn_proc(query)
+				local function stop_proc()
 					if last_proc_stderr and not last_proc_stderr:is_closing() then
 						last_proc_stderr:close(function() end)
 						last_proc_stderr = nil
@@ -161,6 +161,11 @@ return {
 						last_proc:kill("sigint")
 						last_proc = nil
 					end
+				end
+
+				--- @param query string
+				local function spawn_proc(query)
+					stop_proc()
 
 					if not query then
 						return
@@ -189,10 +194,8 @@ return {
 					}, function(code, signal)
 						if code ~= 0 then
 							vim.schedule(function()
-								vim.notify(
-									"rg exited: " .. vim.inspect({ code = code, signal = signal }),
-									vim.log.levels.ERROR
-								)
+								local search_stats_text = string.format("ripgrep exited with code %i", code)
+								mbuf.multibuf_set_header(search_mbuf, { "", "", "", search_stats_text })
 							end)
 						end
 					end)
@@ -238,28 +241,24 @@ return {
 						end
 
 						total_searched_paths = total_searched_paths + #done_searching_paths
-						-- vim.fn.prompt_setprompt(prompt_bufnr, "[" .. total_searched_paths .. "]  ")
+
+						if stats then
+							local search_stats_text = string.format(
+								"ripgrep found %i matches in %i files in %s",
+								stats.matches,
+								total_searched_paths,
+								stats.elapsed.human
+							)
+							mbuf.multibuf_set_header(search_mbuf, { "", "", "", search_stats_text })
+						else
+							local search_stats_text = string.format("ripgrep %i files", total_searched_paths)
+							mbuf.multibuf_set_header(search_mbuf, { "", "", "", search_stats_text })
+						end
 
 						multibuffer.multibuf_add_bufs(search_mbuf, add_opts)
 
 						done_searching_paths = {}
 						done_schedule_active = false
-
-						-- stats: {
-						--   bytes_printed = 26203636,
-						--   bytes_searched = 6602263,
-						--   elapsed = {
-						--     human = "0.109379s",
-						--     nanos = 109378500,
-						--     secs = 0
-						--   },
-						--   matched_lines = 77874,
-						--   matches = 157317,
-						--   searches = 2121,
-						--   searches_with_match = 1556
-						-- }
-
-						-- vim.notify("stats: " .. vim.inspect(stats))
 					end)
 
 					local try_schedule_done_searching_paths = function()
@@ -338,10 +337,26 @@ return {
 				end
 
 				local input = ""
+				local spawn_defer_timer = nil
+
+				local clear_header = function()
+					mbuf.multibuf_set_header(search_mbuf, { "", "", "", "" })
+				end
 
 				local input_changed = vim.schedule_wrap(function()
 					multibuffer.multibuf_clear_bufs(search_mbuf)
-					spawn_proc(input)
+					clear_header()
+					if #input < 3 then
+						stop_proc()
+					else
+						if spawn_defer_timer then
+							vim.uv.timer_stop(spawn_defer_timer)
+							spawn_defer_timer = nil
+						end
+						spawn_defer_timer = vim.defer_fn(function()
+							spawn_proc(input)
+						end, 50)
+					end
 				end)
 
 				local function submit() end
