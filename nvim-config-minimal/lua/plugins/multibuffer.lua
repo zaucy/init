@@ -209,16 +209,26 @@ return {
 						query,
 					}
 
+					local cwd = vim.uv.cwd()
+					assert(cwd)
 					local new_proc, new_proc_err = vim.uv.spawn("rg", {
 						stdio = { nil, new_proc_stdout, new_proc_stderr },
 						hide = true,
-						cwd = vim.uv.cwd(),
+						cwd = cwd,
 						verbatim = false,
 						args = spawn_args,
 					}, function(code, signal)
 						if code ~= 0 then
 							vim.schedule(function()
 								local search_stats_text = string.format("ripgrep exited with code %i", code)
+								if code == 1 then
+									local pretty_cwd = cwd:gsub("\\", "/")
+									local homedir = vim.fn.substitute(vim.fn.expand("~"), "\\\\", "/", "g")
+									if vim.startswith(pretty_cwd, homedir) then
+										pretty_cwd = "~" .. pretty_cwd:sub(#homedir + 1)
+									end
+									search_stats_text = string.format("ripgrep found 0 matches in %s", pretty_cwd)
+								end
 								mbuf.multibuf_set_header(search_mbuf, { "", "", "", search_stats_text })
 							end)
 						end
