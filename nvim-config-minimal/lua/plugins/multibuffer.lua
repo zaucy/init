@@ -1,4 +1,5 @@
 local multibuffer_expand = 1
+local max_ripgrep_search_buf_count = 100
 
 local function render_multibuf_title(bufnr)
 	local icons = require("nvim-web-devicons")
@@ -43,6 +44,32 @@ return {
 			local multibuffer = require("multibuffer")
 			multibuffer.setup({
 				render_multibuf_title = render_multibuf_title,
+			})
+
+			local all_rg_matches = {}
+			local search_hl_ns = vim.api.nvim_create_namespace("multibuffer_search")
+			vim.api.nvim_set_decoration_provider(search_hl_ns, {
+				on_win = function(_, _, mbuf, top, bot)
+					local rg_matches = all_rg_matches[mbuf]
+					if not rg_matches then
+						return
+					end
+					for line = top, bot do
+						local bufnr, s_lnum = multibuffer.multibuf_get_buf_at_line(mbuf, line)
+						if bufnr and s_lnum then
+							local matches = rg_matches[bufnr] and rg_matches[bufnr][s_lnum]
+							if matches then
+								for _, m in ipairs(matches) do
+									vim.api.nvim_buf_set_extmark(mbuf, search_hl_ns, line, m.start, {
+										end_col = m["end"],
+										hl_group = "Search",
+										ephemeral = true,
+									})
+								end
+							end
+						end
+					end
+				end,
 			})
 
 			vim.api.nvim_set_hl(0, "MultibufferTitleBorder", { link = "FloatBorder" })
@@ -107,6 +134,13 @@ return {
 				local mbuf = require("multibuffer")
 
 				local search_mbuf = mbuf.create_multibuf()
+				all_rg_matches[search_mbuf] = {}
+				vim.api.nvim_create_autocmd("BufWipeout", {
+					buffer = search_mbuf,
+					callback = function()
+						all_rg_matches[search_mbuf] = nil
+					end,
+				})
 				local win = vim.api.nvim_get_current_win()
 				local win_opts = vim.api.nvim_win_get_config(win)
 				vim.api.nvim_win_set_buf(win, search_mbuf)
@@ -222,6 +256,9 @@ return {
 					local new_proc
 					local new_proc_err
 
+					local cwd = vim.uv.cwd()
+					assert(cwd)
+
 					local on_proc_exit_safe = vim.schedule_wrap(function(code, signal)
 						if last_proc_stdout ~= new_proc_stdout then
 							return
@@ -254,8 +291,6 @@ return {
 						on_proc_exit_safe(code, signal)
 					end
 
-					local cwd = vim.uv.cwd()
-					assert(cwd)
 					new_proc, new_proc_err = vim.uv.spawn("rg", {
 						stdio = { nil, new_proc_stdout, new_proc_stderr },
 						hide = true,
@@ -268,18 +303,25 @@ return {
 
 					--- @type table<string, MultibufRegion[]>
 					local regions_by_filename = {}
+					--- @type table<string, table<integer, any>>
+					local matches_by_filename = {}
 					--- @type string[]
 					local done_searching_paths = {}
 					local done_schedule_active = false
 					local total_searched_paths = 0
+					local found_files = 0
 					local stats = nil
 
-					local process_done_searching_paths = vim.schedule_wrap(function()
+					local process_done_searching_paths
+
+					process_done_searching_paths = vim.schedule_wrap(function(batched_searching_paths)
 						local add_opts = {}
 
-						for _, path in ipairs(done_searching_paths) do
+						for _, path in ipairs(batched_searching_paths) do
 							local path_bufnr = vim.fn.bufadd(path)
 							local regions = regions_by_filename[path]
+
+							all_rg_matches[search_mbuf][path_bufnr] = matches_by_filename[path]
 
 							table.sort(regions, function(a, b)
 								return a.start_row < b.start_row
@@ -305,24 +347,32 @@ return {
 							})
 						end
 
-						total_searched_paths = total_searched_paths + #done_searching_paths
+						total_searched_paths = total_searched_paths + #batched_searching_paths
 
 						if stats then
 							local search_stats_text = string.format(
-								"ripgrep found %i matches in %i files in %s",
+								"ripgrep found %i matches in %i files in %s; showing %i files",
 								stats.matches,
-								total_searched_paths,
-								stats.elapsed.human
+								found_files,
+								stats.elapsed.human,
+								total_searched_paths
 							)
 							mbuf.multibuf_set_header(search_mbuf, { "", "", "", search_stats_text })
 						else
-							local search_stats_text = string.format("ripgrep %i files", total_searched_paths)
+							local search_stats_text = string.format("ripgrep %i files", found_files)
 							mbuf.multibuf_set_header(search_mbuf, { "", "", "", search_stats_text })
 						end
 
 						multibuffer.multibuf_add_bufs(search_mbuf, add_opts)
 
-						done_searching_paths = {}
+						if #done_searching_paths > 0 and total_searched_paths < max_ripgrep_search_buf_count then
+							vim.defer_fn(function()
+								local next_batch = { table.remove(done_searching_paths, 1) }
+								process_done_searching_paths(next_batch)
+							end, 10)
+							return
+						end
+
 						done_schedule_active = false
 					end)
 
@@ -330,8 +380,14 @@ return {
 						if done_schedule_active then
 							return
 						end
+
+						if total_searched_paths >= max_ripgrep_search_buf_count then
+							return
+						end
+
 						done_schedule_active = true
-						process_done_searching_paths()
+						local batch = { table.remove(done_searching_paths, 1) }
+						process_done_searching_paths(batch)
 					end
 
 					vim.uv.read_start(new_proc_stderr, function(err, data)
@@ -376,9 +432,9 @@ return {
 									return
 								end
 
-								if msg.data.stats then
-									stats = msg.data.stats
-								end
+								-- if msg.data.stats then
+								-- 	stats = msg.data.stats
+								-- end
 
 								if msg.type == "begin" then
 									local path = msg.data.path.text
@@ -386,6 +442,7 @@ return {
 								elseif msg.type == "end" then
 									local path = msg.data.path.text
 									table.insert(done_searching_paths, path)
+									found_files = found_files + 1
 									try_schedule_done_searching_paths()
 								elseif msg.type == "match" then
 									local path = msg.data.path.text
@@ -397,6 +454,14 @@ return {
 									}
 									assert(regions_by_filename[path])
 									table.insert(regions_by_filename[path], region)
+
+									if not matches_by_filename[path] then
+										matches_by_filename[path] = {}
+									end
+									matches_by_filename[path][match_lnum - 1] = msg.data.submatches
+								elseif msg.type == "summary" then
+									stats = msg.data.stats
+									try_schedule_done_searching_paths()
 								end
 							end
 						end
@@ -412,6 +477,7 @@ return {
 
 				local input_changed = vim.schedule_wrap(function()
 					multibuffer.multibuf_clear_bufs(search_mbuf)
+					all_rg_matches[search_mbuf] = {}
 					clear_header()
 					if #input < 3 then
 						stop_proc()
