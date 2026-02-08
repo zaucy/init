@@ -115,6 +115,10 @@ return {
 
 				local prompt_win = nil
 
+				local function get_prompt_win_width()
+					return win_opts.width - 14
+				end
+
 				local ensure_prompt_win = function()
 					if prompt_win and vim.api.nvim_win_is_valid(prompt_win) then
 						return
@@ -124,11 +128,12 @@ return {
 						relative = "win",
 						anchor = "SW",
 						row = 3,
-						col = 0,
+						col = 6,
 						height = 1,
-						width = win_opts.width - 2,
+						width = get_prompt_win_width(),
 						border = "solid",
 						win = win,
+						fixed = true,
 					})
 
 					vim.api.nvim_create_autocmd({ "BufEnter" }, {
@@ -432,9 +437,9 @@ return {
 
 				local motion_keys = {
 					"j",
-					"k",
+					-- "k",
 					"<Down>",
-					"<Up>",
+					-- "<Up>",
 					"<C-d>",
 					"<C-u>",
 					"<C-f>",
@@ -451,6 +456,20 @@ return {
 					local modes = (string.len(key) > 1 or key:match("%W")) and { "n", "i", "s" } or { "n", "s" }
 					vim.keymap.set(modes, key, move_to_mbuf(key), { buffer = prompt_bufnr })
 				end
+
+				vim.keymap.set({ "n", "i", "s" }, "<C-w>", function()
+					vim.api.nvim_set_current_win(win)
+					local line_count = vim.api.nvim_buf_line_count(search_mbuf)
+					local cursor = vim.api.nvim_win_get_cursor(win)
+					if cursor[1] <= 3 then
+						vim.api.nvim_win_set_cursor(win, { math.min(4, line_count), 0 })
+					end
+					vim.api.nvim_feedkeys(
+						vim.api.nvim_replace_termcodes("<C-\\><C-n><C-w>", true, false, true),
+						"n",
+						true
+					)
+				end, { buffer = prompt_bufnr, nowait = true, noremap = true })
 
 				vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
 					buffer = search_mbuf,
@@ -479,7 +498,7 @@ return {
 							ensure_prompt_win()
 							win = current_win
 							win_opts = vim.api.nvim_win_get_config(win)
-							vim.api.nvim_win_set_width(prompt_win, win_opts.width - 2)
+							vim.api.nvim_win_set_width(prompt_win, get_prompt_win_width())
 
 							local prompt_win_options = vim.api.nvim_win_get_config(prompt_win)
 							prompt_win_options.win = win
@@ -515,7 +534,7 @@ return {
 						assert(prompt_win)
 
 						win_opts = vim.api.nvim_win_get_config(win)
-						vim.api.nvim_win_set_width(prompt_win, win_opts.width - 2)
+						vim.api.nvim_win_set_width(prompt_win, get_prompt_win_width())
 					end,
 				})
 
