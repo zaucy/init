@@ -174,6 +174,7 @@ vim.filetype.add({
 	pattern = {
 		["vs_.*.sc"] = "glsl",
 		["fs_.*.sc"] = "glsl",
+		[".*.sch"] = "glsl",
 	},
 })
 
@@ -259,6 +260,7 @@ return {
 							no_uba = true,
 							no_hot_reload_from_ide = true,
 							-- static_analyzer = "default",
+							include_engine_targets = true,
 						})
 					end)
 				end,
@@ -284,6 +286,7 @@ return {
 							-- build systems I use look for this env variable to skip prebuild steps
 							-- "UBT_SKIP_PREBUILD_STEPS=1",
 							-- },
+							include_engine_targets = true,
 						})
 					end)
 				end,

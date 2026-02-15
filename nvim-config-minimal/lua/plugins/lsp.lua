@@ -97,9 +97,9 @@ return {
 			"AerialOpen",
 		},
 		keys = {
-			{ "<leader>s", "<cmd>AerialOpen<cr>", desc = "Goto Symbol" },
-			{ "]s", "<cmd>AerialNext<cr>", desc = "Next Symbol" },
-			{ "[s", "<cmd>AerialPrev<cr>", desc = "Previous Symbol" },
+			-- { "<leader>s", "<cmd>AerialOpen<cr>", desc = "Goto Symbol" },
+			-- { "]s", "<cmd>AerialNext<cr>", desc = "Next Symbol" },
+			-- { "[s", "<cmd>AerialPrev<cr>", desc = "Previous Symbol" },
 		},
 	},
 	{

@@ -92,119 +92,66 @@ end
 vim.api.nvim_create_user_command("BazelDebug", bazel_debug_launch, {})
 vim.api.nvim_create_user_command("BazelDebugAttachWait", bazel_debug_attach, {})
 
-local bazel_group = vim.api.nvim_create_augroup("BazelRefresh", { clear = true })
-local refresh_timer
 local bazel_refresh_handle
 
-vim.api.nvim_create_autocmd("BufWritePre", {
-	group = bazel_group,
-	pattern = "*.bazel",
-	callback = function()
-		local filepath = vim.api.nvim_buf_get_name(0)
-		if vim.fn.filereadable(filepath) == 1 then
-			vim.b.bazel_pre_hash = vim.fn.sha256(table.concat(vim.fn.readfile(filepath), "\n"))
-		else
-			vim.b.bazel_pre_hash = ""
-		end
-	end,
-})
+local function bazel_refresh()
+	local fidget = require("fidget")
+	local progress = fidget.progress.handle.create({
+		title = "//bazel/dev:refresh_compile_commands",
+		lsp_client = { name = "zaucy bazel.lua" },
+		message = "bazel run",
+		cancellable = true,
+		done = false,
+	})
 
-vim.api.nvim_create_autocmd("BufWritePost", {
-	group = bazel_group,
-	pattern = "*.bazel",
-	callback = function(ev)
-		if refresh_timer then
-			refresh_timer:stop()
-			if not refresh_timer:is_closing() then
-				refresh_timer:close()
+	local stdout = vim.uv.new_pipe(false)
+	assert(stdout)
+
+	if bazel_refresh_handle and not bazel_refresh_handle:is_closing() then
+		bazel_refresh_handle:kill("sigint")
+	end
+
+	bazel_refresh_handle = vim.uv.spawn("bazel", {
+		args = { "run", "//bazel/dev:refresh_compile_commands" },
+		cwd = vim.uv.cwd(),
+		stdio = { nil, stdout, nil },
+	}, function(code)
+		stdout:read_stop()
+
+		stdout:close()
+
+		if bazel_refresh_handle then
+			bazel_refresh_handle:close()
+		end
+
+		vim.schedule(function()
+			if code ~= 0 then
+				progress.message = "refresh failed (code: " .. tostring(code) .. ")"
+				progress:cancel()
+			else
+				progress:finish()
+				pcall(vim.cmd.lsp, "restart clangd")
+			end
+		end)
+	end)
+
+	vim.uv.read_start(stdout, function(err, data)
+		if not err and data then
+			local lines = vim.split(data, "\n", { trimempty = true })
+
+			if #lines > 0 then
+				local last_line = vim.trim(lines[#lines])
+
+				vim.schedule(function()
+					progress:report({
+						title = "//bazel/dev:refresh_compile_commands",
+						lsp_client = { name = "zaucy bazel.lua" },
+						message = last_line,
+					})
+				end)
 			end
 		end
+	end)
+end
 
-		refresh_timer = vim.uv.new_timer()
-		assert(refresh_timer)
-		refresh_timer:start(
-			500,
-			0,
-			vim.schedule_wrap(function()
-				if refresh_timer then
-					if not refresh_timer:is_closing() then
-						refresh_timer:close()
-					end
-					refresh_timer = nil
-				end
-
-				local filepath = vim.api.nvim_buf_get_name(ev.buf)
-				local current_hash = ""
-				if vim.fn.filereadable(filepath) == 1 then
-					current_hash = vim.fn.sha256(table.concat(vim.fn.readfile(filepath), "\n"))
-				end
-
-				local pre_hash = ""
-				local ok, val = pcall(vim.api.nvim_buf_get_var, ev.buf, "bazel_pre_hash")
-				if ok then
-					pre_hash = val
-				end
-
-				if pre_hash == current_hash then
-					return
-				end
-
-				local fidget = require("fidget")
-				local progress = fidget.progress.handle.create({
-					title = "//bazel/dev:refresh_compile_commands",
-					lsp_client = { name = "zaucy bazel.lua" },
-					message = "bazel run",
-				})
-
-				local stdout = vim.uv.new_pipe(false)
-				assert(stdout)
-
-				if bazel_refresh_handle and not bazel_refresh_handle:is_closing() then
-					bazel_refresh_handle:kill("sigterm")
-				end
-
-				bazel_refresh_handle = vim.uv.spawn("bazel", {
-					args = { "run", "//bazel/dev:refresh_compile_commands" },
-					cwd = vim.uv.cwd(),
-					stdio = { nil, stdout, nil },
-				}, function(code)
-					stdout:read_stop()
-
-					stdout:close()
-
-					if bazel_refresh_handle then
-						bazel_refresh_handle:close()
-					end
-
-					vim.schedule(function()
-						if code ~= 0 then
-							progress.message = "refresh failed (code: " .. tostring(code) .. ")"
-							progress:cancel()
-						else
-							progress:finish()
-							vim.cmd("lsp restart clangd")
-						end
-					end)
-				end)
-
-				vim.uv.read_start(stdout, function(err, data)
-					if not err and data then
-						local lines = vim.split(data, "\n", { trimempty = true })
-
-						if #lines > 0 then
-							local last_line = vim.trim(lines[#lines])
-
-							vim.schedule(function()
-								progress:report({
-									title = "//bazel/dev:refresh_compile_commands",
-									lsp_client = { name = "zaucy bazel.lua" },
-									message = last_line,
-								})
-							end)
-						end
-					end
-				end)
-			end)
-		)
-	end,
-})
+vim.api.nvim_create_user_command("BazelRefresh", bazel_refresh, {})

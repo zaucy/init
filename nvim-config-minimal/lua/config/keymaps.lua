@@ -142,6 +142,8 @@ vim.keymap.set(
 	{ desc = "open fzf (config)" }
 )
 
+vim.keymap.set({"n", "v"}, "<leader>s", function() require("multibuffer.plugins.symbols").multibuf_document_symbols(0) end)
+
 local function is_buf_similar(buf1, buf2)
 	if vim.bo[buf1].buftype ~= vim.bo[buf2].buftype then
 		return false
@@ -265,7 +267,8 @@ vim.keymap.set({ "n" }, "grr", "<cmd>Telescope lsp_references<cr>", { desc = "vi
 vim.keymap.set(
 	{ "n", "v" },
 	"<leader>S",
-	function() require('zaucy.lsp').dynamic_workspace_symbols({ theme = "ivy" }) end,
+	-- function() require('zaucy.lsp').dynamic_workspace_symbols({ theme = "ivy" }) end,
+	function() require('multibuffer.plugins.symbols').multibuf_workspace_symbols("") end,
 	{ desc = "Workspace symbols" }
 )
 
@@ -274,8 +277,7 @@ vim.keymap.set(
 	"grs",
 	function()
 		local word =  vim.fn.expand("<cword>")
-		require('zaucy.lsp').dynamic_workspace_symbols({ theme = "ivy", })
-		vim.api.nvim_feedkeys(word, "n", false)
+		require('multibuffer.plugins.symbols').multibuf_workspace_symbols(word)
 	end,
 	{ desc = "Workspace symbols" }
 )
