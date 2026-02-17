@@ -22,15 +22,5 @@ vim.api.nvim_create_autocmd("User", {
 			},
 			tier = 0,
 		}
-		require("nvim-treesitter.parsers").ecsact = {
-			install_info = {
-				url = "https://github.com/ecsact-dev/tree-sitter-ecsact",
-				files = { "src/parser.c" },
-				generate_requires_npm = false,
-				requires_generate_from_grammar = false,
-				revision = nil,
-			},
-			tier = 2,
-		}
 	end,
 })

@@ -15,6 +15,12 @@ vim.opt.undodir = vim.fn.stdpath("data") .. "/undo//"
 vim.opt.backup = true
 vim.opt.backupdir = vim.fn.stdpath("data") .. "/backup//"
 
+vim.api.nvim_create_autocmd("FileType", {
+	callback = function(args)
+		pcall(vim.treesitter.start, args.buf)
+	end,
+})
+
 vim.schedule(function()
 	vim.cmd("packadd nvim.undotree")
 	vim.cmd("packadd nvim.difftool")
@@ -50,7 +56,6 @@ vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "CursorHoldI", "FocusGai
 vim.filetype.add({ extension = { nu = "nu" } })
 vim.filetype.add({ extension = { bazelrc = "bazelrc" } })
 vim.filetype.add({ extension = { cpp2 = "cpp2" } })
-vim.filetype.add({ extension = { ecsact = "ecsact" } })
 vim.filetype.add({
 	filename = {
 		["bgfx_shader.sh"] = "glsl",
