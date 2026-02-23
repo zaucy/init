@@ -102,6 +102,7 @@ return {
 
 			vim.keymap.set({ "n", "v" }, "<C-w>/", function()
 				local word = vim.fn.expand("<cword>")
+				require("multibuffer.plugins.ripgrep").multibuffer_expand = 0
 				require("multibuffer.plugins.ripgrep").multibuf_ripgrep({ default_input = word })
 			end, { desc = "open search window" })
 		end,

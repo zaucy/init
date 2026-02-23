@@ -191,12 +191,13 @@ local last_exec_cmds = ""
 
 local function uproject_play_with_last_exec_cmds()
 	local async = require("async")
-	async.run(function()
+	local task = async.run(function()
 		require("uproject").uproject_play(vim.fn.getcwd(), {
 			log_cmds = "Log Log",
 			exec_cmds = last_exec_cmds,
 		})
 	end)
+	task:raise_on_error()
 end
 
 local function uproject_play_with_exec_cmds_prompt()
@@ -230,7 +231,6 @@ return {
 				desc = "Build and open Unreal Editor",
 			},
 			{ "<leader>uR", "<cmd>Uproject reload show_output<cr>", desc = "Reload uproject" },
-			{ "<leader>uC", "<cmd>Uproject clean <cr>", desc = "Clean" },
 			{ "<leader>uL", "<cmd>Uproject unlock_build_dirs <cr>", desc = "Unlock build dirs" },
 			{
 				"<leader>udo",
@@ -243,6 +243,36 @@ return {
 
 			{ "<leader>uP", desc = "Play", uproject_play_with_exec_cmds_prompt },
 			{ "<leader>up", desc = "Play (with last exec cmds)", uproject_play_with_last_exec_cmds },
+
+			{
+				"<leader>uC",
+				desc = "Cook",
+				function()
+					local async = require("async")
+					async.run(function()
+						require("uproject").uproject_cook(vim.fn.getcwd(), {
+							hide_output = false,
+							use_last_target = false,
+							iterative_cooking = true,
+						})
+					end)
+				end,
+			},
+
+			{
+				"<leader>uc",
+				desc = "Cook",
+				function()
+					local async = require("async")
+					async.run(function()
+						require("uproject").uproject_cook(vim.fn.getcwd(), {
+							hide_output = false,
+							use_last_target = true,
+							iterative_cooking = true,
+						})
+					end)
+				end,
+			},
 
 			{
 				"<leader>uB",
@@ -260,7 +290,6 @@ return {
 							no_uba = true,
 							no_hot_reload_from_ide = true,
 							-- static_analyzer = "default",
-							include_engine_targets = true,
 						})
 					end)
 				end,
@@ -286,7 +315,6 @@ return {
 							-- build systems I use look for this env variable to skip prebuild steps
 							-- "UBT_SKIP_PREBUILD_STEPS=1",
 							-- },
-							include_engine_targets = true,
 						})
 					end)
 				end,
