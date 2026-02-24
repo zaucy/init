@@ -47,6 +47,29 @@ return {
 				capabilities = capabilities,
 			})
 
+			vim.lsp.config("clangd", {
+				capabilities = capabilities,
+				cmd = {
+					"clangd",
+					"--background-index",
+					"--clang-tidy",
+					"--header-insertion=never",
+					"--limit-results=100",
+					"--j=4",
+					"--pch-storage=disk", -- mostly needed for unreal to save on memory
+					"--completion-style=bundled",
+				},
+				filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
+				root_markers = {
+					".clangd",
+					"compile_commands.json",
+					"build.ninja",
+					"CMakeLists.txt",
+					".git",
+					"Default.uprojectdirs",
+				},
+			})
+
 			vim.lsp.config("nushell", {
 				capabilities = capabilities,
 				filetypes = { "nu" },
