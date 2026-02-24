@@ -1,6 +1,6 @@
 local function render_multibuf_title(bufnr)
 	local icons = require("nvim-web-devicons")
-	local buf_name = vim.api.nvim_buf_get_name(bufnr)
+	local buf_name = vim.uri_to_fname(vim.uri_from_bufnr(bufnr))
 	local icon, icon_hl_group = icons.get_icon(buf_name)
 	local nice_buf_name = vim.fn.fnamemodify(buf_name, ":~:.")
 	nice_buf_name = string.gsub(nice_buf_name, "\\", "/")
@@ -40,7 +40,11 @@ return {
 		config = function()
 			local multibuffer = require("multibuffer")
 			multibuffer.setup({
+				region_hl_odd_adjust = 4,
 				render_multibuf_title = render_multibuf_title,
+				render_expand_lines = function()
+					return {}
+				end,
 			})
 
 			vim.api.nvim_set_hl(0, "MultibufferTitleBorder", { link = "FloatBorder" })

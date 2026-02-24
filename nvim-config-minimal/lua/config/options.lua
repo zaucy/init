@@ -75,7 +75,9 @@ vim.filetype.add({
 	filename = { ["release-notes-template"] = "tera" },
 })
 
-vim.keymap.set("n", "gd", vim.lsp.buf.definition)
+vim.keymap.set("n", "gd", function()
+	require("multibuffer.plugins.lsp").goto_definition()
+end)
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
 	underline = true,

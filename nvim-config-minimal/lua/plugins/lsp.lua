@@ -36,7 +36,9 @@ return {
 					exclude = { "omnisharp" },
 				},
 				ensure_installed = {
-					"lua_ls",
+					--- issue with newer lua_ls
+					--- https://github.com/folke/lazydev.nvim/issues/136
+					"lua_ls@3.16.4",
 				},
 			})
 
@@ -48,6 +50,11 @@ return {
 			vim.lsp.config("nushell", {
 				capabilities = capabilities,
 				filetypes = { "nu" },
+			})
+
+			vim.lsp.config("ecsact", {
+				capabilities = capabilities,
+				filetypes = { "ecsact" },
 			})
 
 			vim.lsp.enable("nushell", true)
