@@ -180,9 +180,9 @@ local function bind_chat_keys(buf)
 	vim.keymap.set({ "t", "v", "n" }, "<Tab>", function()
 		M.chat_switch_tab_next()
 	end, { buffer = buf })
-	vim.keymap.set({ "t", "v", "n" }, "<S-Tab>", function()
-		M.chat_switch_tab_prev()
-	end, { buffer = buf })
+	-- vim.keymap.set({ "t", "v", "n" }, "<S-Tab>", function()
+	-- 	M.chat_switch_tab_prev()
+	-- end, { buffer = buf })
 end
 
 local function create_chat_term_buf()
@@ -767,7 +767,11 @@ function M._update_transparency()
 				vim.api.nvim_set_option_value("winblend", blend, { win = win })
 				if is_underneath then
 					vim.api.nvim_win_set_hl_ns(win, ns)
-					vim.api.nvim_set_option_value("winhighlight", "Normal:Normal,FloatBorder:FloatBorder,NormalFloat:NormalFloat", { win = win })
+					vim.api.nvim_set_option_value(
+						"winhighlight",
+						"Normal:Normal,FloatBorder:FloatBorder,NormalFloat:NormalFloat",
+						{ win = win }
+					)
 				else
 					vim.api.nvim_win_set_hl_ns(win, 0)
 					if win == state.layout.wins.body then

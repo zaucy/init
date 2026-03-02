@@ -39,12 +39,28 @@ return {
 					--- issue with newer lua_ls
 					--- https://github.com/folke/lazydev.nvim/issues/136
 					"lua_ls@3.16.4",
+					"basedpyright",
 				},
 			})
 
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 			vim.lsp.config("*", {
 				capabilities = capabilities,
+			})
+
+			vim.lsp.config("basedpyright", {
+				capabilities = capabilities,
+				settings = {
+					basedpyright = {
+						analysis = {
+							autoSearchPaths = true,
+							useLibraryCodeForTypes = true,
+							diagnosticMode = "openFilesOnly",
+							-- Add your blender stubs path here if you install them manually
+							-- extraPaths = { vim.fn.expand("~/path/to/blender-stubs") },
+						},
+					},
+				},
 			})
 
 			vim.lsp.config("clangd", {
@@ -82,6 +98,7 @@ return {
 
 			vim.lsp.enable("nushell", true)
 			vim.lsp.enable("lua_ls", true)
+			vim.lsp.enable("basedpyright", true)
 		end,
 	},
 	{
