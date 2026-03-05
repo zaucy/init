@@ -177,6 +177,9 @@ local function bind_chat_keys(buf)
 	if not buf or not vim.api.nvim_buf_is_valid(buf) then
 		return
 	end
+	vim.keymap.set({ "t" }, "<S-CR>", "\\\r", { buffer = buf })
+	vim.keymap.set({ "t" }, "<C-CR>", "\\\r", { buffer = buf })
+	vim.keymap.set({ "t" }, "<S-Tab>", "\x1b[Z", { buffer = buf })
 	vim.keymap.set({ "t", "v", "n" }, "<Tab>", function()
 		M.chat_switch_tab_next()
 	end, { buffer = buf })
