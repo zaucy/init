@@ -336,6 +336,9 @@ vim.api.nvim_create_autocmd("SessionLoadPost", {
 -- chat
 -- require("zaucy.chat").set_toggle_key("<C-S-CR>")
 vim.keymap.set({"n", "v"}, "<C-S-CR>", function() require("zaucy.chat").chat_toggle() end)
+vim.keymap.set({"n", "v", "t"}, "<C-S-Up>", function() require("zaucy.chat").chat_set_fullscreen(true) end)
+vim.keymap.set({"n", "v", "t"}, "<C-S-Down>", function() require("zaucy.chat").chat_set_fullscreen(false) end)
+vim.keymap.set({"n", "v", "i"}, "<C-\\>f", "<cmd>GeminiFollow<cr>")
 
 vim.api.nvim_create_autocmd("User", {
 	pattern = "ZaucyChatTerminalBufCreated",

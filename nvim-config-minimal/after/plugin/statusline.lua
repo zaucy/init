@@ -111,8 +111,22 @@ local function colorize_path()
 	return scheme .. dir_color .. dir .. file_color .. filename
 end
 
+vim.api.nvim_set_hl(0, "StatusLineGeminiFollow", {
+	fg = "#000000", -- Pure black for maximum contrast
+	bg = "#e67e22", -- Rich, deep orange
+	bold = true,
+})
+
+local function gemini_follow_color()
+	local winid = vim.g.statusline_winid or 0
+	if require("gemini.follow").is_following(winid) then
+		return "%#StatusLineGeminiFollow# 󰚩 󰍉 %* "
+	end
+	return ""
+end
+
 function ZaucyStatusline()
-	local status_str = sys_icon .. colorize_path() .. [[%* %h%m%r %=%-14.(%l,%c%V%) %P]]
+	local status_str = gemini_follow_color() .. sys_icon .. colorize_path() .. [[%* %h%m%r %=%-14.(%l,%c%V%) %P]]
 	if package.loaded.dap then
 		local session = require("dap").session()
 		if session ~= nil then

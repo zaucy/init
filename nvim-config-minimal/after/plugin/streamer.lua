@@ -17,6 +17,7 @@ local function streamer_mode()
 
 	require("proj").add_exclude_dir(vim.fn.expand("~/projects/priv"))
 	require("proj").add_exclude_dir(vim.fn.expand("C:/d2d"))
+	require("proj").add_exclude_dir(vim.fn.expand("C:/p4"))
 	require("proj").add_exclude_dir(vim.fn.expand("E:/d2d"))
 end
 

@@ -20,7 +20,10 @@ return {
 	{
 		"nvim-treesitter/nvim-treesitter-context",
 		event = "VeryLazy",
-		opts = {},
+		opts = {
+			max_lines = 3,
+			multiwindow = false,
+		},
 		dependencies = {
 			"nvim-treesitter/nvim-treesitter",
 		},

@@ -1,7 +1,7 @@
 return {
 	{
 		"MeanderingProgrammer/render-markdown.nvim",
-		ft = { "opencode_output" },
+		ft = { "opencode_output", "gemini_output", "markdown" },
 		dependencies = {
 			"nvim-treesitter/nvim-treesitter",
 			"nvim-tree/nvim-web-devicons",
@@ -12,7 +12,7 @@ return {
 			-- debounce = 0,
 			-- sign = { enabled = false },
 			anti_conceal = { enabled = false },
-			file_types = { "opencode_output" },
+			-- file_types = { "opencode_output" },
 			restart_highlighter = true,
 			heading = {
 				position = "inline",

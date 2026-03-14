@@ -31,6 +31,9 @@ local M = {
 
 	--- @type table<string, boolean>
 	_dir_loading = {},
+
+	--- @type boolean
+	_is_fullscreen = false,
 }
 
 local ns = vim.api.nvim_create_namespace("ZaucyChatTabs")
@@ -277,6 +280,16 @@ end
 function Layout:get_geometry()
 	local editor_width = vim.o.columns
 	local editor_height = vim.o.lines
+
+	if M._is_fullscreen then
+		return {
+			col = 0,
+			row = 0,
+			width = editor_width,
+			height = editor_height,
+		}
+	end
+
 	local width = math.floor(editor_width * 0.4)
 	if width < 90 then
 		width = 90
@@ -301,7 +314,8 @@ end
 function Layout:update_text()
 	local geo = self:get_geometry()
 	local btn1_width = 13
-	local cwd_btn_width = math.max(1, geo.width - (btn1_width + 1))
+	local border_w = M._is_fullscreen and 0 or 1
+	local cwd_btn_width = math.max(1, geo.width - (btn1_width + border_w))
 
 	if self.bufs.chat_btn and vim.api.nvim_buf_is_valid(self.bufs.chat_btn) then
 		-- Width 14.
@@ -351,6 +365,7 @@ function Layout:mount()
 	local geo = self:get_geometry()
 	local header_height = 3
 	local btn1_width = 13
+	local border_w = M._is_fullscreen and 0 or 1
 
 	-- Create Buffers if needed
 	if not self.bufs.chat_btn or not vim.api.nvim_buf_is_valid(self.bufs.chat_btn) then
@@ -374,7 +389,7 @@ function Layout:mount()
 		width = btn1_width,
 		height = header_height,
 		style = "minimal",
-		border = { "", "", "", "", "", "", "", "│" },
+		border = M._is_fullscreen and "none" or { "", "", "", "", "", "", "", "│" },
 		focusable = false,
 		zindex = 50,
 	})
@@ -383,12 +398,12 @@ function Layout:mount()
 	vim.wo[self.wins.chat_btn].winfixbuf = true
 
 	-- CWD Button Window
-	-- Shifted by btn1_width + 1 (border)
+	-- Shifted by btn1_width + border_w (border)
 	self.wins.cwd_btn = vim.api.nvim_open_win(self.bufs.cwd_btn, false, {
 		relative = "editor",
 		row = geo.row,
-		col = geo.col + btn1_width + 1,
-		width = math.max(1, geo.width - (btn1_width + 1)),
+		col = geo.col + btn1_width + border_w,
+		width = math.max(1, geo.width - (btn1_width + border_w)),
 		height = header_height,
 		style = "minimal",
 		border = "none",
@@ -406,10 +421,10 @@ function Layout:mount()
 		relative = "editor",
 		row = geo.row + header_height + 1,
 		col = geo.col,
-		width = math.max(1, geo.width - 1),
+		width = math.max(1, geo.width - border_w),
 		height = math.max(1, geo.height - header_height - 1),
 		style = "minimal",
-		border = { "", "", "", "", "", "", "", "│" },
+		border = M._is_fullscreen and "none" or { "", "", "", "", "", "", "", "│" },
 		focusable = true,
 		zindex = 50,
 	})
@@ -430,6 +445,22 @@ function Layout:mount()
 		end,
 	})
 
+	vim.api.nvim_create_autocmd("WinLeave", {
+		group = self.augroup,
+		callback = function()
+			if M._is_fullscreen then
+				local left_win = vim.api.nvim_get_current_win()
+				if self:contains_win(left_win) then
+					vim.schedule(function()
+						if not M.chat_is_focused() then
+							M.chat_hide()
+						end
+					end)
+				end
+			end
+		end,
+	})
+
 	M._ensure_global_autocmds()
 end
 
@@ -437,6 +468,7 @@ function Layout:resize()
 	local geo = self:get_geometry()
 	local header_height = 3
 	local btn1_width = 13
+	local border_w = M._is_fullscreen and 0 or 1
 
 	if self.wins.chat_btn and vim.api.nvim_win_is_valid(self.wins.chat_btn) then
 		vim.api.nvim_win_set_config(self.wins.chat_btn, {
@@ -445,6 +477,7 @@ function Layout:resize()
 			col = geo.col,
 			width = btn1_width,
 			height = header_height,
+			border = M._is_fullscreen and "none" or { "", "", "", "", "", "", "", "│" },
 		})
 	end
 
@@ -452,8 +485,8 @@ function Layout:resize()
 		vim.api.nvim_win_set_config(self.wins.cwd_btn, {
 			relative = "editor",
 			row = geo.row,
-			col = geo.col + btn1_width + 1,
-			width = math.max(1, geo.width - (btn1_width + 1)),
+			col = geo.col + btn1_width + border_w,
+			width = math.max(1, geo.width - (btn1_width + border_w)),
 			height = header_height,
 		})
 	end
@@ -463,12 +496,25 @@ function Layout:resize()
 			relative = "editor",
 			row = geo.row + header_height + 1,
 			col = geo.col,
-			width = math.max(1, geo.width - 1),
+			width = math.max(1, geo.width - border_w),
 			height = math.max(1, geo.height - header_height - 1),
+			border = M._is_fullscreen and "none" or { "", "", "", "", "", "", "", "│" },
 		})
 	end
 
 	self:update_text()
+	update_button_state()
+end
+
+function M._reset_transparency()
+	local all_wins = vim.api.nvim_tabpage_list_wins(0)
+	for _, win in ipairs(all_wins) do
+		if vim.api.nvim_win_is_valid(win) then
+			vim.api.nvim_set_option_value("winblend", 0, { win = win })
+			vim.api.nvim_win_set_hl_ns(win, 0)
+			vim.api.nvim_set_option_value("winhighlight", "", { win = win })
+		end
+	end
 end
 
 function Layout:unmount()
@@ -486,6 +532,7 @@ function Layout:unmount()
 		self.augroup = nil
 	end
 	self.wins = { body = nil, chat_btn = nil, cwd_btn = nil }
+	M._reset_transparency()
 	M._cleanup_global_autocmds()
 end
 
@@ -927,6 +974,17 @@ end
 
 function M.chat_switch_tab_prev()
 	M.chat_switch_tab(M._active_tab_index - 1)
+end
+
+--- @param is_fullscreen boolean
+function M.chat_set_fullscreen(is_fullscreen)
+	M._is_fullscreen = is_fullscreen
+	for _, state in pairs(M._tabpage_state) do
+		if state.layout and state.layout:valid() then
+			state.layout:resize()
+		end
+	end
+	M._update_loading_overlay()
 end
 
 --- @param opts chat.SetupOptions

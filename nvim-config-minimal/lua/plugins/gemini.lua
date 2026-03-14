@@ -75,6 +75,9 @@ return {
 		dependencies = {
 			"zaucy/mcp.nvim",
 		},
-		opts = {},
+		opts = {
+			sticky_max_width = 100,
+			sticky_max_height = 30,
+		},
 	},
 }
