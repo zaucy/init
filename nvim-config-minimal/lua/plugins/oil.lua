@@ -5,13 +5,10 @@ local default_hidden = {
 
 local git_ignored = setmetatable({}, {
 	__index = function(self, key)
-		local proc = vim.system(
-			{ "git", "ls-files", "--ignored", "--exclude-standard", "--others", "--directory" },
-			{
-				cwd = key,
-				text = true,
-			}
-		)
+		local proc = vim.system({ "git", "ls-files", "--ignored", "--exclude-standard", "--others", "--directory" }, {
+			cwd = key,
+			text = true,
+		})
 		local result = proc:wait()
 		local ret = {}
 		if result.code == 0 then
@@ -41,35 +38,36 @@ local function is_hidden_file(name, _)
 	return vim.list_contains(git_ignored[dir], name)
 end
 
-vim.api.nvim_create_autocmd({ 'BufReadPre' }, {
+vim.api.nvim_create_autocmd({ "BufReadPre" }, {
 	pattern = "oil://*",
 	callback = function(ev)
-		local dir = vim.fs.normalize(require('oil').get_current_dir())
+		local dir = vim.fs.normalize(require("oil").get_current_dir())
 		rawset(git_ignored, dir, nil)
 	end,
 })
 
-vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
+vim.api.nvim_create_autocmd({ "BufWritePost" }, {
 	pattern = "*/.gitignore",
 	callback = function(ev)
 		local dir = vim.fs.normalize(vim.fs.dirname(ev.file))
 		rawset(git_ignored, dir, nil)
-		require('oil.view').rerender_all_oil_buffers({ refetch = false })
+		require("oil.view").rerender_all_oil_buffers({ refetch = false })
 	end,
 })
 
-vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
+vim.api.nvim_create_autocmd({ "BufWritePost" }, {
 	pattern = "oil://*",
 	callback = function(ev)
-		local dir = vim.fs.normalize(require('oil').get_current_dir())
+		local dir = vim.fs.normalize(require("oil").get_current_dir())
 		rawset(git_ignored, dir, nil)
-		require('oil.view').rerender_all_oil_buffers({ refetch = false })
+		require("oil.view").rerender_all_oil_buffers({ refetch = false })
 	end,
 })
 
 return {
 	{
 		"stevearc/oil.nvim",
+		enabled = false,
 		lazy = false,
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		opts = {
@@ -94,8 +92,16 @@ return {
 			keymaps = {
 				["g?"] = "actions.show_help",
 				["<CR>"] = "actions.select",
-				["<C-s>"] = { "actions.select", opts = { vertical = true }, desc = "Open the entry in a vertical split" },
-				["<C-h>"] = { "actions.select", opts = { horizontal = true }, desc = "Open the entry in a horizontal split" },
+				["<C-s>"] = {
+					"actions.select",
+					opts = { vertical = true },
+					desc = "Open the entry in a vertical split",
+				},
+				["<C-h>"] = {
+					"actions.select",
+					opts = { horizontal = true },
+					desc = "Open the entry in a horizontal split",
+				},
 				["<C-t>"] = { "actions.select", opts = { tab = true }, desc = "Open the entry in new tab" },
 				["<C-p>"] = "actions.preview",
 				["<C-c>"] = "actions.close",
@@ -107,7 +113,12 @@ return {
 				["g."] = "actions.toggle_hidden",
 				["g\\"] = "actions.toggle_trash",
 				["`"] = { "actions.cd", opts = { silent = true } },
-				["~"] = { "actions.cd", opts = { scope = "tab", silent = true }, desc = ":tcd to the current oil directory", mode = "n" },
+				["~"] = {
+					"actions.cd",
+					opts = { scope = "tab", silent = true },
+					desc = ":tcd to the current oil directory",
+					mode = "n",
+				},
 			},
 			win_options = {
 				-- for git status
@@ -116,12 +127,13 @@ return {
 		},
 		cmd = { "Oil" },
 		keys = {
-			{ "<leader>e", "<cmd>Oil<cr>",   desc = "Explore Files" },
+			{ "<leader>e", "<cmd>Oil<cr>", desc = "Explore Files" },
 			{ "<leader>E", "<cmd>Oil .<cr>", desc = "Explore Files (PWD)" },
 		},
 	},
 	{
 		"refractalize/oil-git-status.nvim",
+		enabled = false,
 		config = {
 			show_ignored = false,
 			symbols = {
@@ -154,5 +166,5 @@ return {
 		dependencies = {
 			"stevearc/oil.nvim",
 		},
-	}
+	},
 }

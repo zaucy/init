@@ -119,9 +119,9 @@ vim.api.nvim_set_hl(0, "StatusLineGeminiFollow", {
 
 local function gemini_follow_color()
 	local winid = vim.g.statusline_winid or 0
-	if require("gemini.follow").is_following(winid) then
-		return "%#StatusLineGeminiFollow# 󰚩 󰍉 %* "
-	end
+	-- if require("gemini.follow").is_following(winid) then
+	-- 	return "%#StatusLineGeminiFollow# 󰚩 󰍉 %* "
+	-- end
 	return ""
 end
 
