@@ -155,3 +155,16 @@ local function bazel_refresh()
 end
 
 vim.api.nvim_create_user_command("BazelRefresh", bazel_refresh, {})
+
+vim.api.nvim_create_autocmd("BufReadPost", {
+	callback = function()
+		local buf_name = vim.api.nvim_buf_get_name(0)
+		if buf_name:find("bazel", 1, true) == nil then
+			return
+		end
+		local real_path = vim.loop.fs_realpath(vim.api.nvim_buf_get_name(0))
+		if real_path and real_path ~= vim.api.nvim_buf_get_name(0) then
+			vim.api.nvim_command("edit " .. real_path)
+		end
+	end,
+})

@@ -99,6 +99,13 @@ return {
 			vim.lsp.enable("nushell", true)
 			vim.lsp.enable("lua_ls", true)
 			vim.lsp.enable("basedpyright", true)
+
+			-- vim.lsp.config("bgfx_shader_analyzer", {
+			-- 	filetypes = { "glsl", "sc" },
+			-- 	cmd = { "bgfx_shader_analyzer" },
+			-- 	root_markers = { ".git" },
+			-- })
+			-- vim.lsp.enable("bgfx_shader_analyzer")
 		end,
 	},
 	{
