@@ -35,6 +35,8 @@ local function bzlmod_add()
 	end)
 end
 
+vim.keymap.set({"n", "v"}, "<C-S-U>", function() vim.pack.update(nil) end, { desc = "Update all packages" })
+
 vim.keymap.set({"n", "v"}, "<leader>e", "<cmd>Oil<cr>", { desc = "Explore Files" })
 vim.keymap.set({"n", "v"}, "<leader>E", "<cmd>Oil .<cr>", { desc = "Explore Files (PWD)" })
 
