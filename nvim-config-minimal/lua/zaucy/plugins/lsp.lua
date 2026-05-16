@@ -19,13 +19,13 @@ require("mason-lspconfig").setup({
 	},
 })
 
-local capabilities = require("cmp_nvim_lsp").default_capabilities()
-vim.lsp.config("*", {
-	capabilities = capabilities,
-})
+-- local capabilities = require("cmp_nvim_lsp").default_capabilities()
+-- vim.lsp.config("*", {
+-- 	capabilities = capabilities,
+-- })
 
 vim.lsp.config("basedpyright", {
-	capabilities = capabilities,
+	-- capabilities = capabilities,
 	settings = {
 		basedpyright = {
 			analysis = {
@@ -38,7 +38,7 @@ vim.lsp.config("basedpyright", {
 })
 
 vim.lsp.config("clangd", {
-	capabilities = capabilities,
+	-- capabilities = capabilities,
 	cmd = {
 		"clangd",
 		"--background-index",
@@ -61,12 +61,12 @@ vim.lsp.config("clangd", {
 })
 
 vim.lsp.config("nushell", {
-	capabilities = capabilities,
+	-- capabilities = capabilities,
 	filetypes = { "nu" },
 })
 
 vim.lsp.config("ecsact", {
-	capabilities = capabilities,
+	-- capabilities = capabilities,
 	filetypes = { "ecsact" },
 })
 
