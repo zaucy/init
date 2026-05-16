@@ -107,3 +107,4 @@ end
 require("zaucy.plugins.lsp")
 require("zaucy.plugins.ui")
 require("zaucy.plugins.gamedev")
+require("zaucy.plugins.git")
