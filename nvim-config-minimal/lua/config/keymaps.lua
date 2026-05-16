@@ -35,6 +35,9 @@ local function bzlmod_add()
 	end)
 end
 
+vim.keymap.set({"n", "v"}, "<leader>e", "<cmd>Oil<cr>", { desc = "Explore Files" })
+vim.keymap.set({"n", "v"}, "<leader>E", "<cmd>Oil .<cr>", { desc = "Explore Files (PWD)" })
+
 vim.keymap.set({ "n" }, "gbb", goto_closest_file("BUILD.bazel"), { desc = "Bazel Build File" })
 vim.keymap.set({ "n" }, "gbm", goto_closest_file("MODULE.bazel"), { desc = "Bazel Module File" })
 vim.keymap.set({ "n" }, "gbw", goto_closest_file("WORKSPACE.bazel"), { desc = "Bazel Workspace File" })

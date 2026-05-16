@@ -79,11 +79,11 @@ vim.keymap.set("n", "gd", function()
 	require("multibuffer.plugins.lsp").goto_definition()
 end)
 
-vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-	underline = true,
-	signs = false,
-	update_in_insert = false,
-})
+-- vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+-- 	underline = true,
+-- 	signs = false,
+-- 	update_in_insert = false,
+-- })
 
 if vim.g.neovide then
 	-- scale factors that leave no space on the left/right with my preferred
