@@ -1,0 +1,1 @@
+-- vim-flatbuffers has no setup
