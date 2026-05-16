@@ -182,13 +182,12 @@ local function bind_chat_keys(buf)
 	end
 	vim.keymap.set({ "t" }, "<S-CR>", "\\\r", { buffer = buf })
 	vim.keymap.set({ "t" }, "<C-CR>", "\\\r", { buffer = buf })
-	-- vim.keymap.set({ "t" }, "<S-Tab>", "\x1b[Z", { buffer = buf })
-	vim.keymap.set({ "t", "v", "n" }, "<Tab>", function()
-		M.chat_switch_tab_next()
+	vim.keymap.set({ "t", "v", "n" }, "<C-Left>", function()
+		M.chat_switch_tab(1)
 	end, { buffer = buf })
-	-- vim.keymap.set({ "t", "v", "n" }, "<S-Tab>", function()
-	-- 	M.chat_switch_tab_prev()
-	-- end, { buffer = buf })
+	vim.keymap.set({ "t", "v", "n" }, "<C-Right>", function()
+		M.chat_switch_tab(2)
+	end, { buffer = buf })
 end
 
 local function create_chat_term_buf()
