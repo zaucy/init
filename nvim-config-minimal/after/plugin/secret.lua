@@ -50,8 +50,8 @@ local function create_floating_window(opts)
 	end
 
 	-- Add keymapping to close windows
-	vim.keymap.set('n', 'q', close_windows, { buffer = buf, noremap = true, silent = true })
-	vim.keymap.set('n', '<Esc>', close_windows, { buffer = buf, noremap = true, silent = true })
+	vim.keymap.set("n", "q", close_windows, { buffer = buf, noremap = true, silent = true })
+	vim.keymap.set("n", "<Esc>", close_windows, { buffer = buf, noremap = true, silent = true })
 
 	-- Return window and buffer IDs for further manipulation
 	return {
@@ -61,7 +61,7 @@ local function create_floating_window(opts)
 		height = height,
 		backdrop_win = backdrop_win,
 		backdrop_buf = backdrop_buf,
-		close = close_windows
+		close = close_windows,
 	}
 end
 
@@ -107,7 +107,7 @@ end
 local function secret_mode()
 	local w = create_floating_window({
 		border = "none",
-	});
+	})
 	set_centered_text(w.buf, w.width, w.height, {
 		"Zeke is currently working on something in",
 		"the background that can't be shown on stream",
@@ -116,7 +116,4 @@ local function secret_mode()
 	})
 end
 
-vim.api.nvim_create_user_command(
-	"SecretMode",
-	secret_mode,
-	{ desc = "Open 'secret' obscuring window" })
+vim.api.nvim_create_user_command("SecretMode", secret_mode, { desc = "Open 'secret' obscuring window" })

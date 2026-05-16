@@ -6,12 +6,50 @@ local cb = function(x)
 	return "https://codeberg.org/" .. x
 end
 
+local local_overrides = {
+	multibuffer = vim.fn.expand("~/projects/zaucy/multibuffer.nvim"),
+}
+
 local modules_to_setup = {}
 
+local original_pack_get = vim.pack.get
+---@diagnostic disable-next-line: duplicate-set-field
+vim.pack.get = function(names)
+	local results = original_pack_get(names)
+	for _, res in ipairs(results) do
+		local name = res.spec.name
+		if local_overrides[name] then
+			res.path = local_overrides[name]
+		end
+	end
+	return results
+end
+
 local function plugin_load(info)
-	table.insert(modules_to_setup, info.spec.name)
-	vim.opt.runtimepath:append(info.path)
-	vim.cmd("packadd! " .. info.spec.name)
+	local plugin_name = info.spec.name
+	table.insert(modules_to_setup, plugin_name)
+	if local_overrides[plugin_name] then
+		local local_path = local_overrides[plugin_name]
+
+		-- Clear existing loaded modules for this plugin to force a reload
+		for k, _ in pairs(package.loaded) do
+			if k == plugin_name or k:match("^" .. plugin_name .. "%.") then
+				package.loaded[k] = nil
+			end
+		end
+
+		vim.opt.runtimepath:prepend(local_path)
+		local after = local_path .. "/after"
+		if vim.fn.isdirectory(after) == 1 then
+			vim.opt.runtimepath:append(after)
+		end
+
+		if vim.loader then
+			vim.loader.reset(local_path)
+		end
+	else
+	end
+	vim.cmd("packadd! " .. plugin_name)
 end
 
 -- stylua: ignore start
@@ -92,12 +130,18 @@ vim.pack.add({
 vim.cmd.colorscheme("catppuccin-nvim")
 
 for _, plugin_name in ipairs(modules_to_setup) do
-	local has_config_mod, config_mod_or_error = pcall(require, "zaucy.plugins." .. plugin_name)
-	if not has_config_mod then
-		-- vim.notify(config_mod_or_error, vim.log.levels.ERROR)
-	else
-		-- NOTE: should I do anything with the config mod?
-		_ = config_mod_or_error
+	local modname = "zaucy.plugins." .. plugin_name
+	local modpath = "lua/" .. modname:gsub("%.", "/") .. ".lua"
+	local has_config_file = #vim.api.nvim_get_runtime_file(modpath, false) > 0
+
+	if has_config_file then
+		local has_config_mod, config_mod_or_error = pcall(require, modname)
+		if not has_config_mod then
+			vim.notify(config_mod_or_error, vim.log.levels.ERROR)
+		else
+			-- NOTE: should I do anything with the config mod?
+			_ = config_mod_or_error
+		end
 	end
 end
 

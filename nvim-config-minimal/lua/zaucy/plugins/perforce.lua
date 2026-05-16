@@ -103,9 +103,6 @@ local function perforce_opened()
 	pickers.new({}, picker_options):find()
 end
 
-require("nui-components").setup({})
-require("perforce").setup({})
-
 vim.keymap.set("n", "<leader>va", "<cmd>!p4 add %<cr>", { desc = "Perforce add" })
 vim.keymap.set("n", "<leader>vd", "<cmd>Vp4Delete!<cr>", { desc = "Perforce delete" })
 vim.keymap.set("n", "<leader>ve", "<cmd>!p4 edit %<cr>", { desc = "Perforce edit" })

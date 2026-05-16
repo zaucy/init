@@ -48,6 +48,9 @@ require("blink.cmp").setup({
 		["<Left>"] = { cancel_if_at_end, "fallback" },
 		["<C-h>"] = { cancel_if_at_end, "fallback" },
 	},
+	cmdline = {
+		enabled = false,
+	},
 	signature = {
 		enabled = true,
 	},

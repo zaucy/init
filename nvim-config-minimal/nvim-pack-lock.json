@@ -12,15 +12,7 @@
       "rev": "d83318ceb4c3cef855a199130cca7d6663f0093c",
       "src": "https://github.com/zaucy/bazel.nvim"
     },
-    "blink": {
-      "rev": "2ef3db111181c5eef22a462aa0122349a6027f28",
-      "src": "https://github.com/saghen/blink.cmp"
-    },
     "blink-cmp": {
-      "rev": "2ef3db111181c5eef22a462aa0122349a6027f28",
-      "src": "https://github.com/saghen/blink.cmp"
-    },
-    "blink.cmp": {
       "rev": "2ef3db111181c5eef22a462aa0122349a6027f28",
       "src": "https://github.com/saghen/blink.cmp"
     },
@@ -36,14 +28,6 @@
       "rev": "78c2ecd659d54972be17aa6ba2deac3c53223b80",
       "src": "https://github.com/p00f/clangd_extensions.nvim"
     },
-    "cmp": {
-      "rev": "a1d504892f2bc56c2e79b65c6faded2fd21f3eca",
-      "src": "https://github.com/hrsh7th/nvim-cmp"
-    },
-    "cmp-async-path": {
-      "rev": "f8af3f726e07f2e9d37672eaa9102581aefce149",
-      "src": "https://codeberg.org/FelipeLema/cmp-async-path"
-    },
     "cmp-bazel": {
       "rev": "068fb9ae059a216eb067a35ccadcac916f8123f0",
       "src": "https://github.com/zaucy/cmp-bazel.nvim"
@@ -53,7 +37,7 @@
       "src": "https://github.com/hrsh7th/cmp-nvim-lsp"
     },
     "codediff": {
-      "rev": "8afc229d38dc13ce71b2ffbb860084b2c726e061",
+      "rev": "e500fb5e7e2fbce701c888b81a9449e1052413ec",
       "src": "https://github.com/esmuellert/codediff.nvim"
     },
     "coerce": {
@@ -145,7 +129,7 @@
       "src": "https://github.com/folke/lazydev.nvim"
     },
     "lspconfig": {
-      "rev": "8f7e64066e2641d5e7d494962a9c7051e3d38dd5",
+      "rev": "f9349d4d99e7d66403ae8bf4fbd357b154dca7a7",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "luvit-meta": {
@@ -177,7 +161,7 @@
       "src": "git@github.com:nvim-mini/mini.icons.git"
     },
     "multibuffer": {
-      "rev": "a3e16eb6beb0dcb5d18c18511f164b41467a13d3",
+      "rev": "9af8e042d2d734d9acbd2a4a7156486109a657a6",
       "src": "https://github.com/zaucy/multibuffer.nvim"
     },
     "multicursor": {
@@ -227,10 +211,6 @@
     "oil-git-status": {
       "rev": "a3e2ccb00cb8822115e28a9a1791eda051d940c9",
       "src": "https://github.com/refractalize/oil-git-status.nvim"
-    },
-    "oil.nvim": {
-      "rev": "0fcc83805ad11cf714a949c98c605ed717e0b83e",
-      "src": "git@github.com:stevearc/oil.nvim.git"
     },
     "opencode": {
       "rev": "4ae5d4582880b9bb061bc0572d2af6b1612e6217",
