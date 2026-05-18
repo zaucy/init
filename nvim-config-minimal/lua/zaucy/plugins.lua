@@ -60,7 +60,6 @@ vim.pack.add({
 	{ name = "nvim-web-devicons",         src = gh("nvim-tree/nvim-web-devicons")                },
 	{ name = "gitsigns",                  src = gh("lewis6991/gitsigns.nvim")                    },
 	{ name = "diffview",                  src = gh("sindrets/diffview.nvim")                     },
-	{ name = "gh-actions",                src = gh("topaxi/gh-actions.nvim")                     },
 	{ name = "lspconfig",                 src = gh("neovim/nvim-lspconfig")                      },
 	{ name = "mason",                     src = gh("mason-org/mason.nvim")                       },
 	{ name = "lazydev",                   src = gh("folke/lazydev.nvim")                         },
