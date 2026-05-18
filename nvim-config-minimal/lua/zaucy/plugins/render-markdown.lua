@@ -1,9 +1,12 @@
 require("render-markdown").setup({
-	-- debounce = 0,
-	-- sign = { enabled = false },
-	anti_conceal = { enabled = false },
-	-- file_types = { "opencode_output" },
+	-- render_modes = { "n", "c", "t", "v", "V" },
+	anti_conceal = {
+		enabled = true,
+	},
 	restart_highlighter = true,
+	win_options = {
+		concealcursor = { rendered = "nvic" },
+	},
 	heading = {
 		position = "inline",
 		width = "block",
@@ -24,5 +27,7 @@ require("render-markdown").setup({
 	},
 	code = {
 		below = "▔",
+		conceal_delimiters = false,
+		border = "thick",
 	},
 })
