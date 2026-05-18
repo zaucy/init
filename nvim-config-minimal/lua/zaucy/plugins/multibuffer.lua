@@ -43,11 +43,11 @@ vim.api.nvim_set_hl(0, "MultibufferTitleName", { link = "FloatTitle" })
 
 local function open_source_buf(mbuf)
 	local winid = vim.api.nvim_get_current_win()
-	local cursor = vim.api.nvim_win_get_cursor(winid)
-	local winline = vim.fn.winline()
 
-	local buf, line = multibuffer.multibuf_get_buf_at_line(mbuf, cursor[1])
+	local buf, line = multibuffer.multibuf_get_origin_at_cursor(winid)
 	if buf then
+		local cursor = vim.api.nvim_win_get_cursor(winid)
+		local winline = vim.fn.winline()
 		vim.api.nvim_set_current_buf(buf)
 		vim.api.nvim_win_set_cursor(0, { line, cursor[2] })
 		vim.fn.winrestview({ topline = line - winline + 1 })

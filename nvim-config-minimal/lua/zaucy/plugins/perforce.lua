@@ -116,3 +116,6 @@ vim.keymap.set("n", "<leader>vs", function()
 	async.run(perforce_opened):raise_on_error()
 end, { desc = "Perforce status" })
 vim.keymap.set("n", "<leader>voa", perforce_opened_all, { desc = "Perfoce opened (all)" })
+
+require("perforce.plugins.signs").setup()
+require("perforce.plugins.oil").setup()

@@ -37,11 +37,11 @@
       "src": "https://github.com/hrsh7th/cmp-nvim-lsp"
     },
     "codediff": {
-      "rev": "e500fb5e7e2fbce701c888b81a9449e1052413ec",
+      "rev": "76ff1b13f0bcba655dca85cea1ef0df877a53c0f",
       "src": "https://github.com/esmuellert/codediff.nvim"
     },
     "coerce": {
-      "rev": "3432c46f7633fe549874e1ffc0cd2bb238c0039c",
+      "rev": "d84cb6d0dcef01440377dc673382ac20bad4b2b5",
       "src": "https://github.com/gregorias/coerce.nvim"
     },
     "command-completion": {
@@ -129,7 +129,7 @@
       "src": "https://github.com/folke/lazydev.nvim"
     },
     "lspconfig": {
-      "rev": "f9349d4d99e7d66403ae8bf4fbd357b154dca7a7",
+      "rev": "3de240997fc3208eb29df5e5c17ba4665961bd84",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "luvit-meta": {
@@ -161,7 +161,7 @@
       "src": "git@github.com:nvim-mini/mini.icons.git"
     },
     "multibuffer": {
-      "rev": "9af8e042d2d734d9acbd2a4a7156486109a657a6",
+      "rev": "12d169bb30008b60c45095e3d67d2c51d6e63c93",
       "src": "https://github.com/zaucy/multibuffer.nvim"
     },
     "multicursor": {
@@ -169,7 +169,7 @@
       "src": "https://github.com/jake-stewart/multicursor.nvim"
     },
     "nerdy": {
-      "rev": "0fe9cc24c08a14ceb002362b07a34e481f870fae",
+      "rev": "4a7198858a502bc75362aabee9f555702822a1b3",
       "src": "https://github.com/2kabhishek/nerdy.nvim"
     },
     "nio": {
@@ -197,11 +197,11 @@
       "src": "https://github.com/norcalli/nvim-colorizer.lua"
     },
     "nvim-web-devicons": {
-      "rev": "2795c26c916bb3c57dde308b82be51971fa92747",
+      "rev": "7d8dad2c837fcdf2e65997e68657c1a21c568074",
       "src": "https://github.com/nvim-tree/nvim-web-devicons"
     },
     "octo": {
-      "rev": "21637048c22f47809d896dace7b2b72b6c724692",
+      "rev": "b495047f0b9d35de3d8c6b84fad9de296d353b41",
       "src": "https://github.com/pwntester/octo.nvim"
     },
     "oil": {
@@ -221,7 +221,7 @@
       "src": "https://github.com/stevearc/overseer.nvim"
     },
     "perforce": {
-      "rev": "9b90f7cd2c8b4c719df24746f9323f14c2f0d999",
+      "rev": "a2f67b0b0b75944099b677be34d330da82c613b6",
       "src": "https://github.com/zaucy/perforce.nvim"
     },
     "plenary": {

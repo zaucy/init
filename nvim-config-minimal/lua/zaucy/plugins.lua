@@ -7,7 +7,8 @@ local cb = function(x)
 end
 
 local local_overrides = {
-	multibuffer = vim.fn.expand("~/projects/zaucy/multibuffer.nvim"),
+	-- multibuffer = vim.fn.expand("~/projects/zaucy/multibuffer.nvim"),
+	-- perforce = vim.fn.expand("~/projects/zaucy/perforce.nvim"),
 }
 
 local modules_to_setup = {}
@@ -60,7 +61,6 @@ vim.pack.add({
 	{ name = "gitsigns",                  src = gh("lewis6991/gitsigns.nvim")                    },
 	{ name = "diffview",                  src = gh("sindrets/diffview.nvim")                     },
 	{ name = "gh-actions",                src = gh("topaxi/gh-actions.nvim")                     },
-	{ name = "octo",                      src = gh("pwntester/octo.nvim")                        },
 	{ name = "lspconfig",                 src = gh("neovim/nvim-lspconfig")                      },
 	{ name = "mason",                     src = gh("mason-org/mason.nvim")                       },
 	{ name = "lazydev",                   src = gh("folke/lazydev.nvim")                         },
@@ -128,6 +128,7 @@ vim.pack.add({
 -- stylua: ignore end
 
 vim.cmd.colorscheme("catppuccin-nvim")
+vim.cmd("highlight ZaucySubstituteSelect guibg=#151521")
 
 for _, plugin_name in ipairs(modules_to_setup) do
 	local modname = "zaucy.plugins." .. plugin_name

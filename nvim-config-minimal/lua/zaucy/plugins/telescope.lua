@@ -182,7 +182,6 @@ setup_telescope_backdrop()
 
 vim.keymap.set("n", "<leader>?", "<cmd>Telescope keymaps theme=ivy<cr>", { desc = "Keymaps" })
 vim.keymap.set("n", "<leader>'", "<cmd>Telescope resume<cr>", { desc = "Open last picker" })
-vim.keymap.set("n", "<leader>/", "<cmd>Telescope live_grep<cr>", { desc = "Global search" })
 vim.keymap.set("n", "<leader>f", "<cmd>Telescope find_files<cr>", { desc = "Find files" })
 vim.keymap.set("n", "<leader>b", "<cmd>Telescope buffers<cr>", { desc = "Find buffers" })
 vim.keymap.set("n", "<leader>c", "<cmd>Telescope find_files cwd=" .. config_dir .. "<cr>", { desc = "Config files" })

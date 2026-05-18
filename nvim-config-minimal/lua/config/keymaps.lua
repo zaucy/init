@@ -1,58 +1,27 @@
-vim.cmd("highlight ZaucySubstituteSelect guibg=#151521")
+local fns = require("config.keymap_fns")
 
 local config_dir = vim.fn.expand("~/projects/zaucy/init/nvim-config-minimal")
 local restart_session_file = vim.fn.stdpath("state") .. "/RestartSession.vim"
 
 vim.keymap.set({ "v" }, '/', '<esc>/\\%V') -- search in selection
 
-local function goto_closest_file(filename)
-	return function()
-		local files = vim.fs.find(filename, {
-			upward = true,
-			path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
-		})
-
-		if #files > 0 then
-			vim.cmd("e " .. files[1])
-		end
-	end
-end
-
-local function bazel_override()
-	vim.ui.input({}, function(input)
-		if not input then return end
-		goto_closest_file("MODULE.bazel")()
-		vim.cmd("!bzloverride " ..  input)
-		vim.fn.feedkeys("G", "n")
-	end)
-end
-
-local function bzlmod_add()
-	vim.ui.input({}, function(input)
-		if not input then return end
-		goto_closest_file("MODULE.bazel")()
-		vim.cmd("!bzlmod add " ..  input)
-	end)
-end
-
 vim.keymap.set({"n", "v"}, "<C-S-U>", function() vim.pack.update(nil) end, { desc = "Update all packages" })
 
 vim.keymap.set({"n", "v"}, "<leader>e", "<cmd>Oil<cr>", { desc = "Explore Files" })
 vim.keymap.set({"n", "v"}, "<leader>E", "<cmd>Oil .<cr>", { desc = "Explore Files (PWD)" })
 
-vim.keymap.set({ "n" }, "gbb", goto_closest_file("BUILD.bazel"), { desc = "Bazel Build File" })
-vim.keymap.set({ "n" }, "gbm", goto_closest_file("MODULE.bazel"), { desc = "Bazel Module File" })
-vim.keymap.set({ "n" }, "gbw", goto_closest_file("WORKSPACE.bazel"), { desc = "Bazel Workspace File" })
-vim.keymap.set({ "n" }, "gbz", goto_closest_file(".bazelrc"), { desc = "Bazelrc File" })
+vim.keymap.set({ "n" }, "gbb", fns.goto_closest_file("BUILD.bazel"), { desc = "Bazel Build File" })
+vim.keymap.set({ "n" }, "gbm", fns.goto_closest_file("MODULE.bazel"), { desc = "Bazel Module File" })
+vim.keymap.set({ "n" }, "gbw", fns.goto_closest_file("WORKSPACE.bazel"), { desc = "Bazel Workspace File" })
+vim.keymap.set({ "n" }, "gbz", fns.goto_closest_file(".bazelrc"), { desc = "Bazelrc File" })
 vim.keymap.set({ "n" }, "gsh", "<cmd>LspClangdSwitchSourceHeader<cr>", { desc = "clangd switch source header" })
 
-vim.keymap.set({ "n" }, "gbo", bazel_override, { desc = "Bazel Override" })
-vim.keymap.set({ "n" }, "gba", bzlmod_add, { desc = "Bazel Override" })
+vim.keymap.set({ "n" }, "gbo", fns.bazel_override, { desc = "Bazel Override" })
+vim.keymap.set({ "n" }, "gba", fns.bzlmod_add, { desc = "Bazel Override" })
 
 vim.keymap.set({ "c" }, "<C-c>", "<C-q><C-c>")
 
-vim.keymap.set({ "n", "v" }, "<leader>qd", "<cmd>BazelDebug<cr>",
-	{ desc = "Build and launch bazel target with nvim-dap" })
+vim.keymap.set({ "n", "v" }, "<leader>qd", "<cmd>BazelDebug<cr>", { desc = "Build and launch bazel target with nvim-dap" })
 
 vim.keymap.set({"n", "v" }, "<leader>ypr", function() vim.fn.setreg("+", vim.fn.expand("%")) end,  { desc = "yank current relative file path"})
 vim.keymap.set({"n", "v" }, "<leader>ypa", function() vim.fn.setreg("+", vim.fn.expand("%:p")) end,  { desc = "yank current absolute file path"})
@@ -63,67 +32,10 @@ for i = 1, 9 do
 	vim.keymap.set({ "n", "v", "t" }, "<C-" ..tostring(i) .. ">", function() require('zaucy.tabline').goto(i) end, { desc = "Goto tab " .. tostring(i) })
 end
 
-local function tonumber_safe(v)
-	local _, n = pcall(tonumber, v)
-	return n
-end
-
-local function do_fzf(cmd, opts)
-	opts = opts or {}
-	return function()
-		local original_buf = vim.api.nvim_get_current_buf()
-		local buf = vim.api.nvim_create_buf(true, false)
-		vim.api.nvim_set_current_buf(buf)
-
-		local fzf_cmd = {"fzf", "--no-mouse"}
-		if opts.fzf_args then
-			for _, arg in ipairs(opts.fzf_args) do
-				table.insert(fzf_cmd, arg)
-			end
-		end
-
-		local channel_id = vim.fn.jobstart(fzf_cmd, {
-			term = true,
-			stdout_buffered = false,
-			cwd = opts.cwd,
-			env = {
-				FZF_DEFAULT_COMMAND = cmd,
-				-- FZF_DEFAULT_OPTS = FZF_DEFAULT_OPTS,
-			},
-			on_exit = function(_, code, _)
-				if code == 0 then
-					local line = vim.api.nvim_buf_get_lines(buf, 0, -1, false)[1]:gsub("\\", "/")
-					local info = vim.json.decode(line)
-					local file_path = vim.fn.fnameescape(info.filename)
-					local full_path = file_path
-					if opts.cwd then
-						full_path = vim.fs.joinpath(opts.cwd, file_path)
-					end
-					vim.cmd.edit(full_path)
-
-					if info.line ~= nil or info.col ~= nil then
-						local line_num = tonumber_safe(info.line) or 1
-						local col_num = (tonumber_safe(info.col) or 1) - 1
-						vim.api.nvim_win_set_cursor(0, {line_num, col_num})
-					end
-					vim.api.nvim_buf_delete(buf, {force = true, unload = true})
-				elseif code == 130 then
-					vim.api.nvim_set_current_buf(original_buf)
-					vim.api.nvim_buf_delete(buf, {force = true, unload = true})
-				end
-			end,
-		  })
-
-		if channel_id > 0 then
-			vim.cmd.startinsert()
-		end
-	end
-end
-
 vim.keymap.set(
 	{"n", "v"},
 	"<C-w>ff",
-	do_fzf("rg --files", {
+	fns.do_fzf("rg --files", {
 		fzf_args = {
 			"--preview", "bat --style=numbers --color=always --line-range :500 {}",
 			"--preview-window", "up:75%",
@@ -136,7 +48,7 @@ vim.keymap.set(
 vim.keymap.set(
 	{"n", "v"},
 	"<C-w>fc",
-	do_fzf("rg --files", {
+	fns.do_fzf("rg --files", {
 		cwd = config_dir,
 		fzf_args = {
 			"--preview", "bat --style=numbers --color=always --line-range :500 {}",
@@ -147,100 +59,9 @@ vim.keymap.set(
 	{ desc = "open fzf (config)" }
 )
 
-vim.keymap.set({"n", "v"}, "<leader>s", function() require("multibuffer.plugins.symbols").multibuf_document_symbols(0) end)
-
-local function is_buf_similar(buf1, buf2)
-	if vim.bo[buf1].buftype ~= vim.bo[buf2].buftype then
-		return false
-	end
-
-	if vim.bo[buf1].filetype ~= vim.bo[buf2].filetype then
-		return false
-	end
-
-	return true
-end
-
-local function wrap_access(list, index)
-	-- zero-base this nerd
-	index = index - 1
-	local wrapped_index = index % #list
-	return list[wrapped_index + 1]
-end
-
-local function find_similar_buf(bufs, start_index, offset)
-	assert(start_index ~= nil, "start_index must be set")
-	assert(start_index > 0, "start_index must be greater than 0")
-	assert(start_index <= #bufs, "start_index must be within bufs range")
-	if #bufs < 2 then
-		return nil
-	end
-
-	local curbuf = vim.api.nvim_get_current_buf()
-
-	offset = offset or 1
-	for i = 0, #bufs - 1 do
-		local buf = wrap_access(bufs, start_index + i + offset)
-		if buf ~= curbuf and is_bufvalid(buf) then
-			if is_buf_similar(0, buf) then
-				return buf
-			end
-		end
-	end
-
-	return nil
-end
-
-local function get_buf_index(buf, bufs)
-	if buf == 0 then
-		buf = vim.api.nvim_get_current_buf()
-	end
-
-	assert(buf ~= nil)
-
-	if bufs == nil then
-		bufs = vim.api.nvim_list_bufs()
-	end
-
-	for i, _ in ipairs(bufs) do
-		if bufs[i] == buf then
-			return i
-		end
-	end
-
-	return nil
-end
-
-local function goto_next_similar_buffer()
-	local bufs = vim.api.nvim_list_bufs()
-	local curr_index = get_buf_index(0, bufs)
-	local buf = find_similar_buf(bufs, curr_index, 1)
-	if buf == nil then
-		vim.notify(
-			"No other similar buffers (buftype=" .. vim.bo.buftype .. ", filetype=" .. vim.bo.filetype .. ")",
-			vim.log.levels.WARN
-		)
-		return
-	end
-	vim.api.nvim_set_current_buf(buf)
-end
-
-local function goto_prev_similar_buffer()
-	local bufs = vim.api.nvim_list_bufs()
-	local curr_index = get_buf_index(0, bufs)
-	local buf = find_similar_buf(bufs, curr_index, -1)
-	if buf == nil then
-		vim.notify(
-			"No other similar buffers (buftype=" .. vim.bo.buftype .. ", filetype=" .. vim.bo.filetype .. ")",
-			vim.log.levels.WARN
-		)
-		return
-	end
-	vim.api.nvim_set_current_buf(buf)
-end
-
--- vim.keymap.set({ "n" }, "]]", goto_next_similar_buffer, { desc = "Next Similar Buf" })
--- vim.keymap.set({ "n" }, "[[", goto_prev_similar_buffer, { desc = "Next Similar Buf" })
+vim.keymap.set({"n", "v"}, "<leader>ss", function() require("multibuffer.plugins.symbols").multibuf_document_symbols({}) end)
+vim.keymap.set({"n", "v"}, "<leader>sf", function() require("multibuffer.plugins.symbols").multibuf_document_symbols({ kinds = { "Function", "Method", "Constructor"} }) end)
+vim.keymap.set({"n", "v"}, "<leader>st", function() require("multibuffer.plugins.symbols").multibuf_document_symbols({ kinds = { "Class", "Interface", "Struct" } }) end)
 
 -- move lines
 vim.keymap.set({ "n" }, "<a-j>", "<cmd>m .+1<cr>==", { desc = "move down" })
@@ -264,10 +85,18 @@ vim.keymap.set({ "n" }, "]b", "<cmd>bnext<cr>", { desc = "next buffer" })
 -- lsp
 -- vim.keymap.set({ "n" }, "gd", "<cmd>Telescope lsp_definitions<cr>", { desc = "Goto Definition" })
 vim.keymap.set({ "n" }, "gD", vim.lsp.buf.declaration, { desc = "Goto Declaration" })
-vim.keymap.set({ "n" }, "gi", vim.lsp.buf.implementation, { desc = "Goto Implementation" })
-vim.keymap.set({ "n" }, "gri", vim.lsp.buf.incoming_calls, { desc = "vim.lsp.buf.incoming_calls()" })
-vim.keymap.set({ "n" }, "gro", vim.lsp.buf.outgoing_calls, { desc = "vim.lsp.buf.outgoing_calls()" })
-vim.keymap.set({ "n" }, "grr", "<cmd>Telescope lsp_references<cr>", { desc = "vim.lsp.buf.outgoing_calls()" })
+-- vim.keymap.set({ "n" }, "gi", vim.lsp.buf.implementation, { desc = "Goto Implementation" })
+-- vim.keymap.set({ "n" }, "gri", vim.lsp.buf.incoming_calls, { desc = "vim.lsp.buf.incoming_calls()" })
+-- vim.keymap.set({ "n" }, "gro", vim.lsp.buf.outgoing_calls, { desc = "vim.lsp.buf.outgoing_calls()" })
+-- vim.keymap.set({ "n" }, "grr", "<cmd>Telescope lsp_references<cr>", { desc = "vim.lsp.buf.outgoing_calls()" })
+
+vim.keymap.set('n', 'grr', function() require('multibuffer.plugins.lsp').references() end)
+vim.keymap.set('n', 'gi', function() require('multibuffer.plugins.lsp').implementation() end)
+vim.keymap.set('n', 'gri', function() require('multibuffer.plugins.lsp').incoming_calls() end)
+vim.keymap.set('n', 'gro', function() require('multibuffer.plugins.lsp').outgoing_calls() end)
+
+vim.keymap.set("n", "<leader>/", function() require("multibuffer.plugins.ripgrep").multibuf_ripgrep({}) end, { desc = "Global search" })
+
 -- vim.keymap.set({ "n" }, "grn", ":IncRename ", { desc = "rename" })
 vim.keymap.set(
 	{ "n", "v" },
@@ -344,61 +173,3 @@ vim.keymap.set({"n", "v", "t"}, "<C-S-CR>", function() require("zaucy.chat").cha
 vim.keymap.set({"n", "v", "t"}, "<C-S-Up>", function() require("zaucy.chat").chat_set_fullscreen(true) end)
 vim.keymap.set({"n", "v", "t"}, "<C-S-Down>", function() require("zaucy.chat").chat_set_fullscreen(false) end)
 vim.keymap.set({"n", "v", "i"}, "<C-\\>f", "<cmd>GeminiFollow<cr>")
-
-vim.api.nvim_create_autocmd("User", {
-	pattern = "ZaucyChatTerminalBufCreated",
-	callback = function(args)
-		vim.keymap.set({ "t" }, "<C-S-CR>", function()
-			vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-\\><C-n>", true, false, true), "n", false)
-			require("zaucy.chat").chat_hide()
-		end, {buffer = args.data.terminal_bufnr})
-
-
-		vim.keymap.set({ "t", "n", "v" }, "<C-g>", function()
-			require("zaucy.chat").chat_hide()
-			require("gemini.diff").focus_next_diff()
-		end, {buffer = args.data.terminal_bufnr})
-
-		local forwarded_keys = {
-			"<C-d>",
-			"<C-u>",
-		}
-
-		for _, key in ipairs(forwarded_keys) do
-			vim.keymap.set({ "t" }, key, "<C-\\><C-n>" .. key, { buffer = args.data.terminal_bufnr, remap = true })
-		end
-
-	end,
-})
-
-local chat_was_focused_when_opening_gemini_diff = false
-
-vim.api.nvim_create_autocmd("User", {
-	pattern = "GeminiOpenDiffPre",
-	callback = function()
-		chat_was_focused_when_opening_gemini_diff = require("zaucy.chat").chat_is_focused()
-		require("zaucy.chat").chat_hide()
-	end,
-})
-
-vim.api.nvim_create_autocmd("User", {
-	pattern = "GeminiOpenDiff",
-	callback = function(args)
-		vim.keymap.set({ "n", "v" }, "<leader>aa", require("gemini.diff").accept_all_diffs, { buffer = args.data.bufnr, desc = "Accept gemini edit" })
-		vim.keymap.set({ "n", "v" }, "<leader>ad", require("gemini.diff").reject_all_diffs, { buffer = args.data.bufnr, desc = "Reject gemini edit" })
-		require("zaucy.ui.diff_hint").show_diff_hint()
-	end
-})
-
-vim.api.nvim_create_autocmd("User", {
-	pattern = "GeminiCloseDiff",
-	callback = function(args)
-		vim.keymap.del({ "n", "v" }, "<leader>aa", { buffer = args.data.bufnr })
-		vim.keymap.del({ "n", "v" }, "<leader>ad", { buffer = args.data.bufnr })
-		require("zaucy.ui.diff_hint").close_diff_hint()
-
-		if chat_was_focused_when_opening_gemini_diff then
-			require("zaucy.chat").chat_show()
-		end
-	end
-})
