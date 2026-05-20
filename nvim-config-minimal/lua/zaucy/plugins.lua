@@ -112,7 +112,6 @@ vim.pack.add({
 	{ name = "plenary",                   src = gh("nvim-lua/plenary.nvim")                      },
 	{ name = "fidget",                    src = gh("j-hui/fidget.nvim")                          },
 	{ name = "mcp",                       src = gh("zaucy/mcp.nvim")                             },
-	{ name = "gemini",                    src = gh("zaucy/gemini.nvim")                          },
 	{ name = "telescope",                 src = gh("nvim-telescope/telescope.nvim")              },
 	{ name = "telescope-zoxide",          src = gh("jvgrootveld/telescope-zoxide")               },
 	{ name = "todo-comments",             src = gh("folke/todo-comments.nvim")                   },
@@ -150,3 +149,4 @@ require("zaucy.plugins.lsp")
 require("zaucy.plugins.ui")
 require("zaucy.plugins.gamedev")
 require("zaucy.plugins.git")
+require("zaucy.plugins.chat")

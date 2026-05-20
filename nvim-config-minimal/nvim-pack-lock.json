@@ -13,7 +13,7 @@
       "src": "https://github.com/zaucy/bazel.nvim"
     },
     "blink-cmp": {
-      "rev": "2ef3db111181c5eef22a462aa0122349a6027f28",
+      "rev": "35e3923a09ff3db150ceff80004befcbbfa071a0",
       "src": "https://github.com/saghen/blink.cmp"
     },
     "blink.lib": {
@@ -41,7 +41,7 @@
       "src": "https://github.com/esmuellert/codediff.nvim"
     },
     "coerce": {
-      "rev": "d84cb6d0dcef01440377dc673382ac20bad4b2b5",
+      "rev": "b9c88382317d53b0203ce4eda03d0645f8d2e612",
       "src": "https://github.com/gregorias/coerce.nvim"
     },
     "command-completion": {
@@ -104,10 +104,6 @@
       "rev": "d3b38b1daaa1e094e3c8c9d98c7ee96152604d0a",
       "src": "https://github.com/zaucy/fnm.nvim"
     },
-    "gemini": {
-      "rev": "5ac651e0a9c6b00b6b804f23c6a17b0ddc76b322",
-      "src": "https://github.com/zaucy/gemini.nvim"
-    },
     "gh-actions": {
       "rev": "7f65a9fa31b8f500469f708c68b30d6c430f92ff",
       "src": "https://github.com/topaxi/gh-actions.nvim"
@@ -129,7 +125,7 @@
       "src": "https://github.com/folke/lazydev.nvim"
     },
     "lspconfig": {
-      "rev": "3de240997fc3208eb29df5e5c17ba4665961bd84",
+      "rev": "246572944c2a1e2a646c2e7609ff619b0fe74c18",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "luvit-meta": {
@@ -137,7 +133,7 @@
       "src": "https://github.com/Bilal2453/luvit-meta"
     },
     "mason": {
-      "rev": "8e921c2b68571e978db5d4d3fef9c9a7f8755473",
+      "rev": "cbf8d285e1462dd24acf3507817be2bbcb035919",
       "src": "https://github.com/mason-org/mason.nvim"
     },
     "mason-conform": {
@@ -157,7 +153,7 @@
       "src": "https://github.com/zaucy/mcp.nvim"
     },
     "mini.icons": {
-      "rev": "9c7b1b90b15bdd69c52f6e31889dbc9987c30ec4",
+      "rev": "520995f1d75da0e4cc901ee95080b1ff2bc46b94",
       "src": "git@github.com:nvim-mini/mini.icons.git"
     },
     "multibuffer": {
@@ -169,7 +165,7 @@
       "src": "https://github.com/jake-stewart/multicursor.nvim"
     },
     "nerdy": {
-      "rev": "4a7198858a502bc75362aabee9f555702822a1b3",
+      "rev": "f06c60542cb04a549588eed98e55f5a9a3de9ccf",
       "src": "https://github.com/2kabhishek/nerdy.nvim"
     },
     "nio": {
@@ -213,7 +209,7 @@
       "src": "https://github.com/refractalize/oil-git-status.nvim"
     },
     "opencode": {
-      "rev": "4ae5d4582880b9bb061bc0572d2af6b1612e6217",
+      "rev": "1a400673610e969ebbb7298705ef242c5348d5e8",
       "src": "https://github.com/sudo-tee/opencode.nvim"
     },
     "overseer": {
