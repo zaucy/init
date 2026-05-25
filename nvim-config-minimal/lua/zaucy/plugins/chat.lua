@@ -1,6 +1,12 @@
 require("zaucy.chat").setup({
 	chat_scratch_dir = vim.fn.substitute(vim.fn.expand("~/projects/zaucy/init/scratch/chat"), "\\\\", "/", "g"),
-	terminal_command = "agy",
+	terminal_command = function(dir)
+		dir = dir:gsub("\\", "/")
+		if vim.startswith(dir, "C:/d") then
+			return "claude"
+		end
+		return "agy"
+	end,
 })
 
 vim.api.nvim_create_autocmd("User", {

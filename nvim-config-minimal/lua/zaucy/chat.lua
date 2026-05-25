@@ -1,6 +1,6 @@
 --- @class chat.SetupOptions
 --- @field chat_scratch_dir string|nil
---- @field terminal_command string
+--- @field terminal_command string|fun(dir: string): string
 
 --- @class chat.ChatTabpageState
 --- @field layout chat.Layout|nil
@@ -190,12 +190,19 @@ local function bind_chat_keys(buf)
 	end, { buffer = buf })
 end
 
+local function get_terminal_command(dir)
+	if type(M._opts.terminal_command) == "function" then
+		return M._opts.terminal_command(dir)
+	end
+	return M._opts.terminal_command
+end
+
 local function create_chat_term_buf()
 	local orig_cwd = vim.fn.getcwd(0, 0)
 	if M._opts.chat_scratch_dir then
 		vim.cmd.lcd(M._opts.chat_scratch_dir)
 	end
-	vim.cmd.terminal(M._opts.terminal_command)
+	vim.cmd.terminal(get_terminal_command(M._opts.chat_scratch_dir or orig_cwd))
 	vim.cmd.lcd(orig_cwd)
 
 	M._chat_term_buf = vim.api.nvim_get_current_buf()
@@ -238,7 +245,7 @@ local function ensure_chat_term_buf(tabpage, state)
 		local term_buf = M._dir_term_bufs[cwd]
 		vim.wo[body_win].winfixbuf = false
 		if term_buf == nil or not vim.api.nvim_buf_is_valid(term_buf) then
-			vim.cmd.terminal(M._opts.terminal_command)
+			vim.cmd.terminal(get_terminal_command(cwd))
 			term_buf = vim.api.nvim_get_current_buf()
 			M._dir_term_bufs[cwd] = term_buf
 			bind_chat_keys(term_buf)
