@@ -57,7 +57,7 @@
       "src": "https://github.com/scottmckendry/cyberdream.nvim"
     },
     "dap": {
-      "rev": "45a69eba683a2c448dd9ecfc4de89511f0646b5f",
+      "rev": "531771530d4f82ad2d21e436e3cc052d68d7aebb",
       "src": "https://github.com/mfussenegger/nvim-dap"
     },
     "dap-go": {
@@ -85,7 +85,7 @@
       "src": "https://github.com/ecsact-dev/ecsact.nvim"
     },
     "fidget": {
-      "rev": "889e2e96edef4e144965571d46f7a77bcc4d0ddf",
+      "rev": "82404b196e73a00b1727a91903beef5ddc319d22",
       "src": "https://github.com/j-hui/fidget.nvim"
     },
     "flatbuffers": {
@@ -125,7 +125,7 @@
       "src": "https://github.com/folke/lazydev.nvim"
     },
     "lspconfig": {
-      "rev": "246572944c2a1e2a646c2e7609ff619b0fe74c18",
+      "rev": "a4ed4e761c400849e8c9f8bda33e5083f890268c",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "luvit-meta": {
@@ -193,7 +193,7 @@
       "src": "https://github.com/norcalli/nvim-colorizer.lua"
     },
     "nvim-web-devicons": {
-      "rev": "7d8dad2c837fcdf2e65997e68657c1a21c568074",
+      "rev": "0d7d35fa946837b8738b17c18d1faa1ac351e7f9",
       "src": "https://github.com/nvim-tree/nvim-web-devicons"
     },
     "octo": {
@@ -209,7 +209,7 @@
       "src": "https://github.com/refractalize/oil-git-status.nvim"
     },
     "opencode": {
-      "rev": "1a400673610e969ebbb7298705ef242c5348d5e8",
+      "rev": "20e559aa983fdbb743435fb23fa76280fe53eba1",
       "src": "https://github.com/sudo-tee/opencode.nvim"
     },
     "overseer": {
@@ -225,7 +225,7 @@
       "src": "https://github.com/nvim-lua/plenary.nvim"
     },
     "proj": {
-      "rev": "97f591f7e3249e1350238f1186b6937895ebe76d",
+      "rev": "dc60b5fd97940d49ec7dff97c3912899740b3351",
       "src": "https://github.com/zaucy/proj.nvim"
     },
     "quicker": {
@@ -245,7 +245,7 @@
       "src": "https://github.com/nvzone/showkeys"
     },
     "snacks": {
-      "rev": "ad9ede6a9cddf16cedbd31b8932d6dcdee9b716e",
+      "rev": "0770753c88228f7f15449c6a5b242e3f7cd0d71c",
       "src": "https://github.com/folke/snacks.nvim"
     },
     "telescope": {

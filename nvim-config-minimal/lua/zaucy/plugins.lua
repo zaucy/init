@@ -8,6 +8,7 @@ end
 
 local local_overrides = {
 	-- multibuffer = vim.fn.expand("~/projects/zaucy/multibuffer.nvim"),
+	-- proj = vim.fn.expand("~/projects/zaucy/proj.nvim"),
 	-- perforce = vim.fn.expand("~/projects/zaucy/perforce.nvim"),
 }
 

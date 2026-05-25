@@ -19,12 +19,14 @@ local function streamer_mode()
 	require("proj").add_exclude_dir(vim.fn.expand("C:/d2d"))
 	require("proj").add_exclude_dir(vim.fn.expand("C:/p4"))
 	require("proj").add_exclude_dir(vim.fn.expand("E:/d2d"))
+
+	vim.env["IS_DEMO"] = "1"
 end
 
 vim.api.nvim_create_user_command(
 	"StreamerMode",
 	streamer_mode,
-	{ desc = "Restarts neovide and re-open it in 'streamer' mode" }
+	{ desc = "Restarts neovim and re-open it in 'streamer' mode" }
 )
 
 vim.api.nvim_create_autocmd("SessionLoadPost", {
