@@ -44,9 +44,10 @@ vim.lsp.config("clangd", {
 		"--background-index",
 		"--clang-tidy",
 		"--header-insertion=never",
-		"--limit-results=100",
-		"--j=4",
+		"--limit-results=25",
+		"--j=2",
 		"--pch-storage=disk", -- mostly needed for unreal to save on memory
+		"--malloc-trim",
 		"--completion-style=bundled",
 	},
 	filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
