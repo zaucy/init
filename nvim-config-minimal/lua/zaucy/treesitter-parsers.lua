@@ -13,11 +13,12 @@ vim.api.nvim_create_autocmd("User", {
 		}
 		require("nvim-treesitter.parsers").cpp2 = {
 			install_info = {
-				url = "https://github.com/tsoj/tree-sitter-cpp2",
-				files = { "src/parser.c", "src/scanner.c" },
+				url = "https://github.com/zaucy/tree-sitter-cpp2",
+				-- path = vim.fn.expand("~/projects/tree-sitter-cpp2"),
+				files = { "src/parser.c" },
 				branch = "main",
 				generate_requires_npm = false,
-				requires_generate_from_grammar = false,
+				queries = "queries/cpp2",
 				revision = nil,
 			},
 			tier = 0,

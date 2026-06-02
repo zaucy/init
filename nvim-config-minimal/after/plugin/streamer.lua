@@ -20,7 +20,7 @@ local function streamer_mode()
 	require("proj").add_exclude_dir(vim.fn.expand("C:/p4"))
 	require("proj").add_exclude_dir(vim.fn.expand("E:/d2d"))
 
-	vim.env["IS_DEMO"] = "1"
+	vim.env["AGY_CLI_HIDE_ACCOUNT_INFO"] = "1"
 end
 
 vim.api.nvim_create_user_command(

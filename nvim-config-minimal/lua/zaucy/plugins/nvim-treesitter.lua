@@ -1,4 +1,8 @@
-require("nvim-treesitter").setup({})
+require("nvim-treesitter").setup({
+	highlight = {
+		enable = true,
+	},
+})
 vim.g.no_plugin_maps = true
 
 require("treesitter-context").setup({
