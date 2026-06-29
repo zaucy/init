@@ -211,7 +211,12 @@ require("uproject").setup({})
 
 vim.keymap.set("n", "<leader>uu", "<cmd>Uproject show_output<cr>", { desc = "Show last output" })
 vim.keymap.set("n", "<leader>uo", "<cmd>Uproject open<cr>", { desc = "Open Unreal Editor" })
-vim.keymap.set("n", "<leader>uO", "<cmd>Uproject build use_precompiled wait open<cr>", { desc = "Build and open Unreal Editor" })
+vim.keymap.set(
+	"n",
+	"<leader>uO",
+	"<cmd>Uproject build use_precompiled wait open<cr>",
+	{ desc = "Build and open Unreal Editor" }
+)
 vim.keymap.set("n", "<leader>uR", "<cmd>Uproject reload show_output<cr>", { desc = "Reload uproject" })
 vim.keymap.set("n", "<leader>uL", "<cmd>Uproject unlock_build_dirs <cr>", { desc = "Unlock build dirs" })
 vim.keymap.set("n", "<leader>udo", "<cmd>Uproject open debug<cr>", { desc = "Open Unreal Editor (debug)" })
@@ -251,8 +256,6 @@ vim.keymap.set("n", "<leader>uB", function()
 			use_last_target = false,
 			unlock = "auto",
 			use_precompiled = false,
-			no_uba = true,
-			no_hot_reload_from_ide = true,
 		})
 	end)
 end, { desc = "Build" })
@@ -266,8 +269,6 @@ vim.keymap.set("n", "<leader>ub", function()
 			use_last_target = true,
 			use_precompiled = false,
 			unlock = "auto",
-			no_uba = true,
-			no_hot_reload_from_ide = true,
 		})
 	end)
 end, { desc = "Build last (fast)" })
@@ -322,3 +323,12 @@ vim.keymap.set("n", "<leader>ui", function()
 
 	vim.api.nvim_put(lines, "l", true, true)
 end)
+
+vim.api.nvim_create_autocmd("User", {
+	pattern = "UprojectBufferCreated",
+	callback = function(ev)
+		vim.keymap.set("n", "E", function()
+			require("uproject").toggle_error_fold()
+		end, { buffer = ev.data.bufnr, desc = "Toggle Error/Warning Fold" })
+	end,
+})

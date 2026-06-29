@@ -10,6 +10,7 @@ local local_overrides = {
 	-- multibuffer = vim.fn.expand("~/projects/zaucy/multibuffer.nvim"),
 	-- proj = vim.fn.expand("~/projects/zaucy/proj.nvim"),
 	-- perforce = vim.fn.expand("~/projects/zaucy/perforce.nvim"),
+	-- uproject = vim.fn.expand("~/projects/zaucy/uproject.nvim"),
 }
 
 local modules_to_setup = {}
@@ -123,6 +124,8 @@ vim.pack.add({
 	{ name = "floaterm",                  src = gh("nvzone/floaterm")                            },
 	{ name = "volt",                      src = gh("nvzone/volt")                                },
 	{ name = "visual-whitespace",         src = gh("mcauley-penney/visual-whitespace.nvim")      },
+	{ name = "guh",                       src = gh("justinmk/guh.nvim")                          },
+	{ name = "diffs",                     src = gh("barrettruth/diffs.nvim")                     },
 }, { load = plugin_load })
 -- stylua: ignore end
 

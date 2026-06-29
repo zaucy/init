@@ -1,11 +1,11 @@
 {
   "plugins": {
     "aerial": {
-      "rev": "43dd88ad4024b1945906887521057c73d3b0d84e",
+      "rev": "28fe6e822ae344544c379d60fcb13c9519a1f08a",
       "src": "https://github.com/stevearc/aerial.nvim"
     },
     "async": {
-      "rev": "7a1d7d49933fbe902b84b55f352a3b10fd587331",
+      "rev": "e2a813be9cd143ab1181de6d8a0720e0230cd86e",
       "src": "https://github.com/lewis6991/async.nvim"
     },
     "bazel": {
@@ -13,15 +13,15 @@
       "src": "https://github.com/zaucy/bazel.nvim"
     },
     "blink-cmp": {
-      "rev": "35e3923a09ff3db150ceff80004befcbbfa071a0",
+      "rev": "bda905a4bf1b3edfa708b0be193b8c63d8620c96",
       "src": "https://github.com/saghen/blink.cmp"
     },
     "blink.lib": {
-      "rev": "f29d8bac6549bc1e7d699c83f680823d7def98bd",
+      "rev": "5876dd95deeb70aadbe9f1c0b7117a135061cdac",
       "src": "https://github.com/saghen/blink.lib"
     },
     "catppuccin": {
-      "rev": "426dbebe06b5c69fd846ceb17b42e12f890aedf1",
+      "rev": "e068ab5f8261f23f6f71ffd8791ae40315b77b9c",
       "src": "https://github.com/catppuccin/nvim"
     },
     "clangd_extensions": {
@@ -37,11 +37,11 @@
       "src": "https://github.com/hrsh7th/cmp-nvim-lsp"
     },
     "codediff": {
-      "rev": "76ff1b13f0bcba655dca85cea1ef0df877a53c0f",
+      "rev": "7608f3b436ce1f84a4888f75e53079caa981a2e9",
       "src": "https://github.com/esmuellert/codediff.nvim"
     },
     "coerce": {
-      "rev": "b9c88382317d53b0203ce4eda03d0645f8d2e612",
+      "rev": "68d931234d02f2230a627fea46812d3c18d24e6e",
       "src": "https://github.com/gregorias/coerce.nvim"
     },
     "command-completion": {
@@ -49,15 +49,15 @@
       "src": "https://github.com/zaucy/command-completion.nvim"
     },
     "conform": {
-      "rev": "18aeab3d63d350dcf44d64c462cc489a3412af40",
+      "rev": "619363c30309d29ffa631e67c8183f2a72caa373",
       "src": "https://github.com/stevearc/conform.nvim"
     },
     "cyberdream": {
-      "rev": "d1866f5b606896ca530be00bafbd12a3e6bb6efd",
+      "rev": "b9cc88378b776f33d3ea77164716f37c3f13ef72",
       "src": "https://github.com/scottmckendry/cyberdream.nvim"
     },
     "dap": {
-      "rev": "531771530d4f82ad2d21e436e3cc052d68d7aebb",
+      "rev": "9e848e09a697ee95302a3ef2dd43fd6eb709e570",
       "src": "https://github.com/mfussenegger/nvim-dap"
     },
     "dap-go": {
@@ -72,6 +72,10 @@
       "rev": "1a66cabaa4a4da0be107d5eda6d57242f0fe7e49",
       "src": "https://github.com/rcarriga/nvim-dap-ui"
     },
+    "diffs": {
+      "rev": "7ab445c39224160203ae692d3c883e2f51f2d442",
+      "src": "https://github.com/barrettruth/diffs.nvim"
+    },
     "diffview": {
       "rev": "4516612fe98ff56ae0415a259ff6361a89419b0a",
       "src": "https://github.com/sindrets/diffview.nvim"
@@ -85,7 +89,7 @@
       "src": "https://github.com/ecsact-dev/ecsact.nvim"
     },
     "fidget": {
-      "rev": "82404b196e73a00b1727a91903beef5ddc319d22",
+      "rev": "6f793b2bcd2d35e201c09520f698bb763220908a",
       "src": "https://github.com/j-hui/fidget.nvim"
     },
     "flatbuffers": {
@@ -105,12 +109,16 @@
       "src": "https://github.com/zaucy/fnm.nvim"
     },
     "gh-actions": {
-      "rev": "7f65a9fa31b8f500469f708c68b30d6c430f92ff",
+      "rev": "a20d84a1476b3d25990e81f9e27d2d4182d3ddab",
       "src": "https://github.com/topaxi/gh-actions.nvim"
     },
     "gitsigns": {
-      "rev": "dd3f588bacbeb041be6facf1742e42097f62165d",
+      "rev": "2038c666bd9d8a0b7349a0b6ee00dc83104b9ecf",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
+    },
+    "guh": {
+      "rev": "943779f7cdb0acee203985ad531fb53ff95d9c8e",
+      "src": "https://github.com/justinmk/guh.nvim"
     },
     "inc-rename": {
       "rev": "0074b551a17338ccdcd299bd86687cc651bcb33d",
@@ -125,7 +133,7 @@
       "src": "https://github.com/folke/lazydev.nvim"
     },
     "lspconfig": {
-      "rev": "a4ed4e761c400849e8c9f8bda33e5083f890268c",
+      "rev": "3371bf298c1f56efc26771ee961f461176958fb5",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "luvit-meta": {
@@ -133,7 +141,7 @@
       "src": "https://github.com/Bilal2453/luvit-meta"
     },
     "mason": {
-      "rev": "cbf8d285e1462dd24acf3507817be2bbcb035919",
+      "rev": "2a6940af80375532e5e9e7c1f2fc6319a1b7a69d",
       "src": "https://github.com/mason-org/mason.nvim"
     },
     "mason-conform": {
@@ -141,7 +149,7 @@
       "src": "https://github.com/zapling/mason-conform.nvim"
     },
     "mason-lspconfig": {
-      "rev": "7b01e2974a47d489bb92f47a41e4c0088ea8f86e",
+      "rev": "47059d71b42d74b0a1e9f61c1d99d301039c3b5b",
       "src": "https://github.com/mason-org/mason-lspconfig.nvim"
     },
     "mcos": {
@@ -153,7 +161,7 @@
       "src": "https://github.com/zaucy/mcp.nvim"
     },
     "mini.icons": {
-      "rev": "520995f1d75da0e4cc901ee95080b1ff2bc46b94",
+      "rev": "e56797f90192d81f1fda02e662fc3e8e3d775027",
       "src": "git@github.com:nvim-mini/mini.icons.git"
     },
     "multibuffer": {
@@ -165,7 +173,7 @@
       "src": "https://github.com/jake-stewart/multicursor.nvim"
     },
     "nerdy": {
-      "rev": "f06c60542cb04a549588eed98e55f5a9a3de9ccf",
+      "rev": "8fd18f0075c480b4e0865464dcd4fb7a42c6889e",
       "src": "https://github.com/2kabhishek/nerdy.nvim"
     },
     "nio": {
@@ -193,15 +201,15 @@
       "src": "https://github.com/norcalli/nvim-colorizer.lua"
     },
     "nvim-web-devicons": {
-      "rev": "0d7d35fa946837b8738b17c18d1faa1ac351e7f9",
+      "rev": "dfbfaa967a6f7ec50789bead7ef87e336c1fa63c",
       "src": "https://github.com/nvim-tree/nvim-web-devicons"
     },
     "octo": {
-      "rev": "b495047f0b9d35de3d8c6b84fad9de296d353b41",
+      "rev": "66b8eeca8e18213a19742f8a031e6947c738342f",
       "src": "https://github.com/pwntester/octo.nvim"
     },
     "oil": {
-      "rev": "0fcc83805ad11cf714a949c98c605ed717e0b83e",
+      "rev": "b73018b75affd13fa38e2fc94ef753b465f770d7",
       "src": "https://github.com/stevearc/oil.nvim"
     },
     "oil-git-status": {
@@ -209,11 +217,11 @@
       "src": "https://github.com/refractalize/oil-git-status.nvim"
     },
     "opencode": {
-      "rev": "20e559aa983fdbb743435fb23fa76280fe53eba1",
+      "rev": "a677af6b3613c4753e126d06e57fa10b6d813be6",
       "src": "https://github.com/sudo-tee/opencode.nvim"
     },
     "overseer": {
-      "rev": "3d0c7e7bbfe1a1c6f9bfecd0af8709171a97df71",
+      "rev": "a93d9f6d6defdac4bcd6d2c8ba988650e42e0a0e",
       "src": "https://github.com/stevearc/overseer.nvim"
     },
     "perforce": {
@@ -229,15 +237,15 @@
       "src": "https://github.com/zaucy/proj.nvim"
     },
     "quicker": {
-      "rev": "1c9322b7e2967472548ba9bccd1ccd40e49d0a49",
+      "rev": "4a6883cb13fe097a20a046eb55f6dffd239276e3",
       "src": "https://github.com/stevearc/quicker.nvim"
     },
     "render-markdown": {
-      "rev": "629eb9533ec989d9d5c6cab8f3ad5372422c24e0",
+      "rev": "f422cb5c6855f150e2ddcfaf44e7157b98b34f6a",
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "resession": {
-      "rev": "05adc14db5c2d0eae064765101dd5e9c594c7851",
+      "rev": "0983fbdd3fe938c80fb7dd33817f08f428426ac8",
       "src": "https://github.com/stevearc/resession.nvim"
     },
     "showkeys": {
@@ -245,11 +253,11 @@
       "src": "https://github.com/nvzone/showkeys"
     },
     "snacks": {
-      "rev": "0770753c88228f7f15449c6a5b242e3f7cd0d71c",
+      "rev": "882c996cf28183f4d63640de0b4c02ec886d01f2",
       "src": "https://github.com/folke/snacks.nvim"
     },
     "telescope": {
-      "rev": "7d324792b7943e4aa16ad007212e6acc6f9fe335",
+      "rev": "427b576c16792edad01a92b89721d923c19ad60f",
       "src": "https://github.com/nvim-telescope/telescope.nvim"
     },
     "telescope-zoxide": {
@@ -277,11 +285,11 @@
       "src": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects"
     },
     "uproject": {
-      "rev": "e6fb5425dfda2075382ead26c691839e63cc70ca",
+      "rev": "e3203723b6302295d7ee82b78fdae0c4e589bd4d",
       "src": "https://github.com/zaucy/uproject.nvim"
     },
     "visual-whitespace": {
-      "rev": "49ff2b1c572ed7033a584381fa23aad2bf3bb258",
+      "rev": "d1f8889dd09ca9b07bc3b7af7cd5d1bfb5a7ea71",
       "src": "https://github.com/mcauley-penney/visual-whitespace.nvim"
     },
     "volt": {

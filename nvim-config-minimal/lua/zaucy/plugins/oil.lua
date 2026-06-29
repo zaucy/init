@@ -84,7 +84,8 @@ oil.setup({
 		show_hidden = false,
 		is_hidden_file = is_hidden_file,
 	},
-	cleanup_delay_ms = 0,
+	---@diagnostic disable-next-line: assign-type-mismatch
+	cleanup_delay_ms = false,
 	use_default_keymaps = false,
 	keymaps = {
 		["g?"] = "actions.show_help",
