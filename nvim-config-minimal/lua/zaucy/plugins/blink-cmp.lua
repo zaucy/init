@@ -72,6 +72,13 @@ require("blink.cmp").setup({
 			show_without_menu = true,
 		},
 	},
-	sources = { default = { "lsp", "path", "snippets", "buffer" } },
+	sources = {
+		default = {
+			"lsp",
+			-- "path",
+			-- "snippets",
+			-- "buffer",
+		},
+	},
 	fuzzy = { implementation = "lua" },
 })

@@ -11,6 +11,7 @@ local local_overrides = {
 	-- proj = vim.fn.expand("~/projects/zaucy/proj.nvim"),
 	-- perforce = vim.fn.expand("~/projects/zaucy/perforce.nvim"),
 	-- uproject = vim.fn.expand("~/projects/zaucy/uproject.nvim"),
+	bazel = vim.fn.expand("~/projects/bazel.nvim"),
 }
 
 local modules_to_setup = {}
@@ -126,6 +127,8 @@ vim.pack.add({
 	{ name = "visual-whitespace",         src = gh("mcauley-penney/visual-whitespace.nvim")      },
 	{ name = "guh",                       src = gh("justinmk/guh.nvim")                          },
 	{ name = "diffs",                     src = gh("barrettruth/diffs.nvim")                     },
+	{ name = "hex",                       src = gh("RaafatTurki/hex.nvim")                       },
+	{ name = "ansi",                      src = gh("0xferrous/ansi.nvim")                        },
 }, { load = plugin_load })
 -- stylua: ignore end
 

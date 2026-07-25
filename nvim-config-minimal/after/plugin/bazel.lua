@@ -162,9 +162,14 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 		if buf_name:find("bazel", 1, true) == nil then
 			return
 		end
-		local real_path = vim.loop.fs_realpath(vim.api.nvim_buf_get_name(0))
-		if real_path and real_path ~= vim.api.nvim_buf_get_name(0) then
-			vim.api.nvim_command("edit " .. real_path)
+		buf_name = buf_name:gsub("\\", "/")
+
+		local real_path = vim.loop.fs_realpath(buf_name)
+		if real_path then
+			real_path = real_path:gsub("\\", "/")
+			if real_path ~= buf_name then
+				vim.api.nvim_command("edit " .. real_path)
+			end
 		end
 	end,
 })

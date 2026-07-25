@@ -35,6 +35,45 @@ function M.bazel_override()
 	end)
 end
 
+function M.goto_bazel_file(path)
+	if not path then
+		path = vim.fn.expand("%")
+	end
+
+	require("bazel").info({}, function(info)
+		local check_dirs = {
+			info["bazel-bin"],
+			info["execution_root"],
+			info["output_base"],
+			info["output_path"],
+		}
+
+		local found_files = {}
+
+		for _, dir in ipairs(check_dirs) do
+			local p = vim.fs.joinpath(dir, path)
+			local p_dir = vim.fs.dirname(p)
+			local stat = vim.uv.fs_stat(p_dir)
+
+			if stat then
+				table.insert(found_files, p_dir)
+			end
+		end
+
+		if #found_files == 0 then
+			vim.notify("couldn't find any bazel files for " .. path, vim.log.levels.ERROR)
+		else
+			vim.ui.select(found_files, {}, function(p)
+				if not p then
+					return
+				end
+
+				vim.cmd("e " .. p)
+			end)
+		end
+	end)
+end
+
 function M.bzlmod_add()
 	vim.ui.input({}, function(input)
 		if not input then

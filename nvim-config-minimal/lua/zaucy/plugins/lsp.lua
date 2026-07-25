@@ -60,6 +60,12 @@ vim.lsp.config("clangd", {
 	},
 })
 
+vim.lsp.config("cppm-lsp", {
+	cmd = { "cppm-lsp" },
+	filetypes = { "cpp" },
+	root_markers = { "build.cppm" },
+})
+
 vim.lsp.config("nushell", {
 	-- capabilities = capabilities,
 	filetypes = { "nu" },

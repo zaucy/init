@@ -15,6 +15,7 @@ vim.keymap.set({ "n" }, "gbm", fns.goto_closest_file("MODULE.bazel"), { desc = "
 vim.keymap.set({ "n" }, "gbw", fns.goto_closest_file("WORKSPACE.bazel"), { desc = "Bazel Workspace File" })
 vim.keymap.set({ "n" }, "gbz", fns.goto_closest_file(".bazelrc"), { desc = "Bazelrc File" })
 vim.keymap.set({ "n" }, "gsh", "<cmd>LspClangdSwitchSourceHeader<cr>", { desc = "clangd switch source header" })
+vim.keymap.set({ "n", "v" }, "gbe", fns.goto_bazel_file, { desc = "goto bazel file from bazel info (exec, etc.)" })
 
 vim.keymap.set({ "n" }, "gbo", fns.bazel_override, { desc = "Bazel Override" })
 vim.keymap.set({ "n" }, "gba", fns.bzlmod_add, { desc = "Bazel Override" })

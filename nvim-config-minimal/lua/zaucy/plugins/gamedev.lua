@@ -273,12 +273,69 @@ vim.keymap.set("n", "<leader>ub", function()
 	end)
 end, { desc = "Build last (fast)" })
 
+local function render_rounded_border_text(text)
+	text = "│ " .. text .. " │"
+	local top_text = "╭" .. string.rep("─", #text - 8) .. "╮"
+	local bottom_text = "╰" .. string.rep("─", #text - 8) .. "╯"
+	return { top_text, text, bottom_text }
+end
+
 vim.keymap.set("n", "<leader>uh", function()
-	local async = require("async")
-	async.run(function()
-		telescope_unreal_headers()
-	end)
-end, { desc = "Find unreal headers" })
+	local bazel = require("bazel")
+
+	if bazel.bazel_root(vim.fn.getcwd()) then
+		local header_count = 0
+		local tabstop = 8
+		local bufnr = vim.api.nvim_create_buf(false, true)
+		vim.api.nvim_set_option_value("buftype", "nofile", { buf = bufnr })
+		vim.api.nvim_buf_set_lines(bufnr, 0, 3, false, render_rounded_border_text(" headers: (loading...)"))
+		vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
+		vim.api.nvim_set_option_value("tabstop", tabstop, { buf = bufnr })
+		vim.api.nvim_win_set_buf(0, bufnr)
+
+		local bazel_cc = require("bazel.cc")
+		bazel_cc.list_headers({
+			query = "//...",
+			deps = true,
+			on_message = function(info)
+				header_count = header_count + 1
+				vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
+				if tabstop < #info.header + 1 then
+					tabstop = #info.header + 1
+					vim.api.nvim_set_option_value("tabstop", tabstop, { buf = bufnr })
+				end
+				vim.api.nvim_buf_set_lines(
+					bufnr,
+					0,
+					3,
+					false,
+					render_rounded_border_text(" headers: " .. tostring(header_count))
+				)
+				vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, { info.header .. "\t" .. info.target })
+				vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
+			end,
+			on_exit = function(exit_code)
+				vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
+
+				vim.api.nvim_buf_set_lines(
+					bufnr,
+					0,
+					3,
+					false,
+					render_rounded_border_text(
+						" headers: " .. tostring(header_count) .. " (exit_code=" .. tostring(exit_code) .. ")"
+					)
+				)
+				vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
+			end,
+		})
+	else
+		local async = require("async")
+		async.run(function()
+			telescope_unreal_headers()
+		end)
+	end
+end, { desc = "Find headers" })
 
 vim.keymap.set("n", "<leader>ut", function()
 	local util = require("uproject.util")
