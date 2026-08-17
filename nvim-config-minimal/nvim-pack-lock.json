@@ -168,6 +168,10 @@
       "rev": "179a86e00c5932f964af25dbfbdd825fbc5d4aa8",
       "src": "https://github.com/zaucy/mcp.nvim"
     },
+    "mini.completion": {
+      "rev": "d2a2b2a2b5350b713ade3bb744df39eee7d4229b",
+      "src": "https://github.com/nvim-mini/mini.completion"
+    },
     "mini.icons": {
       "rev": "98faae31e9be1cc054ae63485e58ceb185efcad0",
       "src": "git@github.com:nvim-mini/mini.icons.git"

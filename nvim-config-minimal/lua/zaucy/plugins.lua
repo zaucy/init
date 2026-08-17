@@ -7,7 +7,7 @@ local cb = function(x)
 end
 
 local local_overrides = {
-	-- multibuffer = vim.fn.expand("~/projects/zaucy/multibuffer.nvim"),
+	multibuffer = vim.fn.expand("~/projects/zaucy/multibuffer.nvim"),
 	-- proj = vim.fn.expand("~/projects/zaucy/proj.nvim"),
 	-- perforce = vim.fn.expand("~/projects/zaucy/perforce.nvim"),
 	-- uproject = vim.fn.expand("~/projects/zaucy/uproject.nvim"),
@@ -91,8 +91,8 @@ vim.pack.add({
 	{ name = "showkeys",                  src = gh("nvzone/showkeys")                            },
 	{ name = "which-key",                 src = gh("folke/which-key.nvim")                       },
 	-- { name = "command-completion",     src = gh("zaucy/command-completion.nvim")              },
-	{ name = "blink-cmp",                 src = gh("saghen/blink.cmp") },
-	{ name = "blink.lib",                 src = gh("saghen/blink.lib") },
+	{ name = "blink-cmp",                 src = gh("saghen/blink.cmp")                           },
+	{ name = "blink.lib",                 src = gh("saghen/blink.lib")                           },
 	{ name = "bazel",                     src = gh("zaucy/bazel.nvim")                           },
 	{ name = "codediff",                  src = gh("esmuellert/codediff.nvim")                   },
 	{ name = "nui",                       src = gh("MunifTanjim/nui.nvim")                       },
@@ -129,6 +129,7 @@ vim.pack.add({
 	{ name = "diffs",                     src = gh("barrettruth/diffs.nvim")                     },
 	{ name = "hex",                       src = gh("RaafatTurki/hex.nvim")                       },
 	{ name = "ansi",                      src = gh("0xferrous/ansi.nvim")                        },
+	-- { name = "mini.completion",           src = gh("nvim-mini/mini.completion")                  },
 }, { load = plugin_load })
 -- stylua: ignore end
 

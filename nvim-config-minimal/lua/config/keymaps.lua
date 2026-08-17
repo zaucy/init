@@ -178,3 +178,9 @@ vim.keymap.set({"n", "v"}, "<leader>aa", function() require("zaucy.agy").prompt_
 vim.keymap.set("n", "<leader>ac", function() require("zaucy.agy").clear() end, { desc = "Clear Agy visuals" })
 vim.keymap.set("n", "<leader>a[", function() require("zaucy.agy").goto_prev() end, { desc = "Previous Agy highlight" })
 vim.keymap.set("n", "<leader>a]", function() require("zaucy.agy").goto_next() end, { desc = "Next Agy highlight" })
+
+if vim.g.radnvim then
+  vim.keymap.set({"n", "v", "i", "c"}, "<C-S-p>", function()
+    require("radnvim").cmd("palette")
+  end, { desc = "Raddebugger: Open Command Palette" })
+end

@@ -102,8 +102,7 @@ function M.redraw_all()
 				msg.opts.line = pos[1] + 1
 				if msg.opts.end_line and msg.bottom_id then
 					local b_ok, b_pos =
-						pcall(vim.api.nvim_buf_get_extmark_by_id, msg.opts.bufnr, msg.opts.ns,
-							msg.bottom_id, {})
+						pcall(vim.api.nvim_buf_get_extmark_by_id, msg.opts.bufnr, msg.opts.ns, msg.bottom_id, {})
 					if b_ok and #b_pos > 0 then
 						msg.opts.end_line = b_pos[1]
 					end
