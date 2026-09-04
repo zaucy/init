@@ -117,33 +117,72 @@ local function debug_disconnect()
 end
 
 local function toggle_breakpoint()
-	require('dap').toggle_breakpoint()
+	local ok, radnvim = pcall(require, "radnvim")
+	if ok then
+		radnvim.toggle_breakpoint()
+	else
+		require("dap").toggle_breakpoint()
+	end
 end
 
 local function toggle_conditional_breakpoint()
-	vim.ui.input({ prompt = 'Condition' }, function(condition)
-		require('dap').toggle_breakpoint(condition)
-	end)
+	local ok, radnvim = pcall(require, "radnvim")
+	if ok then
+		vim.ui.input({ prompt = "Condition" }, function(condition)
+			if condition and condition ~= "" then
+				radnvim.set_breakpoint(nil, nil, { condition = condition })
+			end
+		end)
+	else
+		vim.ui.input({ prompt = "Condition" }, function(condition)
+			require("dap").toggle_breakpoint(condition)
+		end)
+	end
 end
 
 local function halt_process()
-	require('dap').repl.execute('process interrupt')
+	local ok, radnvim = pcall(require, "radnvim")
+	if ok then
+		radnvim.halt()
+	else
+		require("dap").repl.execute("process interrupt")
+	end
 end
 
 local function dap_continue()
-	require('dap').continue({ new = false })
+	local ok, radnvim = pcall(require, "radnvim")
+	if ok then
+		radnvim.run()
+	else
+		require("dap").continue({ new = false })
+	end
 end
 
 local function step_over()
-	require('dap').step_over()
+	local ok, radnvim = pcall(require, "radnvim")
+	if ok then
+		radnvim.step_over()
+	else
+		require("dap").step_over()
+	end
 end
 
 local function step_into()
-	require('dap').step_into()
+	local ok, radnvim = pcall(require, "radnvim")
+	if ok then
+		radnvim.step_into()
+	else
+		require("dap").step_into()
+	end
 end
 
 local function step_out()
-	require('dap').step_out()
+	local ok, radnvim = pcall(require, "radnvim")
+	if ok then
+		radnvim.step_out()
+	else
+		require("dap").step_out()
+	end
 end
 
 local dap = require('dap')
@@ -175,26 +214,9 @@ dapui.setup({})
 require("nvim-dap-virtual-text").setup({})
 require("dap-go").setup({})
 
-if vim.g.radnvim then
-	local radnvim = require('radnvim')
-	toggle_breakpoint = function() radnvim.toggle_breakpoint() end
-	toggle_conditional_breakpoint = function()
-		vim.ui.input({ prompt = 'Condition' }, function(condition)
-			if condition and condition ~= '' then
-				radnvim.set_breakpoint(nil, nil, { condition = condition })
-			end
-		end)
-	end
-	halt_process = function() radnvim.halt() end
-	dap_continue = function() radnvim.run() end
-	step_over = function() radnvim.step_over() end
-	step_into = function() radnvim.step_into() end
-	step_out = function() radnvim.step_out() end
-end
-
 local function callstack_picker()
-	if vim.g.radnvim then
-		local radnvim = require("radnvim")
+	local ok, radnvim = pcall(require, "radnvim")
+	if ok then
 		local stack = radnvim.get_callstack()
 		if #stack == 0 then
 			vim.notify("No active call stack (target not stopped)", vim.log.levels.WARN)
@@ -243,8 +265,9 @@ local function callstack_picker()
 end
 
 local function hover_eval()
-	if vim.g.radnvim then
-		require("radnvim").hover()
+	local ok, radnvim = pcall(require, "radnvim")
+	if ok then
+		radnvim.hover()
 	else
 		require("dap.ui.widgets").hover()
 	end

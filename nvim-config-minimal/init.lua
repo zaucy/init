@@ -1,8 +1,6 @@
 _G.zaucy = {}
 
-if not vim.g.radnvim then
-	require("vim._core.ui2").enable({})
-end
+require("vim._core.ui2").enable({})
 require("config.options")
 require("config.keymaps")
 require("zaucy.plugins")

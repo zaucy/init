@@ -179,41 +179,46 @@ vim.keymap.set("n", "<leader>ac", function() require("zaucy.agy").clear() end, {
 vim.keymap.set("n", "<leader>a[", function() require("zaucy.agy").goto_prev() end, { desc = "Previous Agy highlight" })
 vim.keymap.set("n", "<leader>a]", function() require("zaucy.agy").goto_next() end, { desc = "Next Agy highlight" })
 
-if vim.g.radnvim then
-  local radnvim = require("radnvim")
-  vim.keymap.set({"n", "v", "i", "c"}, "<C-S-p>", function()
-    radnvim.cmd("palette")
-  end, { desc = "Raddebugger: Open Command Palette" })
+vim.keymap.set({ "n", "v", "i", "c" }, "<C-S-p>", function()
+	local ok, radnvim = pcall(require, "radnvim")
+	if ok then
+		radnvim.cmd("palette")
+	end
+end, { desc = "Raddebugger: Open Command Palette" })
 
-  vim.keymap.set({"n", "v", "i"}, "<F5>", function()
-    radnvim.run()
-  end, { desc = "Debugger: Run / Continue" })
+vim.keymap.set({ "n", "v", "i" }, "<F5>", function()
+	local ok, radnvim = pcall(require, "radnvim")
+	if ok then
+		radnvim.run()
+	else
+		require("dap").continue({ new = false })
+	end
+end, { desc = "Debugger: Run / Continue" })
 
-  vim.keymap.set({"n", "v", "i"}, "<C-F5>", function()
-    radnvim.stop()
-  end, { desc = "Debugger: Stop Process" })
+vim.keymap.set({ "n", "v", "i" }, "<C-F5>", function()
+	local ok, radnvim = pcall(require, "radnvim")
+	if ok then
+		radnvim.stop()
+	else
+		require("dap").terminate()
+	end
+end, { desc = "Debugger: Stop Process" })
 
-  vim.keymap.set({"n", "v", "i"}, "<C-S-F5>", function()
-    radnvim.restart()
-  end, { desc = "Debugger: Restart" })
+vim.keymap.set({ "n", "v", "i" }, "<C-S-F5>", function()
+	local ok, radnvim = pcall(require, "radnvim")
+	if ok then
+		radnvim.restart()
+	else
+		require("dap").restart()
+	end
+end, { desc = "Debugger: Restart" })
 
-  vim.keymap.set("n", "K", function()
-    if radnvim.is_halted() then
-      radnvim.hover()
-    else
-      vim.lsp.buf.hover()
-    end
-  end, { desc = "Hover (LSP / Debugger)" })
-else
-  vim.keymap.set({"n", "v", "i"}, "<F5>", function()
-    require("dap").continue({ new = false })
-  end, { desc = "Debugger: Continue" })
+vim.keymap.set("n", "K", function()
+	local ok, radnvim = pcall(require, "radnvim")
+	if ok and radnvim.is_halted and radnvim.is_halted() then
+		radnvim.hover()
+	else
+		vim.lsp.buf.hover()
+	end
+end, { desc = "Hover (LSP / Debugger)" })
 
-  vim.keymap.set({"n", "v", "i"}, "<C-F5>", function()
-    require("dap").terminate()
-  end, { desc = "Debugger: Stop Process" })
-
-  vim.keymap.set({"n", "v", "i"}, "<C-S-F5>", function()
-    require("dap").restart()
-  end, { desc = "Debugger: Restart" })
-end

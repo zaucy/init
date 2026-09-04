@@ -40,7 +40,7 @@ vim.lsp.config("basedpyright", {
 vim.lsp.config("clangd", {
 	-- capabilities = capabilities,
 	cmd = {
-		"clangd",
+		"C:/Users/zekew/.cppm/bin/clangd.exe",
 		"--background-index",
 		"--clang-tidy",
 		"--header-insertion=never",

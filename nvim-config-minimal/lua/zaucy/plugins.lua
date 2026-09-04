@@ -62,7 +62,7 @@ vim.pack.add({
 	{ name = "oil-git-status",            src = gh("refractalize/oil-git-status.nvim")           },
 	{ name = "nvim-web-devicons",         src = gh("nvim-tree/nvim-web-devicons")                },
 	{ name = "gitsigns",                  src = gh("lewis6991/gitsigns.nvim")                    },
-	{ name = "diffview",                  src = gh("sindrets/diffview.nvim")                     },
+	-- { name = "diffview",                  src = gh("sindrets/diffview.nvim")                     },
 	{ name = "lspconfig",                 src = gh("neovim/nvim-lspconfig")                      },
 	{ name = "mason",                     src = gh("mason-org/mason.nvim")                       },
 	{ name = "lazydev",                   src = gh("folke/lazydev.nvim")                         },
