@@ -10,7 +10,7 @@ local local_overrides = {
 	multibuffer = vim.fn.expand("~/projects/zaucy/multibuffer.nvim"),
 	-- proj = vim.fn.expand("~/projects/zaucy/proj.nvim"),
 	-- perforce = vim.fn.expand("~/projects/zaucy/perforce.nvim"),
-	-- uproject = vim.fn.expand("~/projects/zaucy/uproject.nvim"),
+	uproject = vim.fn.expand("~/projects/zaucy/uproject.nvim"),
 	bazel = vim.fn.expand("~/projects/bazel.nvim"),
 }
 

@@ -283,7 +283,7 @@ end
 vim.keymap.set("n", "<leader>uh", function()
 	local bazel = require("bazel")
 
-	if bazel.bazel_root(vim.fn.getcwd()) then
+	if pcall(bazel.bazel_root, vim.fn.getcwd()) then
 		local header_count = 0
 		local tabstop = 8
 		local bufnr = vim.api.nvim_create_buf(false, true)

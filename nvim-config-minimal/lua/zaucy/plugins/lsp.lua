@@ -15,7 +15,7 @@ require("mason-lspconfig").setup({
 		--- issue with newer lua_ls
 		--- https://github.com/folke/lazydev.nvim/issues/136
 		"lua_ls@3.16.4",
-		"basedpyright",
+		-- "basedpyright",
 	},
 })
 
@@ -46,9 +46,9 @@ vim.lsp.config("clangd", {
 		"--header-insertion=never",
 		"--limit-results=25",
 		"--j=2",
-		"--pch-storage=disk", -- mostly needed for unreal to save on memory
-		"--malloc-trim",
-		"--completion-style=bundled",
+		-- "--pch-storage=disk", -- mostly needed for unreal to save on memory
+		-- "--malloc-trim",
+		-- "--completion-style=bundled",
 	},
 	filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
 	root_markers = {
@@ -61,11 +61,11 @@ vim.lsp.config("clangd", {
 	},
 })
 
-vim.lsp.config("cppm-lsp", {
-	cmd = { "cppm-lsp" },
-	filetypes = { "cpp" },
-	root_markers = { "build.cppm" },
-})
+-- vim.lsp.config("cppm-lsp", {
+-- 	cmd = { "cppm-lsp" },
+-- 	filetypes = { "cpp" },
+-- 	root_markers = { "build.cppm" },
+-- })
 
 vim.lsp.config("nushell", {
 	-- capabilities = capabilities,
@@ -79,9 +79,9 @@ vim.lsp.config("ecsact", {
 
 vim.lsp.enable("nushell", true)
 vim.lsp.enable("lua_ls", true)
-vim.lsp.enable("basedpyright", true)
+-- vim.lsp.enable("basedpyright", true)
 
-require("clangd_extensions").setup({})
+-- require("clangd_extensions").setup({})
 
 require("telescope").load_extension("aerial")
 require("aerial").setup({
