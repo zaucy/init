@@ -175,6 +175,8 @@ vim.keymap.set({"n", "v", "t"}, "<C-S-Up>", function() require("zaucy.chat").cha
 vim.keymap.set({"n", "v", "t"}, "<C-S-Down>", function() require("zaucy.chat").chat_set_fullscreen(false) end)
 vim.keymap.set({"n", "v", "i"}, "<C-\\>f", "<cmd>GeminiFollow<cr>")
 vim.keymap.set({"n", "v"}, "<leader>aa", function() require("zaucy.agy").prompt_agy() end, { desc = "Prompt Agy" })
+vim.keymap.set({"n", "v"}, "<leader>as", function() require("zaucy.agy").search_workspace() end, { desc = "Agy workspace search" })
+vim.keymap.set("n", "<leader>ar", "<cmd>AgyResume<cr>", { desc = "Agy resume conversation" })
 vim.keymap.set("n", "<leader>ac", function() require("zaucy.agy").clear() end, { desc = "Clear Agy visuals" })
 vim.keymap.set("n", "<leader>a[", function() require("zaucy.agy").goto_prev() end, { desc = "Previous Agy highlight" })
 vim.keymap.set("n", "<leader>a]", function() require("zaucy.agy").goto_next() end, { desc = "Next Agy highlight" })

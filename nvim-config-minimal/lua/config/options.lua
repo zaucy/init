@@ -15,6 +15,12 @@ vim.opt.undodir = vim.fn.stdpath("data") .. "/undo//"
 vim.opt.backup = true
 vim.opt.backupdir = vim.fn.stdpath("data") .. "/backup//"
 
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
+vim.opt.foldtext = ""
+
 vim.api.nvim_create_autocmd("FileType", {
 	callback = function(args)
 		pcall(vim.treesitter.start, args.buf)
@@ -201,6 +207,14 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufNew", "BufWinEnter", "TermOpen" },
 		if vim.bo.buftype == "prompt" then
 			return
 		end
+
+		if vim.bo.buftype == "acwrite" and vim.bo.filetype == "agy" then
+			vim.wo.signcolumn = "yes"
+			vim.wo.number = false
+			vim.wo.relativenumber = false
+			return
+		end
+
 		if vim.bo.buftype == "acwrite" then
 			return
 		end

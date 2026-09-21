@@ -1,108 +1,3 @@
-local function perforce_opened_all()
-	local perforce = require("perforce")
-	local n = require("nui-components")
-
-	local r = n.create_renderer({})
-
-	local options = {
-		n.separator("Loading..."),
-	}
-
-	local function renderer()
-		return n.rows(
-			n.prompt({
-				prefix = "> ",
-				placeholder = "search...",
-			}),
-			n.select({
-				data = options,
-				multiselect = false,
-			})
-		)
-	end
-
-	r:render(renderer)
-
-	perforce.opened({ all_clients = true }, function(errors, things)
-		if errors then
-			options = {
-				n.separator("ERROR"),
-			}
-			for _, error in pairs(errors) do
-				table.insert(options, n.option(error))
-			end
-			return
-		end
-
-		local user_map = {}
-
-		for _, thing in ipairs(things) do
-			local user_items = user_map[thing.user] or {}
-
-			table.insert(options, n.option(thing.depotFile))
-
-			user_map[thing.user] = user_items
-		end
-
-		vim.schedule(function()
-			r:redraw()
-		end)
-	end)
-end
-
---- @async
-local function perforce_opened()
-	local async = require("async")
-	local perforce = require("perforce")
-	local pickers = require("telescope.pickers")
-	local finders = require("telescope.finders")
-	local previewers = require("telescope.previewers")
-	local sorters = require("telescope.sorters")
-	local themes = require("telescope.themes")
-
-	local opened_err, opened_result = async.await(2, perforce.opened, {})
-
-	if opened_err then
-		error(opened_err, vim.log.levels.ERROR)
-	end
-
-	async.await(vim.schedule)
-
-	if #opened_result == 0 then
-		vim.notify("no perforce opened files")
-		return
-	end
-
-	local depot_files = vim.tbl_map(function(item)
-		return item.depotFile
-	end, opened_result)
-	local where_err, where_result = async.await(2, perforce.where, depot_files)
-
-	if where_err then
-		error(where_err, vim.log.levels.ERROR)
-	end
-
-	async.await(vim.schedule)
-
-	local picker_options = themes.get_ivy({
-		previewer = previewers.vim_buffer_cat.new({}),
-		sorter = sorters.get_fuzzy_file(),
-		finder = finders.new_table({
-			results = where_result,
-			entry_maker = function(item)
-				return {
-					value = item,
-					display = item.depotFile,
-					ordinal = item.depotFile,
-					filename = item.path,
-				}
-			end,
-		}),
-	})
-
-	pickers.new({}, picker_options):find()
-end
-
 vim.keymap.set("n", "<leader>va", "<cmd>!p4 add %<cr>", { desc = "Perforce add" })
 vim.keymap.set("n", "<leader>vd", "<cmd>Vp4Delete!<cr>", { desc = "Perforce delete" })
 vim.keymap.set("n", "<leader>ve", "<cmd>!p4 edit %<cr>", { desc = "Perforce edit" })
@@ -111,11 +6,9 @@ vim.keymap.set("n", "<leader>vc", "<cmd>Vp4Reopen<cr>", { desc = "Perforce chang
 vim.keymap.set("n", "<leader>vq", "<cmd>Vp4Filelog<cr>", { desc = "Perforce file log (quickfix)" })
 vim.keymap.set("n", "<leader>v.", "<cmd>Vp4Diff<cr>", { desc = "Perforce file diff" })
 
-vim.keymap.set("n", "<leader>vs", function()
-	local async = require("async")
-	async.run(perforce_opened):raise_on_error()
-end, { desc = "Perforce status" })
-vim.keymap.set("n", "<leader>voa", perforce_opened_all, { desc = "Perfoce opened (all)" })
+vim.keymap.set("n", "<leader>vs", "<cmd>e oil-p4://default/<cr>")
+vim.keymap.set("n", "<leader>voa", "<cmd>e oil-p4://opened/<cr>")
+vim.keymap.set("n", "<leader>vh", "<cmd>e oil-p4://history/<cr>")
 
 require("perforce.plugins.signs").setup()
 require("perforce.plugins.oil").setup()

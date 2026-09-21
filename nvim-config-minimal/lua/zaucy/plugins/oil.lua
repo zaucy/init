@@ -117,6 +117,7 @@ oil.setup({
 			desc = ":tcd to the current oil directory",
 			mode = "n",
 		},
+		["<leader>ve"] = "actions.p4_change",
 	},
 	win_options = {
 		-- for git status
