@@ -34,7 +34,8 @@ local function colorize_path()
 	local bufnr = vim.api.nvim_win_get_buf(winid)
 	local scheme = ""
 
-	local file_path = vim.api.nvim_buf_get_name(bufnr)
+	local bufname = vim.api.nvim_buf_get_name(bufnr)
+	local file_path = bufname
 	local filename = vim.fs.basename(file_path)
 
 	-- file_path = vim.fn.substitute(file_path, "\\\\", "/", "g")
@@ -85,6 +86,16 @@ local function colorize_path()
 		scheme = term_color .. "  %*"
 		dir_color = term_color
 		file_path = file_path:sub(6) -- strip out 'term:/'
+	elseif vim.startswith(bufname, "crude-git:") then
+		local norm_cwd = tabpage_cwd:gsub("\\", "/")
+		local scheme_prefix = "crude-git://"
+		local rest = bufname:sub(#scheme_prefix + 1)
+		local repo_part, action_part = rest:match("^(.-)//(.*)$")
+		if repo_part and vim.fs.normalize(repo_part) == norm_cwd then
+			return scheme_prefix .. action_part
+		end
+
+		return bufname:gsub("\\", "/")
 	else
 		if has_tabpage_cwd then
 			local rel_file_path = vim.fs.relpath(tabpage_cwd, file_path)
@@ -96,10 +107,10 @@ local function colorize_path()
 		if vim.startswith(file_path, homedir) then
 			file_path = "~" .. file_path:sub(#homedir + 1)
 		end
-		dir = file_path:sub(1, #file_path - #filename - 1)
-		if #filename > 0 then
-			dir = dir .. "/"
-		end
+		dir = file_path:sub(1, #file_path - #filename)
+		-- if #filename > 0 then
+		-- 	dir = dir .. "/"
+		-- end
 
 		local nvim_config_prefix = "~/projects/zaucy/init/nvim-config-minimal/"
 		if vim.startswith(dir, nvim_config_prefix) then

@@ -7,8 +7,8 @@ vim.keymap.set({ "v" }, '/', '<esc>/\\%V') -- search in selection
 
 vim.keymap.set({"n", "v"}, "<C-S-U>", function() vim.pack.update(nil) end, { desc = "Update all packages" })
 
-vim.keymap.set({"n", "v"}, "<leader>e", "<cmd>Oil<cr>", { desc = "Explore Files" })
-vim.keymap.set({"n", "v"}, "<leader>E", "<cmd>Oil .<cr>", { desc = "Explore Files (PWD)" })
+vim.keymap.set({"n", "v"}, "<leader>e", fns.explore, { desc = "Explore Files" })
+vim.keymap.set({"n", "v"}, "<leader>E", "<cmd>edit .<cr>", { desc = "Explore Files (PWD)" })
 
 vim.keymap.set({ "n" }, "gbb", fns.goto_closest_file("BUILD.bazel"), { desc = "Bazel Build File" })
 vim.keymap.set({ "n" }, "gbm", fns.goto_closest_file("MODULE.bazel"), { desc = "Bazel Module File" })
@@ -176,6 +176,8 @@ vim.keymap.set({"n", "v", "t"}, "<C-S-Down>", function() require("zaucy.chat").c
 vim.keymap.set({"n", "v", "i"}, "<C-\\>f", "<cmd>GeminiFollow<cr>")
 vim.keymap.set({"n", "v"}, "<leader>aa", function() require("zaucy.agy").prompt_agy() end, { desc = "Prompt Agy" })
 vim.keymap.set({"n", "v"}, "<leader>as", function() require("zaucy.agy").search_workspace() end, { desc = "Agy workspace search" })
+vim.keymap.set({"n", "v"}, "<leader>an", "<cmd>edit agy://new<cr>", { desc = "Agy new convo" })
+vim.keymap.set({"n", "v"}, "<leader>ah", "<cmd>edit agy://<cr>", { desc = "Agy home/history" })
 vim.keymap.set("n", "<leader>ar", "<cmd>AgyResume<cr>", { desc = "Agy resume conversation" })
 vim.keymap.set("n", "<leader>ac", function() require("zaucy.agy").clear() end, { desc = "Clear Agy visuals" })
 vim.keymap.set("n", "<leader>a[", function() require("zaucy.agy").goto_prev() end, { desc = "Previous Agy highlight" })

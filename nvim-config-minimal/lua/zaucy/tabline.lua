@@ -25,11 +25,93 @@ local M = {}
 M._index_names = { "󰎦", "󰎩", "󰎬", "󰎮", "󰎰", "󰎵", "󰎸", "󰎻", "󰎾", }
 M._index_names_active = { "󰎤", "󰎧", "󰎪", "󰎭", "󰎱", "󰎳", "󰎶", "󰎹", "󰎼" }
 M._tabs = { vim.api.nvim_get_current_tabpage() }
+M._pending_index = nil
 
 M._named_tabs = {
 	[homedir] = "",
 	[initdir] = "󰒔",
 }
+
+local function notify_radnvim()
+	local ok, rad = pcall(require, "radnvim")
+	if ok and type(rad) == "table" and rad._notify_all then
+		rad._notify_all()
+	end
+end
+
+local function prune_invalid_tabs()
+	for index, tabpage in pairs(M._tabs) do
+		if not vim.api.nvim_tabpage_is_valid(tabpage) then
+			M._tabs[index] = nil
+		end
+	end
+end
+
+local function assign_tab_slot(index, tabpage)
+	for k, tp in pairs(M._tabs) do
+		if tp == tabpage and k ~= index then
+			M._tabs[k] = nil
+		end
+	end
+	M._tabs[index] = tabpage
+end
+
+local function save_session_state(force)
+	if vim.g.SessionLoad and not force then
+		return
+	end
+	prune_invalid_tabs()
+	local slots = {}
+	for index, tabpage in pairs(M._tabs) do
+		if vim.api.nvim_tabpage_is_valid(tabpage) then
+			local tabnr = vim.api.nvim_tabpage_get_number(tabpage)
+			slots[tostring(tabnr)] = index
+		end
+	end
+	pcall(function()
+		vim.g.ZaucyTablineState = vim.json.encode({
+			slots = slots,
+			named_tabs = M._named_tabs,
+		})
+	end)
+end
+
+local function restore_session_state()
+	local raw = vim.g.ZaucyTablineState
+	if type(raw) ~= "string" or raw == "" then
+		return
+	end
+	local ok, decoded = pcall(vim.json.decode, raw)
+	if not ok or type(decoded) ~= "table" then
+		return
+	end
+
+	if type(decoded.named_tabs) == "table" then
+		for k, v in pairs(decoded.named_tabs) do
+			M._named_tabs[k] = v
+		end
+	end
+
+	if type(decoded.slots) == "table" then
+		local new_tabs = {}
+		local tabpages_by_nr = {}
+		for _, tp in ipairs(vim.api.nvim_list_tabpages()) do
+			if vim.api.nvim_tabpage_is_valid(tp) then
+				tabpages_by_nr[tostring(vim.api.nvim_tabpage_get_number(tp))] = tp
+			end
+		end
+		for tabnr_str, slot in pairs(decoded.slots) do
+			local slot_num = tonumber(slot)
+			local tp = tabpages_by_nr[tostring(tabnr_str)]
+			if slot_num and slot_num >= 1 and slot_num <= 9 and tp then
+				new_tabs[slot_num] = tp
+			end
+		end
+		if next(new_tabs) ~= nil then
+			M._tabs = new_tabs
+		end
+	end
+end
 
 function M.goto(index)
 	assert(type(index) == "number")
@@ -41,12 +123,20 @@ function M.goto(index)
 	-- 	vim.cmd('tabclose')
 	-- end
 
+	prune_invalid_tabs()
+
 	if M._tabs[index] ~= nil and vim.api.nvim_tabpage_is_valid(M._tabs[index]) then
 		vim.api.nvim_set_current_tabpage(M._tabs[index])
 	else
+		M._pending_index = index
 		vim.cmd('tabnew')
-		M._tabs[index] = vim.api.nvim_get_current_tabpage()
+		M._pending_index = nil
+		assign_tab_slot(index, vim.api.nvim_get_current_tabpage())
 	end
+
+	save_session_state()
+	notify_radnvim()
+	vim.cmd.redrawtabline()
 end
 
 function M.draw()
@@ -55,11 +145,7 @@ function M.draw()
 		return ""
 	end
 
-	for index, tabpage in pairs(M._tabs) do
-		if not vim.api.nvim_tabpage_is_valid(tabpage) then
-			M._tabs[index] = nil
-		end
-	end
+	prune_invalid_tabs()
 
 	local current_tabpage = vim.api.nvim_get_current_tabpage()
 	local tabpages = vim.api.nvim_list_tabpages()
@@ -140,6 +226,9 @@ function M.set_tab_name(dir, name)
 
 	dir = vim.fn.substitute(vim.fn.expand(dir), '\\\\', '/', 'g')
 	M._named_tabs[dir] = name
+	save_session_state()
+	notify_radnvim()
+	vim.cmd.redrawtabline()
 end
 
 local function is_diffview_tab(tabpage, bufname)
@@ -174,6 +263,8 @@ end
 
 -- Radnvim native titlebar integration via global configuration
 vim.g.radnvim_tab_format = function(info)
+	prune_invalid_tabs()
+
 	local tabcwd = vim.fn.substitute(info.cwd or vim.fn.getcwd(-1, info.tab_index), '\\\\', '/', 'g')
 	local existing_tab_name = M._named_tabs[tabcwd]
 
@@ -202,12 +293,22 @@ vim.g.radnvim_tab_format = function(info)
 			end
 		end
 
-		-- Auto-assign new normal tab to lowest available slot
-		if not numbered_index then
+		-- If opened via M.goto(index), assign to the requested slot before auto-assigning
+		if not numbered_index and M._pending_index and info.tab == vim.api.nvim_get_current_tabpage() then
+			local target = M._pending_index
+			M._pending_index = nil
+			assign_tab_slot(target, info.tab)
+			numbered_index = target
+			save_session_state()
+		end
+
+		-- Auto-assign new normal tab to lowest available slot (skip while session is mid-load)
+		if not numbered_index and not vim.g.SessionLoad then
 			for i = 1, 9 do
 				if M._tabs[i] == nil or not vim.api.nvim_tabpage_is_valid(M._tabs[i]) then
-					M._tabs[i] = info.tab
+					assign_tab_slot(i, info.tab)
 					numbered_index = i
+					save_session_state()
 					break
 				end
 			end
@@ -275,5 +376,126 @@ vim.g.radnvim_tab_format = function(info)
 		}
 	end
 end
+
+vim.api.nvim_create_autocmd("SessionLoadPre", {
+	callback = function()
+		M._tabs = {}
+		local cur_buf = vim.api.nvim_get_current_buf()
+		local non_term_bufs = {}
+		for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+			if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buftype ~= "terminal" then
+				table.insert(non_term_bufs, buf)
+			end
+		end
+		if #non_term_bufs == 1 and is_blank_scratch_buffer(cur_buf) then
+			return
+		end
+		local scratch = vim.api.nvim_create_buf(true, false)
+		for _, win in ipairs(vim.api.nvim_list_wins()) do
+			if vim.api.nvim_win_is_valid(win) then
+				pcall(vim.api.nvim_win_set_buf, win, scratch)
+			end
+		end
+		for _, buf in ipairs(non_term_bufs) do
+			if buf ~= scratch and vim.api.nvim_buf_is_valid(buf) then
+				pcall(vim.api.nvim_buf_delete, buf, { force = true })
+			end
+		end
+	end,
+})
+
+vim.api.nvim_create_autocmd("BufFilePost", {
+	callback = function(ev)
+		if not vim.g.SessionLoad or vim.b[ev.buf]._session_renaming then
+			return
+		end
+		local name = vim.api.nvim_buf_get_name(ev.buf)
+		if name == "" then
+			return
+		end
+		vim.b[ev.buf]._session_target_name = name
+		vim.b[ev.buf]._session_renaming = true
+		pcall(vim.api.nvim_buf_set_name, ev.buf, "")
+		vim.b[ev.buf]._session_renaming = nil
+	end,
+})
+
+local function restore_session_buffers()
+	local by_norm_name = {}
+	local restored_any = false
+	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+		if vim.api.nvim_buf_is_valid(buf) and vim.b[buf]._session_target_name then
+			restored_any = true
+			local target = vim.b[buf]._session_target_name
+			local norm_target = vim.fs.normalize(target):gsub("/+$", "")
+			vim.b[buf]._session_target_name = nil
+
+			local canonical = by_norm_name[norm_target]
+			if canonical and vim.api.nvim_buf_is_valid(canonical) then
+				for _, win in ipairs(vim.fn.win_findbuf(buf)) do
+					if vim.api.nvim_win_is_valid(win) then
+						vim.api.nvim_win_set_buf(win, canonical)
+					end
+				end
+				pcall(vim.api.nvim_buf_delete, buf, { force = true })
+			else
+				for _, other in ipairs(vim.api.nvim_list_bufs()) do
+					if other ~= buf and vim.api.nvim_buf_is_valid(other) and not vim.api.nvim_buf_is_loaded(other) then
+						local other_name = vim.api.nvim_buf_get_name(other)
+						if other_name ~= "" and vim.fs.normalize(other_name):gsub("/+$", "") == norm_target then
+							pcall(vim.api.nvim_buf_delete, other, { force = true })
+						end
+					end
+				end
+				vim.b[buf]._session_renaming = true
+				pcall(vim.api.nvim_buf_set_name, buf, target)
+				vim.b[buf]._session_renaming = nil
+				by_norm_name[norm_target] = buf
+			end
+		end
+	end
+	if restored_any then
+		local ok, crude = pcall(require, "crude")
+		if ok and crude and crude.load_uninitialized_buffers then
+			pcall(crude.load_uninitialized_buffers)
+		end
+	end
+end
+
+vim.api.nvim_create_autocmd("SessionLoadPost", {
+	callback = function()
+		restore_session_buffers()
+		restore_session_state()
+		save_session_state(true)
+		notify_radnvim()
+		vim.cmd.redrawtabline()
+		vim.schedule(function()
+			restore_session_state()
+			save_session_state(true)
+			notify_radnvim()
+			vim.cmd.redrawtabline()
+		end)
+	end,
+})
+
+vim.api.nvim_create_autocmd({ "UIEnter", "VimEnter" }, {
+	callback = function()
+		notify_radnvim()
+		vim.schedule(function()
+			notify_radnvim()
+			vim.cmd.redrawtabline()
+		end)
+	end,
+})
+
+vim.api.nvim_create_autocmd("TabClosed", {
+	callback = function()
+		prune_invalid_tabs()
+		save_session_state()
+		notify_radnvim()
+	end,
+})
+
+save_session_state()
 
 return M

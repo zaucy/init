@@ -40,7 +40,7 @@ vim.lsp.config("basedpyright", {
 vim.lsp.config("clangd", {
 	-- capabilities = capabilities,
 	cmd = {
-		"C:/Users/zekew/.cppm/bin/clangd.exe",
+		"clangd",
 		"--background-index",
 		"--clang-tidy",
 		"--header-insertion=never",
@@ -61,11 +61,11 @@ vim.lsp.config("clangd", {
 	},
 })
 
--- vim.lsp.config("cppm-lsp", {
--- 	cmd = { "cppm-lsp" },
--- 	filetypes = { "cpp" },
--- 	root_markers = { "build.cppm" },
--- })
+vim.lsp.config("cppm-lsp", {
+	cmd = { "cppm-lsp" },
+	filetypes = { "cpp" },
+	root_markers = { "build.cppm" },
+})
 
 vim.lsp.config("nushell", {
 	-- capabilities = capabilities,

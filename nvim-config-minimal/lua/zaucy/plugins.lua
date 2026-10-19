@@ -15,14 +15,12 @@ require("zaucy.plugins-override") {
 	-- bazel = vim.fn.expand("~/projects/bazel.nvim"),
 	-- mcos = vim.fn.expand("~/projects/zaucy/mcos.nvim"),
 	-- agy = vim.fn.expand("~/projects/zaucy/agy.nvim"),
+	-- crude = vim.fn.expand("~/projects/zaucy/crude.nvim"),
 }
 
 vim.pack.add({
-	{ name = "oil",                       src = gh("stevearc/oil.nvim")                          },
-	{ name = "oil-git-status",            src = gh("refractalize/oil-git-status.nvim")           },
 	{ name = "nvim-web-devicons",         src = gh("nvim-tree/nvim-web-devicons")                },
 	{ name = "gitsigns",                  src = gh("lewis6991/gitsigns.nvim")                    },
-	-- { name = "diffview",                  src = gh("sindrets/diffview.nvim")                     },
 	{ name = "lspconfig",                 src = gh("neovim/nvim-lspconfig")                      },
 	{ name = "mason",                     src = gh("mason-org/mason.nvim")                       },
 	{ name = "lazydev",                   src = gh("folke/lazydev.nvim")                         },
@@ -31,7 +29,6 @@ vim.pack.add({
 	{ name = "clangd_extensions",         src = gh("p00f/clangd_extensions.nvim")                },
 	{ name = "aerial",                    src = gh("stevearc/aerial.nvim")                       },
 	{ name = "inc_rename",                src = gh("smjonas/inc-rename.nvim")                    },
-	-- { name = "render-markdown",           src = gh("MeanderingProgrammer/render-markdown.nvim")  },
 	{ name = "multibuffer",               src = gh("zaucy/multibuffer.nvim")                     },
 	{ name = "mcos",                      src = gh("zaucy/mcos.nvim")                            },
 	{ name = "nerdy",                     src = gh("2kabhishek/nerdy.nvim")                      },
@@ -86,10 +83,11 @@ vim.pack.add({
 	{ name = "volt",                      src = gh("nvzone/volt")                                },
 	{ name = "visual-whitespace",         src = gh("mcauley-penney/visual-whitespace.nvim")      },
 	{ name = "guh",                       src = gh("justinmk/guh.nvim")                          },
-	{ name = "diffs",                     src = gh("barrettruth/diffs.nvim")                     },
+	-- { name = "diffs",                     src = gh("barrettruth/diffs.nvim")                     },
 	{ name = "hex",                       src = gh("RaafatTurki/hex.nvim")                       },
 	{ name = "ansi",                      src = gh("0xferrous/ansi.nvim")                        },
 	-- { name = "mini.completion",           src = gh("nvim-mini/mini.completion")                  },
+	{ name = "crude",                      src = gh("zaucy/crude.nvim")                          },
 })
 -- stylua: ignore end
 

@@ -1,6 +1,13 @@
+--- @class chat.TabConfig
+--- @field type? "terminal"|"buffer"
+--- @field cmd? string|fun(dir: string): string|number|chat.TabConfig|nil
+--- @field mode? "normal"|"insert"
+
 --- @class chat.SetupOptions
---- @field chat_scratch_dir string|nil
---- @field terminal_command string|fun(dir: string): string
+--- @field chat_scratch_dir? string
+--- @field terminal_command? string|fun(dir: string): string|chat.TabConfig
+--- @field chat? chat.TabConfig|fun(dir: string): chat.TabConfig|string
+--- @field cwd? chat.TabConfig|fun(dir: string): chat.TabConfig|string
 
 --- @class chat.ChatTabpageState
 --- @field layout chat.Layout|nil
@@ -180,8 +187,10 @@ local function bind_chat_keys(buf)
 	if not buf or not vim.api.nvim_buf_is_valid(buf) then
 		return
 	end
-	vim.keymap.set({ "t" }, "<S-CR>", "\\\r", { buffer = buf })
-	vim.keymap.set({ "t" }, "<C-CR>", "\\\r", { buffer = buf })
+	if vim.bo[buf].buftype == "terminal" then
+		vim.keymap.set({ "t" }, "<S-CR>", "\\\r", { buffer = buf })
+		vim.keymap.set({ "t" }, "<C-CR>", "\\\r", { buffer = buf })
+	end
 	vim.keymap.set({ "t", "v", "n" }, "<C-S-Left>", function()
 		M.chat_switch_tab(1)
 	end, { buffer = buf })
@@ -197,20 +206,149 @@ local function get_terminal_command(dir)
 	return M._opts.terminal_command
 end
 
-local function create_chat_term_buf()
-	local orig_cwd = vim.fn.getcwd(0, 0)
-	if M._opts.chat_scratch_dir then
-		vim.cmd.lcd(M._opts.chat_scratch_dir)
-	end
-	vim.cmd.terminal(get_terminal_command(M._opts.chat_scratch_dir or orig_cwd))
-	vim.cmd.lcd(orig_cwd)
+--- @param tab_index number
+--- @param dir string
+--- @return chat.TabConfig
+local function get_tab_config(tab_index, dir)
+	local raw = (tab_index == 1) and M._opts.chat or M._opts.cwd
 
-	M._chat_term_buf = vim.api.nvim_get_current_buf()
-	bind_chat_keys(M._chat_term_buf)
-	vim.api.nvim_exec_autocmds("User", {
-		pattern = "ZaucyChatTerminalBufCreated",
-		data = { terminal_bufnr = M._chat_term_buf },
-	})
+	if type(raw) == "function" then
+		raw = raw(dir)
+	end
+
+	if type(raw) == "string" then
+		if raw:match("^:?e%s+") or raw:match("^:?edit%s+") or raw:match("://") then
+			return { type = "buffer", cmd = raw, mode = "normal" }
+		else
+			return { type = "terminal", cmd = raw, mode = "insert" }
+		end
+	end
+
+	if type(raw) == "table" then
+		local tab_type = raw.type
+		if type(tab_type) == "function" then
+			tab_type = tab_type(dir)
+		end
+
+		local cmd = raw.cmd
+		local mode = raw.mode
+		if type(cmd) == "function" then
+			local res = cmd(dir)
+			if type(res) == "table" then
+				return {
+					type = res.type or tab_type or "terminal",
+					cmd = res.cmd,
+					mode = res.mode or mode,
+				}
+			elseif type(res) == "string" or type(res) == "number" then
+				cmd = res
+			end
+		end
+
+		if tab_type == nil then
+			if type(cmd) == "string" and (cmd:match("^:?e%s+") or cmd:match("^:?edit%s+") or cmd:match("://")) then
+				tab_type = "buffer"
+			else
+				tab_type = "terminal"
+			end
+		end
+
+		return {
+			type = tab_type,
+			cmd = cmd or get_terminal_command(dir),
+			mode = mode,
+		}
+	end
+
+	local fallback = get_terminal_command(dir)
+	if type(fallback) == "table" then
+		return {
+			type = fallback.type or "terminal",
+			cmd = fallback.cmd,
+			mode = fallback.mode or "insert",
+		}
+	elseif type(fallback) == "string" and (fallback:match("^:?e%s+") or fallback:match("^:?edit%s+") or fallback:match("://")) then
+		return {
+			type = "buffer",
+			cmd = fallback,
+			mode = "normal",
+		}
+	end
+
+	return {
+		type = "terminal",
+		cmd = fallback,
+		mode = "insert",
+	}
+end
+
+--- @param tab_index number
+--- @param dir string
+--- @param tab_config chat.TabConfig
+--- @return number
+local function open_tab_buf(tab_index, dir, tab_config)
+	local cmd = tab_config.cmd
+	if type(cmd) == "function" then
+		local res = cmd(dir)
+		if type(res) == "table" then
+			tab_config = res
+			cmd = tab_config.cmd
+		elseif type(res) == "number" and vim.api.nvim_buf_is_valid(res) then
+			bind_chat_keys(res)
+			vim.api.nvim_exec_autocmds("User", {
+				pattern = "ZaucyChatBufCreated",
+				data = { bufnr = res, tab_index = tab_index },
+			})
+			return res
+		elseif type(res) == "string" then
+			cmd = res
+		end
+	end
+
+	local orig_cwd = vim.fn.getcwd(0, 0)
+	local changed_dir = false
+	if dir and dir ~= "" then
+		changed_dir = pcall(vim.cmd.lcd, dir)
+	end
+
+	local new_buf
+	if tab_config.type == "buffer" then
+		if type(cmd) == "string" and cmd ~= "" then
+			if cmd:match("^:?e%s+") or cmd:match("^:?edit%s+") or cmd:sub(1, 1) == ":" then
+				local clean_cmd = cmd:gsub("^:", "")
+				vim.cmd(clean_cmd)
+			else
+				vim.cmd.edit(cmd)
+			end
+		end
+		new_buf = vim.api.nvim_get_current_buf()
+		bind_chat_keys(new_buf)
+		vim.api.nvim_exec_autocmds("User", {
+			pattern = "ZaucyChatBufCreated",
+			data = { bufnr = new_buf, tab_index = tab_index },
+		})
+	else
+		local term_cmd = cmd
+		if type(term_cmd) ~= "string" or term_cmd == "" then
+			term_cmd = get_terminal_command(dir)
+		end
+		vim.cmd.terminal(term_cmd)
+		new_buf = vim.api.nvim_get_current_buf()
+		bind_chat_keys(new_buf)
+		vim.api.nvim_exec_autocmds("User", {
+			pattern = "ZaucyChatTerminalBufCreated",
+			data = { terminal_bufnr = new_buf, tab_index = tab_index },
+		})
+		vim.api.nvim_exec_autocmds("User", {
+			pattern = "ZaucyChatBufCreated",
+			data = { bufnr = new_buf, tab_index = tab_index },
+		})
+	end
+
+	if changed_dir then
+		pcall(vim.cmd.lcd, orig_cwd)
+	end
+	return new_buf
 end
 
 --- @param tabpage number
@@ -224,14 +362,18 @@ local function ensure_chat_term_buf(tabpage, state)
 	local body_win = state.layout.wins.body
 
 	if M._active_tab_index == 1 then
+		local orig_cwd = vim.fn.getcwd(0, 0)
+		local dir = M._opts.chat_scratch_dir or orig_cwd
+		local conf = get_tab_config(1, dir)
+
 		vim.api.nvim_win_call(body_win, function()
-			-- Disable fixbuf equivalent if needed, though we manipulate buf directly
 			vim.wo[body_win].winfixbuf = false
 			if M._chat_term_buf and vim.api.nvim_buf_is_valid(M._chat_term_buf) then
 				vim.api.nvim_win_set_buf(body_win, M._chat_term_buf)
 			else
-				create_chat_term_buf()
-				vim.api.nvim_win_set_buf(body_win, M._chat_term_buf)
+				local buf = open_tab_buf(1, dir, conf)
+				M._chat_term_buf = buf
+				vim.api.nvim_win_set_buf(body_win, buf)
 			end
 			vim.wo[body_win].winfixbuf = true
 		end)
@@ -240,21 +382,17 @@ local function ensure_chat_term_buf(tabpage, state)
 
 	local cwd = vim.fn.getcwd(-1, tabpage)
 	cwd = cwd:gsub("\\", "/")
+	local conf = get_tab_config(2, cwd)
 
 	vim.api.nvim_win_call(body_win, function()
-		local term_buf = M._dir_term_bufs[cwd]
+		local buf = M._dir_term_bufs[cwd]
 		vim.wo[body_win].winfixbuf = false
-		if term_buf == nil or not vim.api.nvim_buf_is_valid(term_buf) then
-			vim.cmd.terminal(get_terminal_command(cwd))
-			term_buf = vim.api.nvim_get_current_buf()
-			M._dir_term_bufs[cwd] = term_buf
-			bind_chat_keys(term_buf)
-			vim.api.nvim_exec_autocmds("User", {
-				pattern = "ZaucyChatTerminalBufCreated",
-				data = { terminal_bufnr = term_buf },
-			})
+		if buf == nil or not vim.api.nvim_buf_is_valid(buf) then
+			buf = open_tab_buf(2, cwd, conf)
+			M._dir_term_bufs[cwd] = buf
+			vim.api.nvim_win_set_buf(body_win, buf)
 		else
-			vim.api.nvim_win_set_buf(body_win, term_buf)
+			vim.api.nvim_win_set_buf(body_win, buf)
 		end
 		vim.wo[body_win].winfixbuf = true
 	end)
@@ -300,18 +438,21 @@ function Layout:get_geometry()
 	if width < 90 then
 		width = 90
 	end
-	if width > editor_width then
-		width = editor_width
+	local offset_x = 4
+	local offset_y_top = 2
+	local offset_y_bottom = math.max(5, (vim.o.cmdheight or 1) + (vim.o.laststatus > 0 and 1 or 0) + 3)
+	local max_width = math.max(1, editor_width - offset_x - 2)
+	if width > max_width then
+		width = max_width
 	end
 
-	local col = editor_width - width
-	-- Full height usually implies avoiding cmdline, but let's try to match full editor
-	-- Snacks used 0.999999 height, essentially full screen.
-	local height = editor_height
+	local col = math.max(1, editor_width - width - offset_x)
+	local row = offset_y_top
+	local height = math.max(1, editor_height - offset_y_top - offset_y_bottom)
 
 	return {
 		col = col,
-		row = 0,
+		row = row,
 		width = width,
 		height = height,
 	}
@@ -320,8 +461,7 @@ end
 function Layout:update_text()
 	local geo = self:get_geometry()
 	local btn1_width = 13
-	local border_w = M._is_fullscreen and 0 or 1
-	local cwd_btn_width = math.max(1, geo.width - (btn1_width + border_w))
+	local cwd_btn_width = math.max(1, geo.width - btn1_width)
 
 	if self.bufs.chat_btn and vim.api.nvim_buf_is_valid(self.bufs.chat_btn) then
 		-- Width 14.
@@ -350,6 +490,9 @@ function Layout:update_text()
 		local pad_right = padding_total - pad_left
 
 		local line_text = string.rep(" ", pad_left) .. cwd .. string.rep(" ", pad_right)
+		if #line_text > cwd_btn_width then
+			line_text = cwd:sub(-cwd_btn_width)
+		end
 		local empty_line = string.rep(" ", cwd_btn_width)
 
 		local lines = {
@@ -371,7 +514,6 @@ function Layout:mount()
 	local geo = self:get_geometry()
 	local header_height = 3
 	local btn1_width = 13
-	local border_w = M._is_fullscreen and 0 or 1
 
 	-- Create Buffers if needed
 	if not self.bufs.chat_btn or not vim.api.nvim_buf_is_valid(self.bufs.chat_btn) then
@@ -387,7 +529,7 @@ function Layout:mount()
 	self:update_text()
 	update_button_state()
 
-	-- Chat Button Window
+	-- Chat Button Window (top-left rounded corner, top border, left border)
 	self.wins.chat_btn = vim.api.nvim_open_win(self.bufs.chat_btn, false, {
 		relative = "editor",
 		row = geo.row,
@@ -395,42 +537,57 @@ function Layout:mount()
 		width = btn1_width,
 		height = header_height,
 		style = "minimal",
-		border = M._is_fullscreen and "none" or { "", "", "", "", "", "", "", "│" },
-		focusable = false,
+		border = M._is_fullscreen and "none" or { "╭", "─", "", "", "", "", "", "│" },
+		focusable = true,
 		zindex = 50,
 	})
 	setup_window_props(self.wins.chat_btn)
 	vim.wo[self.wins.chat_btn].wrap = false
 	vim.wo[self.wins.chat_btn].winfixbuf = true
 
-	-- CWD Button Window
-	-- Shifted by btn1_width + border_w (border)
+	local border_w = M._is_fullscreen and 0 or 1
+
+	-- CWD Button Window (top border, top-right rounded corner, right border)
 	self.wins.cwd_btn = vim.api.nvim_open_win(self.bufs.cwd_btn, false, {
 		relative = "editor",
 		row = geo.row,
 		col = geo.col + btn1_width + border_w,
-		width = math.max(1, geo.width - (btn1_width + border_w)),
+		width = math.max(1, geo.width - btn1_width),
 		height = header_height,
 		style = "minimal",
-		border = "none",
-		focusable = false,
+		border = M._is_fullscreen and "none" or { "", "─", "╮", "│", "", "", "", "" },
+		focusable = true,
 		zindex = 50,
 	})
 	setup_window_props(self.wins.cwd_btn)
 	vim.wo[self.wins.cwd_btn].wrap = false
 	vim.wo[self.wins.cwd_btn].winfixbuf = true
 
-	-- Body Window (we don't open with a specific buffer yet, will be set later)
+	vim.keymap.set({ "n", "v" }, "<LeftMouse>", function()
+		M.chat_switch_tab(1)
+		if self.wins.body and vim.api.nvim_win_is_valid(self.wins.body) then
+			vim.api.nvim_set_current_win(self.wins.body)
+		end
+	end, { buffer = self.bufs.chat_btn, silent = true })
+
+	vim.keymap.set({ "n", "v" }, "<LeftMouse>", function()
+		M.chat_switch_tab(2)
+		if self.wins.body and vim.api.nvim_win_is_valid(self.wins.body) then
+			vim.api.nvim_set_current_win(self.wins.body)
+		end
+	end, { buffer = self.bufs.cwd_btn, silent = true })
+
+	-- Body Window (divider line with T-junctions at top, left and right borders, bottom rounded corners)
 	-- Use a temp buffer initially
 	local body_buf = vim.api.nvim_create_buf(false, true)
 	self.wins.body = vim.api.nvim_open_win(body_buf, true, {
 		relative = "editor",
 		row = geo.row + header_height + 1,
 		col = geo.col,
-		width = math.max(1, geo.width - border_w),
+		width = geo.width,
 		height = math.max(1, geo.height - header_height - 1),
 		style = "minimal",
-		border = M._is_fullscreen and "none" or { "", "", "", "", "", "", "", "│" },
+		border = M._is_fullscreen and "none" or { "├", "─", "┤", "│", "╯", "─", "╰", "│" },
 		focusable = true,
 		zindex = 50,
 	})
@@ -440,10 +597,64 @@ function Layout:mount()
 
 	self.augroup = vim.api.nvim_create_augroup("ZaucyChatLayout_" .. self.wins.body, { clear = true })
 
+	vim.api.nvim_create_autocmd("WinEnter", {
+		group = self.augroup,
+		callback = function()
+			local cur_win = vim.api.nvim_get_current_win()
+			if cur_win == self.wins.chat_btn then
+				M.chat_switch_tab(1)
+				if self.wins.body and vim.api.nvim_win_is_valid(self.wins.body) then
+					vim.schedule(function()
+						if self.wins.body and vim.api.nvim_win_is_valid(self.wins.body) then
+							vim.api.nvim_set_current_win(self.wins.body)
+						end
+					end)
+				end
+			elseif cur_win == self.wins.cwd_btn then
+				M.chat_switch_tab(2)
+				if self.wins.body and vim.api.nvim_win_is_valid(self.wins.body) then
+					vim.schedule(function()
+						if self.wins.body and vim.api.nvim_win_is_valid(self.wins.body) then
+							vim.api.nvim_set_current_win(self.wins.body)
+						end
+					end)
+				end
+			end
+		end,
+	})
+
+	vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
+		group = self.augroup,
+		callback = function(args)
+			local cur_win = vim.api.nvim_get_current_win()
+			if cur_win == self.wins.body then
+				local buf = args.buf or vim.api.nvim_win_get_buf(cur_win)
+				if buf and vim.api.nvim_buf_is_valid(buf) then
+					bind_chat_keys(buf)
+					vim.api.nvim_exec_autocmds("User", {
+						pattern = "ZaucyChatBufCreated",
+						data = { bufnr = buf, tab_index = M._active_tab_index },
+					})
+					if M._active_tab_index == 1 then
+						M._chat_term_buf = buf
+					elseif M._active_tab_index == 2 then
+						local tabpage = vim.api.nvim_get_current_tabpage()
+						local cwd = vim.fn.getcwd(-1, tabpage):gsub("\\", "/")
+						M._dir_term_bufs[cwd] = buf
+					end
+				end
+			end
+		end,
+	})
+
 	-- Cleanup Autocmd (if any window is closed via :q etc)
 	vim.api.nvim_create_autocmd("WinClosed", {
 		group = self.augroup,
-		pattern = { tostring(self.wins.body), tostring(self.wins.chat_btn), tostring(self.wins.cwd_btn) },
+		pattern = {
+			tostring(self.wins.body),
+			tostring(self.wins.chat_btn),
+			tostring(self.wins.cwd_btn),
+		},
 		callback = function()
 			vim.schedule(function()
 				self:unmount()
@@ -474,7 +685,6 @@ function Layout:resize()
 	local geo = self:get_geometry()
 	local header_height = 3
 	local btn1_width = 13
-	local border_w = M._is_fullscreen and 0 or 1
 
 	if self.wins.chat_btn and vim.api.nvim_win_is_valid(self.wins.chat_btn) then
 		vim.api.nvim_win_set_config(self.wins.chat_btn, {
@@ -483,17 +693,20 @@ function Layout:resize()
 			col = geo.col,
 			width = btn1_width,
 			height = header_height,
-			border = M._is_fullscreen and "none" or { "", "", "", "", "", "", "", "│" },
+			border = M._is_fullscreen and "none" or { "╭", "─", "", "", "", "", "", "│" },
 		})
 	end
+
+	local border_w = M._is_fullscreen and 0 or 1
 
 	if self.wins.cwd_btn and vim.api.nvim_win_is_valid(self.wins.cwd_btn) then
 		vim.api.nvim_win_set_config(self.wins.cwd_btn, {
 			relative = "editor",
 			row = geo.row,
 			col = geo.col + btn1_width + border_w,
-			width = math.max(1, geo.width - (btn1_width + border_w)),
+			width = math.max(1, geo.width - btn1_width),
 			height = header_height,
+			border = M._is_fullscreen and "none" or { "", "─", "╮", "│", "", "", "", "" },
 		})
 	end
 
@@ -502,9 +715,9 @@ function Layout:resize()
 			relative = "editor",
 			row = geo.row + header_height + 1,
 			col = geo.col,
-			width = math.max(1, geo.width - border_w),
+			width = geo.width,
 			height = math.max(1, geo.height - header_height - 1),
-			border = M._is_fullscreen and "none" or { "", "", "", "", "", "", "", "│" },
+			border = M._is_fullscreen and "none" or { "├", "─", "┤", "│", "╯", "─", "╰", "│" },
 		})
 	end
 
@@ -595,7 +808,6 @@ local function ensure_layout()
 	-- Initialize content
 	ensure_chat_term_buf(tabpage, state)
 
-	vim.cmd.startinsert()
 	M._update_loading_overlay()
 
 	return state
@@ -777,21 +989,25 @@ function M._update_transparency()
 					local config = vim.api.nvim_win_get_config(win)
 					if config.border then
 						if type(config.border) == "string" and config.border ~= "none" then
+							win_r = win_r - 1
+							win_c = win_c - 1
 							win_w = win_w + 2
 							win_h = win_h + 2
 						elseif type(config.border) == "table" then
 							local b = config.border
 							if #b >= 8 then
-								if b[1] ~= "" then
+								if b[1] ~= "" or b[2] ~= "" or b[3] ~= "" then
 									win_h = win_h + 1
+									win_r = win_r - 1
 								end -- top
-								if b[5] ~= "" then
+								if b[5] ~= "" or b[6] ~= "" or b[7] ~= "" then
 									win_h = win_h + 1
 								end -- bottom
-								if b[7] ~= "" then
+								if b[7] ~= "" or b[8] ~= "" or b[1] ~= "" then
 									win_w = win_w + 1
+									win_c = win_c - 1
 								end -- left
-								if b[3] ~= "" then
+								if b[3] ~= "" or b[4] ~= "" or b[5] ~= "" then
 									win_w = win_w + 1
 								end -- right
 							end
@@ -859,12 +1075,35 @@ function M.set_dir_loading(dir, loading)
 	end
 end
 
+function M._apply_tab_mode(win, tab_index)
+	if not win or not vim.api.nvim_win_is_valid(win) then
+		return
+	end
+	local tabpage = vim.api.nvim_get_current_tabpage()
+	local orig_cwd = vim.fn.getcwd(0, 0)
+	local dir = (tab_index == 1) and (M._opts.chat_scratch_dir or orig_cwd) or vim.fn.getcwd(-1, tabpage):gsub("\\", "/")
+	local conf = get_tab_config(tab_index, dir)
+	local buf = vim.api.nvim_win_get_buf(win)
+	local is_term = vim.bo[buf].buftype == "terminal"
+
+	local mode = conf.mode
+	if mode == nil then
+		mode = is_term and "insert" or "normal"
+	end
+
+	if mode == "insert" then
+		vim.cmd.startinsert()
+	else
+		vim.cmd.stopinsert()
+	end
+end
+
 function M.chat_show()
 	local state = ensure_layout()
 	-- ensure_layout mounts the layout, which effectively "unhides" it
 	if state.layout and state.layout.wins.body and vim.api.nvim_win_is_valid(state.layout.wins.body) then
 		vim.api.nvim_set_current_win(state.layout.wins.body)
-		vim.cmd.startinsert()
+		M._apply_tab_mode(state.layout.wins.body, M._active_tab_index)
 		M._update_loading_overlay()
 	end
 end
@@ -923,7 +1162,7 @@ function M.chat_focus()
 
 		if state.layout and state.layout.wins.body then
 			vim.api.nvim_set_current_win(state.layout.wins.body)
-			vim.cmd.startinsert()
+			M._apply_tab_mode(state.layout.wins.body, M._active_tab_index)
 		end
 	end
 end
@@ -960,6 +1199,20 @@ function M.chat_switch_tab(index)
 	-- Ensure layout exists and is valid
 	local state = ensure_layout()
 
+	-- Save the active buffer of the current tab before switching
+	if state.layout and state.layout.wins.body and vim.api.nvim_win_is_valid(state.layout.wins.body) then
+		local cur_buf = vim.api.nvim_win_get_buf(state.layout.wins.body)
+		if cur_buf and vim.api.nvim_buf_is_valid(cur_buf) then
+			if M._active_tab_index == 1 then
+				M._chat_term_buf = cur_buf
+			elseif M._active_tab_index == 2 then
+				local tabpage = vim.api.nvim_get_current_tabpage()
+				local cur_cwd = vim.fn.getcwd(-1, tabpage):gsub("\\", "/")
+				M._dir_term_bufs[cur_cwd] = cur_buf
+			end
+		end
+	end
+
 	-- We have 2 "tabs" in the UI (buttons)
 	local num_tabs = 2
 
@@ -971,6 +1224,13 @@ function M.chat_switch_tab(index)
 	for tabpage, other_state in pairs(M._tabpage_state) do
 		ensure_chat_term_buf(tabpage, other_state)
 	end
+
+	if state.layout and state.layout.wins.body and vim.api.nvim_win_is_valid(state.layout.wins.body) then
+		if M.chat_is_focused() then
+			M._apply_tab_mode(state.layout.wins.body, M._active_tab_index)
+		end
+	end
+
 	M._update_loading_overlay()
 end
 

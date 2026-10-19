@@ -6,9 +6,10 @@ vim.keymap.set("n", "<leader>vc", "<cmd>Vp4Reopen<cr>", { desc = "Perforce chang
 vim.keymap.set("n", "<leader>vq", "<cmd>Vp4Filelog<cr>", { desc = "Perforce file log (quickfix)" })
 vim.keymap.set("n", "<leader>v.", "<cmd>Vp4Diff<cr>", { desc = "Perforce file diff" })
 
-vim.keymap.set("n", "<leader>vs", "<cmd>e oil-p4://default/<cr>")
-vim.keymap.set("n", "<leader>voa", "<cmd>e oil-p4://opened/<cr>")
-vim.keymap.set("n", "<leader>vh", "<cmd>e oil-p4://history/<cr>")
+-- vim.keymap.set("n", "<leader>vs", "<cmd>e oil-p4://default/<cr>")
+-- vim.keymap.set("n", "<leader>voa", "<cmd>e oil-p4://opened/<cr>")
+-- vim.keymap.set("n", "<leader>vh", "<cmd>e oil-p4://history/<cr>")
 
 require("perforce.plugins.signs").setup()
-require("perforce.plugins.oil").setup()
+-- require("perforce.plugins.oil").setup()
+-- require("perforce.plugins.crude").setup()

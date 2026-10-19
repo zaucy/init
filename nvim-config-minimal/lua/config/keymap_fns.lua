@@ -136,4 +136,8 @@ function M.do_fzf(cmd, opts)
 	end
 end
 
+function M.explore()
+	require("crude").explore()
+end
+
 return M
